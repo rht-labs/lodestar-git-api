@@ -32,7 +32,7 @@ objects:
           deploymentconfig: "${NAME}"
       spec:
         containers:
-          image: "${IMAGE_NAME}:${IMAGE_TAG}"
+        - image: "${IMAGE_NAME}:${IMAGE_TAG}"
           imagePullPolicy: Always
           name: "${NAME}"
           ports:
