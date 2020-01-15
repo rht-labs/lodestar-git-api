@@ -1,19 +1,19 @@
 build_vars:
-  NAME: git-api
-  GIT_URL: https://github.com/rht-labs/git-api.git
+  NAME: omp-git-api
+  GIT_URL: https://github.com/rht-labs/open-management-portal-git-api.git
   GIT_REF: master
-  OUTPUT_IMAGE_NAME: git-api
+  OUTPUT_IMAGE_NAME: omp-git-api
   OUTPUT_IMAGE_TAG: latest
   BUILDER_IMAGE_NAME: quay.io/quarkus/ubi-quarkus-native-s2i
   BUILDER_IMAGE_TAG: 19.2.1
 
 deploy_vars:
-  NAME: git-api
-  IMAGE_NAME: git-api
+  NAME: omp-git-api
+  IMAGE_NAME: omp-git-api
   IMAGE_TAG: latest
 
 openshift_cluster_content:
-- object: git-api
+- object: omp-git-api
   content:
   - name: build
     template: '{{ inventory_dir }}/../templates/build.yml'
