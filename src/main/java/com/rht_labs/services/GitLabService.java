@@ -5,11 +5,13 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-import com.rht_labs.models.CreateProject;
+import com.rht_labs.models.CreateProjectResponse;
 
 @Path("/api/v4")
 @RegisterRestClient(configKey="gitlab_service")
@@ -32,5 +34,15 @@ public interface GitLabService {
     @Path("/projects")
     @Produces("application/json")
     // passthrough so no need  
-    Response createNewProject (Object createProject);
+    CreateProjectResponse createNewProject (Object createProject);
+
+
+    @POST
+    @Path("/projects/{id}/repository/files/{file_path}")
+    @Produces("application/json")
+    // passthrough so no need  
+    Response editFileInRepo (@PathParam Integer id, 
+                            @PathParam String file_path, 
+                            Object configurationToWriteToGitLabAndSomeOtherStuff);
+
 }
