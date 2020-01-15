@@ -28,3 +28,6 @@ Or you can use Docker to build the native executable using: `mvn package -Pnativ
 You can then execute your binary: `./target/open-management-portal-git-api-1.0.0-SNAPSHOT-runner`
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/building-native-image-guide .
+
+## Add basic JDG to OCP
+oc new-app cache-service -p APPLICATION_USER=omp -p APPLICATION_PASSWORD=<PASSWORD> -p TOTAL_CONTAINER_MEM=4096 -p EVICTION_POLICY=reject -n <PROJECT_NAME>
