@@ -7,10 +7,10 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.CDI;
 
 @ApplicationScoped
-@ConfigProperties(prefix = "gitlab")
 public class GitLabConfig {
-    @ConfigProperty(name = "personal.access.token")
-    private String personalAccessToken;
+    //  TODO - figure out what went wrong with this approach
+    @ConfigProperty(name = "gitlab.personal.access.token")
+    public String personalAccessToken;
 
     public String getPersonalAccessToken() {
         return personalAccessToken;
