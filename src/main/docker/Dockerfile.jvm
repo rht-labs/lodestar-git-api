@@ -7,11 +7,11 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.jvm -t quarkus/open-management-portal-integration-jvm .
+# docker build -f src/main/docker/Dockerfile.jvm -t quarkus/git-api-jvm .
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 quarkus/open-management-portal-integration-jvm
+# docker run -i --rm -p 8080:8080 quarkus/git-api-jvm
 #
 ###
 FROM fabric8/java-alpine-openjdk8-jre:1.6.5
