@@ -12,11 +12,14 @@ public class CreateFileRequest {
     public String filePath;
 
     @JsonbProperty("content")
-    public String content;
+    public Object content;
 
     @JsonbProperty("branch")
     public String branch = "master";
 
     @JsonbProperty("comment")
     public String comment;
+
+    @JsonbProperty("convert_to")
+    public Conversion convertTo = Conversion.NONE;
 }

@@ -1,5 +1,8 @@
 package com.rht_labs.omp.resources;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.rht_labs.omp.models.CreateFileRequest;
 import com.rht_labs.omp.models.CreateProjectRequest;
 import com.rht_labs.omp.models.GitLabCreateFileInRepositoryRequest;
@@ -26,7 +29,7 @@ public class ProjectsResource {
 
     @PUT
     public Object createFileInRepository(CreateFileRequest request) {
-        GitLabCreateFileInRepositoryRequest gitLabRequest = new GitLabCreateFileInRepositoryRequest(request.filePath, request.branch, request.comment, request.content);
+        GitLabCreateFileInRepositoryRequest gitLabRequest = new GitLabCreateFileInRepositoryRequest(request.filePath, request.branch, request.comment, convertJson(request));
         return gitLabService.createFileInRepository(request.projectId, request.filePath, gitLabRequest);
     }
 
@@ -35,27 +38,23 @@ public class ProjectsResource {
         GitLabCreateProjectRequest gitLabRequest = new GitLabCreateProjectRequest();
         gitLabRequest.name = request.residencyName;
         return gitLabService.createNewProject(gitLabRequest);
+    }
 
-//        // 1. Create YAML from request obj
-//        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-//        try {
-//            String yaml = mapper.writeValueAsString(request);
-//
-//            // 2. Add base64 encoded yaml to content key
-//            EditFileInGitRequest configurationToWriteToGitLabAndSomeOtherStuff = new EditFileInGitRequest();
-//            configurationToWriteToGitLabAndSomeOtherStuff.content = Base64.getEncoder().encodeToString(yaml.getBytes());
-//            configurationToWriteToGitLabAndSomeOtherStuff.file_path = request.fileName;
-//
-//            // 3. send req to gitlab with new id of project and set filename (url encoded)
-//            // String fileName = URLEncoder.encode(body.fileName, StandardCharsets.UTF_8.toString());
-//            return gitLabService.editFileInRepo(gitlabResponse.id, request.fileName,
-//                                    configurationToWriteToGitLabAndSomeOtherStuff).getEntity();
-//
-//        } catch (Throwable err) {
-//            // todo something with err #YOLO
-//            err.printStackTrace();
-//            return null;
-//        }
-        
+    private static byte[] convertJson(CreateFileRequest request) {
+        try {
+            ObjectMapper objectMapper;
+
+            switch (request.convertTo) {
+                case YAML:
+                    objectMapper = new ObjectMapper(new YAMLFactory());
+                    break;
+                default:
+                    objectMapper = new ObjectMapper();
+            }
+
+            return objectMapper.writeValueAsBytes(request.content);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

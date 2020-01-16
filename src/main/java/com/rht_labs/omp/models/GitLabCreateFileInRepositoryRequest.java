@@ -36,13 +36,6 @@ public class GitLabCreateFileInRepositoryRequest {
     private byte[] base64Content;
     private String urlEncodedFilePath;
 
-    public GitLabCreateFileInRepositoryRequest(String filePath, String branch, String commitMessage, String content) {
-        this.branch = branch;
-        this.commitMessage = commitMessage;
-        setContent(content);
-        setFilePath(filePath);
-    }
-
     public GitLabCreateFileInRepositoryRequest(String filePath, String branch, String commitMessage, byte[] content) {
         this.branch = branch;
         this.commitMessage = commitMessage;
