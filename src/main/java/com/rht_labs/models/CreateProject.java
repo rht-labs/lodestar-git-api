@@ -6,5 +6,6 @@ public class CreateProject {
     // base64 encoded or string?
     public String clusterName;
     public String region;
+    public String fileName;
     // what about additional file contnet?
 }
