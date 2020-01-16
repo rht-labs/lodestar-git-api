@@ -51,7 +51,7 @@ pipeline{
                     // Arbitrary Groovy Script executions can do in script tags
                     env.PROJECT_NAMESPACE = "${NAMESPACE_PREFIX}-test"
                     env.NODE_ENV = "test"
-                    env.SPRING_PROFILES_ACTIVE = "openshift-test"
+                    env.QUARKUS_PROFILE = "openshift-test"
                     env.RELEASE = true
                 }
             }
@@ -70,7 +70,7 @@ pipeline{
                     // Arbitrary Groovy Script executions can do in script tags
                     env.PROJECT_NAMESPACE = "${NAMESPACE_PREFIX}-dev"
                     env.NODE_ENV = "dev"
-                    env.SPRING_PROFILES_ACTIVE = "openshift-dev"
+                    env.QUARKUS_PROFILE = "openshift-dev"
                 }
             }
         }
