@@ -3,14 +3,11 @@ package com.rht_labs.omp.models;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CreateProjectResponse {
+public class GitLabCreateProjectResponse {
     public Integer id;
     public Object description;
     public String name;
-    public String nameWithNamespace;
     public String path;
-    public String pathWithNamespace;
-    public String createdAt;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     public Map<String, Object> getAdditionalProperties() {

@@ -3,7 +3,7 @@ package com.rht_labs.omp.models;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EditFileInGit {
+public class EditFileInGitRequest {
     public String branch = "master";
     public String author_email = "auto@changeme.com";
     public String encoding = "base64";
