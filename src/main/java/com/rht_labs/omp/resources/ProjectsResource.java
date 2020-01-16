@@ -1,19 +1,15 @@
 package com.rht_labs.omp.resources;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.rht_labs.omp.models.CreateFileRequest;
 import com.rht_labs.omp.models.CreateProjectRequest;
-import com.rht_labs.omp.models.EditFileInGitRequest;
+import com.rht_labs.omp.models.GitLabCreateFileInRepositoryRequest;
 import com.rht_labs.omp.models.GitLabCreateProjectRequest;
-import com.rht_labs.omp.models.GitLabCreateProjectResponse;
 import com.rht_labs.omp.services.GitLabService;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.Base64;
 
 @Path("/api/projects")
 @Produces(MediaType.APPLICATION_JSON)
@@ -23,18 +19,22 @@ public class ProjectsResource {
     @RestClient
     protected GitLabService gitLabService;
 
-    // TODO - add query string to filter by thing eg region, age etc
     @GET
     public Object listAllProjects() {
         return gitLabService.getProjects().getEntity();
+    }
+
+    @PUT
+    public Object createFileInRepository(CreateFileRequest request) {
+        GitLabCreateFileInRepositoryRequest gitLabRequest = new GitLabCreateFileInRepositoryRequest(request.filePath, request.branch, request.comment, request.content);
+        return gitLabService.createFileInRepository(request.projectId, request.filePath, gitLabRequest);
     }
 
     @POST
     public Object createNewProject(CreateProjectRequest request) {
         GitLabCreateProjectRequest gitLabRequest = new GitLabCreateProjectRequest();
         gitLabRequest.name = request.residencyName;
-        GitLabCreateProjectResponse gitlabResponse = gitLabService.createNewProject(gitLabRequest);
-        return gitlabResponse;
+        return gitLabService.createNewProject(gitLabRequest);
 
 //        // 1. Create YAML from request obj
 //        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());

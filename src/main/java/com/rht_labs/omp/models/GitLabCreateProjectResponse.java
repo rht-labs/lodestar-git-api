@@ -8,6 +8,7 @@ public class GitLabCreateProjectResponse {
     public Object description;
     public String name;
     public String path;
+
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     public Map<String, Object> getAdditionalProperties() {

@@ -1,4 +1,5 @@
 .applier/roles
+.idea/
 
 # Created by https://www.gitignore.io/api/code,java,linux,macos,windows,eclipse,java-web,intellij
 # Edit at https://www.gitignore.io/?templates=code,java,linux,macos,windows,eclipse,java-web,intellij
@@ -105,6 +106,7 @@ local.properties
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries
+.idea/libraries
 
 # Gradle and Maven with auto-import
 # When using Gradle or Maven with auto-import, you should exclude module files,
