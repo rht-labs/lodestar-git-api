@@ -1,7 +1,5 @@
-package com.rht_labs.resources;
+package com.rht_labs.omp.resources;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import javax.inject.Inject;
@@ -14,10 +12,10 @@ import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rht_labs.models.CreateProject;
-import com.rht_labs.models.CreateProjectResponse;
-import com.rht_labs.models.EditFileInGit;
-import com.rht_labs.services.GitLabService;
+import com.rht_labs.omp.models.CreateProject;
+import com.rht_labs.omp.models.CreateProjectResponse;
+import com.rht_labs.omp.models.EditFileInGit;
+import com.rht_labs.omp.services.GitLabService;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
@@ -25,7 +23,6 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ProjectsResource {
-
     @Inject
     @RestClient
     private GitLabService gitLabService;

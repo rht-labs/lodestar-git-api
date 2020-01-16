@@ -1,4 +1,4 @@
-package com.rht_labs.models;
+package com.rht_labs.omp.models;
 
 public class CreateProject {
     // name of new residency
