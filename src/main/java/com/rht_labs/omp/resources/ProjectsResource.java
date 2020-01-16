@@ -13,6 +13,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.nio.charset.StandardCharsets;
 
 @Path("/api/projects")
 @Produces(MediaType.APPLICATION_JSON)
@@ -29,8 +30,14 @@ public class ProjectsResource {
 
     @PUT
     public Object createFileInRepository(CreateFileRequest request) {
-        GitLabCreateFileInRepositoryRequest gitLabRequest = new GitLabCreateFileInRepositoryRequest(request.filePath, request.branch, request.comment, convertJson(request));
+        GitLabCreateFileInRepositoryRequest gitLabRequest = new GitLabCreateFileInRepositoryRequest(request.filePath, request.branch, request.comment, convert(request));
         return gitLabService.createFileInRepository(request.projectId, request.filePath, gitLabRequest);
+    }
+
+    @DELETE
+    @Path("{project_id}")
+    public Object deleteProject(@PathParam("project_id") String projectId) {
+        return gitLabService.deleteProject(projectId);
     }
 
     @POST
@@ -40,16 +47,23 @@ public class ProjectsResource {
         return gitLabService.createNewProject(gitLabRequest);
     }
 
-    private static byte[] convertJson(CreateFileRequest request) {
+    private static byte[] convert(CreateFileRequest request) {
         try {
             ObjectMapper objectMapper;
 
-            switch (request.convertTo) {
+            switch (request.outputFormat) {
                 case YAML:
                     objectMapper = new ObjectMapper(new YAMLFactory());
                     break;
-                default:
+                case JSON:
                     objectMapper = new ObjectMapper();
+                    break;
+                default:
+                    if (request.content instanceof String) {
+                        return ((String)request.content).getBytes(StandardCharsets.UTF_8);
+                    } else {
+                        throw new RuntimeException("Unsupported content format");
+                    }
             }
 
             return objectMapper.writeValueAsBytes(request.content);

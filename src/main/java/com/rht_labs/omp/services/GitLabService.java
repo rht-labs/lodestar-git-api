@@ -1,6 +1,5 @@
 package com.rht_labs.omp.services;
 
-import com.rht_labs.omp.models.CreateProjectRequest;
 import com.rht_labs.omp.models.GitLabCreateFileInRepositoryRequest;
 import com.rht_labs.omp.models.GitLabCreateProjectRequest;
 import com.rht_labs.omp.models.GitLabCreateProjectResponse;
@@ -8,10 +7,7 @@ import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 @Path("/api/v4")
@@ -24,6 +20,12 @@ public interface GitLabService {
     @Produces("application/json")
     Response getProjects();
 
+    // reference: https://docs.gitlab.com/ee/api/projects.html#remove-project
+    @DELETE
+    @Path("/projects/{id}")
+    @Produces("application/json")
+    Response deleteProject(@PathParam("id") @Encoded String projectId);
+
     // reference: https://docs.gitlab.com/ee/api/projects.html#create-project
     @POST
     @Path("/projects")
@@ -34,5 +36,5 @@ public interface GitLabService {
     @POST
     @Path("/projects/{id}/repository/files/{file_path}")
     @Produces("application/json")
-    Response createFileInRepository(@PathParam("id") Integer projectId, @PathParam("file_path") String filePath, GitLabCreateFileInRepositoryRequest request);
+    Response createFileInRepository(@PathParam("id") @Encoded String projectId, @PathParam("file_path") @Encoded String filePath, GitLabCreateFileInRepositoryRequest request);
 }
