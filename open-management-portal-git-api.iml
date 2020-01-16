@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" version="4">
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
@@ -90,7 +90,6 @@
     <orderEntry type="library" name="Maven: io.quarkus:quarkus-core:1.1.1.Final" level="project" />
     <orderEntry type="library" name="Maven: io.smallrye.config:smallrye-config:1.5.1" level="project" />
     <orderEntry type="library" name="Maven: io.smallrye.config:smallrye-config-common:1.5.1" level="project" />
-    <orderEntry type="library" name="Maven: org.jboss.logmanager:jboss-logmanager-embedded:1.0.4" level="project" />
     <orderEntry type="library" name="Maven: org.jboss.logging:jboss-logging-annotations:2.1.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.jboss.threads:jboss-threads:3.0.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.29" level="project" />
@@ -215,6 +214,8 @@
     <orderEntry type="library" name="Maven: org.infinispan.protostream:protostream:4.3.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.infinispan:infinispan-query-dsl:10.0.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.infinispan.protostream:protostream-processor:4.3.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.quarkus:quarkus-logging-json:1.1.1.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.jboss.logmanager:jboss-logmanager-embedded:1.0.4" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.9.2" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.9.10" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.9.10" level="project" />
