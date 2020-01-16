@@ -7,6 +7,11 @@ import org.infinispan.client.hotrod.RemoteCacheManager;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+/**
+ * A very simple facade to write the cache data to remote JDG caches.
+ *
+ * @author faisalmasood
+ */
 @Singleton
 public class DataCache {
 
