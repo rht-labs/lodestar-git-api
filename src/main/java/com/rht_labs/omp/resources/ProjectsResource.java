@@ -1,23 +1,18 @@
 package com.rht_labs.omp.resources;
 
-import java.util.Base64;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.rht_labs.omp.models.CreateFileRequest;
+import com.rht_labs.omp.models.CreateProjectRequest;
+import com.rht_labs.omp.models.GitLabCreateFileInRepositoryRequest;
+import com.rht_labs.omp.models.GitLabCreateProjectRequest;
+import com.rht_labs.omp.services.GitLabService;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rht_labs.omp.models.CreateProject;
-import com.rht_labs.omp.models.CreateProjectResponse;
-import com.rht_labs.omp.models.EditFileInGit;
-import com.rht_labs.omp.services.GitLabService;
-
-import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 @Path("/api/projects")
 @Produces(MediaType.APPLICATION_JSON)
@@ -25,43 +20,41 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 public class ProjectsResource {
     @Inject
     @RestClient
-    private GitLabService gitLabService;
+    protected GitLabService gitLabService;
 
-    // TODO - add query string to filter by thing eg region, age etc
     @GET
     public Object listAllProjects() {
         return gitLabService.getProjects().getEntity();
     }
 
+    @PUT
+    public Object createFileInRepository(CreateFileRequest request) {
+        GitLabCreateFileInRepositoryRequest gitLabRequest = new GitLabCreateFileInRepositoryRequest(request.filePath, request.branch, request.comment, convertJson(request));
+        return gitLabService.createFileInRepository(request.projectId, request.filePath, gitLabRequest);
+    }
+
     @POST
-    public Object createNewProject(CreateProject body) {
-        // edit and strip out just the name field
+    public Object createNewProject(CreateProjectRequest request) {
+        GitLabCreateProjectRequest gitLabRequest = new GitLabCreateProjectRequest();
+        gitLabRequest.name = request.residencyName;
+        return gitLabService.createNewProject(gitLabRequest);
+    }
 
-        // 🥰 SEXY code here.... Be in awe of the JavaScript developer writing Java 😂 
-        String awesomeRequestObject = "{\"name\":\"" + body.name + "\"}";
-        // TODO - what heppens if this errors?
-        CreateProjectResponse gitlabResponse = gitLabService.createNewProject(awesomeRequestObject);
-
-        // 1. Create YAML from request obj
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    private static byte[] convertJson(CreateFileRequest request) {
         try {
-            String yaml = mapper.writeValueAsString(body);
+            ObjectMapper objectMapper;
 
-            // 2. Add base64 encoded yaml to content key
-            EditFileInGit configurationToWriteToGitLabAndSomeOtherStuff = new EditFileInGit();
-            configurationToWriteToGitLabAndSomeOtherStuff.content = Base64.getEncoder().encodeToString(yaml.getBytes());
-            configurationToWriteToGitLabAndSomeOtherStuff.file_path = body.fileName;
+            switch (request.convertTo) {
+                case YAML:
+                    objectMapper = new ObjectMapper(new YAMLFactory());
+                    break;
+                default:
+                    objectMapper = new ObjectMapper();
+            }
 
-            // 3. send req to gitlab with new id of project and set filename (url encoded)
-            // String fileName = URLEncoder.encode(body.fileName, StandardCharsets.UTF_8.toString());
-            return gitLabService.editFileInRepo(gitlabResponse.id, body.fileName,
-                                    configurationToWriteToGitLabAndSomeOtherStuff).getEntity();
-    
-        } catch (Throwable err) {
-            // todo something with err #YOLO
-            err.printStackTrace();
-            return null;
+            return objectMapper.writeValueAsBytes(request.content);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
-        
     }
 }
