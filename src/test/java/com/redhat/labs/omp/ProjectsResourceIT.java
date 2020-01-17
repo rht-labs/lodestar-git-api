@@ -3,10 +3,7 @@ package com.redhat.labs.omp;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import static io.restassured.RestAssured.given;
 
@@ -15,8 +12,8 @@ public class ProjectsResourceIT {
     public static final String NAMESPACE = "lab20";
     public static final String PROJECT_NAME = "quarkus-integration-test";
 
-    @BeforeAll
-    public static void init() {
+    @BeforeEach
+    public void init() {
         try {
             createProject(false);
         } catch (Throwable e) {
@@ -24,10 +21,11 @@ public class ProjectsResourceIT {
         }
     }
 
-    @AfterAll
-    public static void teardown() {
+    @AfterEach
+    public void teardown() {
         try {
             deleteProject(false);
+            Thread.sleep(1000);
         } catch (Throwable e) {
             // ignored by design
         }
@@ -96,12 +94,6 @@ public class ProjectsResourceIT {
     public void testDeleteProject() throws InterruptedException {
         // delete the project
         deleteProject(true);
-
-        // wait a while after deletion, real GitLab is slow
-        Thread.sleep(1000);
-
-        // create the project
-        createProject(false);
     }
 
     @Test
