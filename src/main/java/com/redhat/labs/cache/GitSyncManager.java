@@ -1,10 +1,12 @@
 package com.redhat.labs.cache;
 
+import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -25,25 +27,22 @@ import javax.inject.Singleton;
 @Singleton
 public class GitSyncManager {
 
-    public static Logger logger = LoggerFactory.getLogger(GitSyncManager.class);
+        public static Logger logger = LoggerFactory.getLogger(GitSyncManager.class);
 
 
 
     @Inject
     Vertx vertx;
 
-/*    //init all the listeners for the vertx event bus - a utility method
     @PostConstruct
-    public void init() {
+            public void init(){
+        this.dataCache = new ResidencyDataCache();
+    }
 
-        logger.info("Adding default consumers....");
-//        vertx.eventBus().<JsonObject>consumer(CreateProjectEventHandler.CHANNEL_CREATE_PROJECT_EVENT, new CreateProjectEventHandler()::handleEvent).exceptionHandler(Throwable::printStackTrace);
-//        vertx.eventBus().<JsonObject>consumer(GetAllProjectEventHandler.CHANNEL_GET_ALL_PROJECT_EVENTS, new GetAllProjectEventHandler()::handleEvent).exceptionHandler(Throwable::printStackTrace);
-//
-        //addEventHandler(CreateProjectEventHandler.CHANNEL_CREATE_PROJECT_EVENT, new CreateProjectEventHandler());
-    }*/
+    ResidencyDataCache dataCache;
 
     public void addEventHandler(String channelName, EventHandler eventHandler) {
+        eventHandler.setPersistenceStore(dataCache);
         vertx.eventBus().<JsonObject>consumer(channelName, eventHandler::handleEvent).exceptionHandler(Throwable::printStackTrace);
 
     }

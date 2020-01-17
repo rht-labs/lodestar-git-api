@@ -1,5 +1,6 @@
 package com.redhat.labs.cache.eventHandlers;
 
+import com.redhat.labs.cache.ResidencyDataStore;
 import com.redhat.labs.cache.EventHandler;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
@@ -16,8 +17,11 @@ public class GetAllProjectEventHandler implements EventHandler {
 
     @Override
     public   void handleEvent(Message<JsonObject> getAllProjectsMessage) {
+        logger.info("Get All Project Event Received {}", getAllProjectsMessage);
         JsonObject getAllProjectsRequest = getAllProjectsMessage.body();
         logger.info("{} object received to create a project", getAllProjectsRequest);
+
+
         getAllProjectsMessage.reply("Success");
     }
 
@@ -26,11 +30,11 @@ public class GetAllProjectEventHandler implements EventHandler {
         return CHANNEL_GET_ALL_PROJECT_EVENTS;
     }
 
-
-
-
-
-
+    @Override
+    public void setPersistenceStore(ResidencyDataStore residencyDataStore) {
+        this.residencyDataStore = residencyDataStore;
+    }
+    private ResidencyDataStore residencyDataStore;
 
     private static final String CHANNEL_GET_ALL_PROJECT_EVENTS = "cache.getAllProjects";
 

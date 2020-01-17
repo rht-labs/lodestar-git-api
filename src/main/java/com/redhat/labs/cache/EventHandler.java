@@ -9,6 +9,7 @@ import io.vertx.core.json.JsonObject;
  */
 public interface EventHandler {
 
-    public   void handleEvent(Message<JsonObject> getAllProjectsMessage);
+    public void handleEvent(Message<JsonObject> getAllProjectsMessage);
     public String getChannelName();
+    public void setPersistenceStore(ResidencyDataStore residencyDataStore);
 }

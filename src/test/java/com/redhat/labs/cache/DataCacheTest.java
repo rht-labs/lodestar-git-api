@@ -1,11 +1,15 @@
 package com.redhat.labs.cache;
 
-import com.redhat.labs.cache.cacheStore.DataCache;
+import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
 import io.quarkus.test.junit.QuarkusTest;
+import io.vertx.core.json.JsonObject;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
 import org.infinispan.query.remote.client.ProtobufMetadataManagerConstants;
+import org.infinispan.server.hotrod.HotRodServer;
+import org.infinispan.server.hotrod.configuration.HotRodServerConfiguration;
+import org.infinispan.server.hotrod.configuration.HotRodServerConfigurationBuilder;
 import org.infinispan.server.hotrod.test.HotRodTestingUtil;
 import org.infinispan.test.fwk.TestCacheManagerFactory;
 import org.infinispan.test.fwk.TestResourceTracker;
@@ -14,6 +18,12 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @QuarkusTest
 class DataCacheTest {
 
@@ -21,7 +31,7 @@ class DataCacheTest {
 //    static InfinispanServerExtension server = new InfinispanServerExtension();
 
     @BeforeAll
-    public static void init(){
+    public static void init() {
 //        Map<String, String> a = server.start();
 //
 //        RemoteCacheManager rcm = server.hotRodClient();
@@ -33,24 +43,38 @@ class DataCacheTest {
 ////        rcm.administration().createCache("myCache", (BasicConfiguration) null);
 
         TestResourceTracker.setThreadTestName("InfinispanServer");
+//        GlobalConfigurationBuilder builder = new GlobalConfigurationBuilder();
+//
+//
+//        builder.marshaller(JavaSerializationMarshaller.class)
+//                .addJavaSerialWhiteList("org.infinispan.example.*", "org.infinispan.concrete.SomeClass");
+
+
         EmbeddedCacheManager ecm = TestCacheManagerFactory.createCacheManager(
                 new GlobalConfigurationBuilder().nonClusteredDefault().defaultCacheName("default"),
                 new ConfigurationBuilder());
         ecm.createCache(ProtobufMetadataManagerConstants.PROTOBUF_METADATA_CACHE_NAME, new ConfigurationBuilder().indexing().build());
         ecm.createCache("myCache", new ConfigurationBuilder().indexing().build());
         // Client connects to a non default port
-        HotRodTestingUtil.startHotRodServer(ecm, 11222);
+        HotRodServerConfigurationBuilder hcb = new HotRodServerConfigurationBuilder();
+
+        HotRodServer hs =  HotRodTestingUtil.startHotRodServer(ecm, 11222);
+//        hs.setMarshaller(new org.infinispan.commons.marshall.JavaSerializationMarshaller());
+
+
     }
 
 
-    @Inject
-    DataCache dataCache;
+
+
 
     @Test
-    public void testPut(){
+    public void testPut() {
+        ResidencyDataCache dataCache = new ResidencyDataCache();
+        ResidencyInformation data = new ResidencyInformation("yaml fle", new String("some data"));
+        dataCache.store("a", data);
 
-
-        dataCache.put("a", "b");
+        assertEquals(data, dataCache.fetch("a"));
     }
 
 }
