@@ -1,12 +1,12 @@
-package com.rht_labs.omp.resources;
+package com.redhat.labs.omp.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.rht_labs.omp.models.CreateFileRequest;
-import com.rht_labs.omp.models.CreateProjectRequest;
-import com.rht_labs.omp.models.GitLabCreateFileInRepositoryRequest;
-import com.rht_labs.omp.models.GitLabCreateProjectRequest;
-import com.rht_labs.omp.services.GitLabService;
+import com.redhat.labs.omp.models.CreateFileRequest;
+import com.redhat.labs.omp.models.CreateProjectRequest;
+import com.redhat.labs.omp.models.GitLabCreateProjectRequest;
+import com.redhat.labs.omp.models.GitLabCreateFileInRepositoryRequest;
+import com.redhat.labs.omp.services.GitLabService;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.spi.NotImplementedYetException;
 import javax.ws.rs.core.Response;

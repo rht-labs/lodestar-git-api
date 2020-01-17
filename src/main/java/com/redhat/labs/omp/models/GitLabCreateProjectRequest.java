@@ -1,4 +1,4 @@
-package com.rht_labs.omp.models;
+package com.redhat.labs.omp.models;
 
 public class GitLabCreateProjectRequest {
     public String name;

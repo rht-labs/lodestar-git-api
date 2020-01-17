@@ -1,4 +1,4 @@
-package com.rht_labs.cache.cacheStore;
+package com.redhat.labs.cache.cacheStore;
 
 import io.quarkus.infinispan.client.Remote;
 import org.infinispan.client.hotrod.RemoteCache;

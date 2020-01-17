@@ -1,14 +1,10 @@
-package com.rht_labs.cache;
+package com.redhat.labs.cache;
 
-import com.rht_labs.cache.eventHandlers.CreateProjectEventHandler;
-import com.rht_labs.cache.eventHandlers.GetAllProjectEventHandler;
 import io.vertx.core.Vertx;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 

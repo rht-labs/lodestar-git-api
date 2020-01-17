@@ -1,4 +1,4 @@
-package com.rht_labs.omp.config;
+package com.redhat.labs.omp.config;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 

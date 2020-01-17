@@ -1,6 +1,6 @@
-package com.rht_labs.cache.eventHandlers;
+package com.redhat.labs.cache.eventHandlers;
 
-import com.rht_labs.cache.EventHandler;
+import com.redhat.labs.cache.EventHandler;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;

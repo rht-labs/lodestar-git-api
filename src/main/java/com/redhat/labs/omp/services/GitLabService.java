@@ -1,7 +1,7 @@
-package com.rht_labs.omp.services;
+package com.redhat.labs.omp.services;
 
-import com.rht_labs.omp.models.GitLabCreateFileInRepositoryRequest;
-import com.rht_labs.omp.models.GitLabCreateProjectRequest;
+import com.redhat.labs.omp.models.GitLabCreateProjectRequest;
+import com.redhat.labs.omp.models.GitLabCreateFileInRepositoryRequest;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
@@ -11,7 +11,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/api/v4")
 @RegisterRestClient(configKey = "gitlab.api")
-@ClientHeaderParam(name = "Private-Token", value = "{com.rht_labs.omp.config.GitLabConfig.getPersonalAccessToken}")
+@ClientHeaderParam(name = "Private-Token", value = "{com.redhat.labs.omp.config.GitLabConfig.getPersonalAccessToken}")
 public interface GitLabService {
     // reference: https://docs.gitlab.com/ee/api/projects.html#list-all-projects
     @GET

@@ -1,9 +1,7 @@
-package com.rht_labs.cache;
+package com.redhat.labs.cache;
 
-import com.rht_labs.cache.cacheStore.DataCache;
+import com.redhat.labs.cache.cacheStore.DataCache;
 import io.quarkus.test.junit.QuarkusTest;
-import org.infinispan.client.hotrod.RemoteCacheManager;
-import org.infinispan.commons.configuration.BasicConfiguration;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.infinispan.configuration.global.GlobalConfigurationBuilder;
 import org.infinispan.manager.EmbeddedCacheManager;
@@ -11,13 +9,10 @@ import org.infinispan.query.remote.client.ProtobufMetadataManagerConstants;
 import org.infinispan.server.hotrod.test.HotRodTestingUtil;
 import org.infinispan.test.fwk.TestCacheManagerFactory;
 import org.infinispan.test.fwk.TestResourceTracker;
-import org.infinispan.test.jupiter.InfinispanServerExtension;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
 import javax.inject.Inject;
-import java.util.Map;
 
 @QuarkusTest
 class DataCacheTest {

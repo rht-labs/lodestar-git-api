@@ -1,6 +1,6 @@
-package com.rht_labs.cache;
+package com.redhat.labs.cache;
 
-import com.rht_labs.cache.eventHandlers.CreateProjectEventHandler;
+import com.redhat.labs.cache.eventHandlers.CreateProjectEventHandler;
 import io.quarkus.test.junit.QuarkusTest;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;

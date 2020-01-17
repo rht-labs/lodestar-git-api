@@ -1,4 +1,4 @@
-package com.rht_labs.cache;
+package com.redhat.labs.cache;
 
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
