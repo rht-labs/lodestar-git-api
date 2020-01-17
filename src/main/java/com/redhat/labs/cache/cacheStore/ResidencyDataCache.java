@@ -26,6 +26,8 @@ public class ResidencyDataCache implements ResidencyDataStore {
 
     public static Logger logger = LoggerFactory.getLogger(ResidencyDataCache.class);
 
+
+
     public ResidencyDataCache() {
 
         org.infinispan.client.hotrod.configuration.ConfigurationBuilder cb
