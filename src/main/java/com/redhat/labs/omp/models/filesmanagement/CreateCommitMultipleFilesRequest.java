@@ -1,4 +1,4 @@
-package com.redhat.labs.omp.models;
+package com.redhat.labs.omp.models.filesmanagement;
 
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;

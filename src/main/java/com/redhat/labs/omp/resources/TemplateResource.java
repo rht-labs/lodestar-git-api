@@ -2,8 +2,8 @@ package com.redhat.labs.omp.resources;
 
 
 import com.redhat.labs.omp.models.GetFileResponse;
-import com.redhat.labs.omp.models.GetMultipleFilesResponse;
-import com.redhat.labs.omp.models.SingleFileResponse;
+import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
+import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
 import com.redhat.labs.omp.resources.filters.Logged;
 import com.redhat.labs.omp.services.GitLabService;
 import org.eclipse.microprofile.config.inject.ConfigProperty;

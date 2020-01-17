@@ -1,6 +1,6 @@
 package com.redhat.labs.omp.services;
 
-import com.redhat.labs.omp.models.CreateCommitMultipleFilesRequest;
+import com.redhat.labs.omp.models.filesmanagement.CreateCommitMultipleFilesRequest;
 import com.redhat.labs.omp.models.GetFileResponse;
 import com.redhat.labs.omp.models.GitLabCreateProjectRequest;
 import com.redhat.labs.omp.models.GitLabCreateFileInRepositoryRequest;
@@ -9,10 +9,8 @@ import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
-import javax.annotation.PostConstruct;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
 @Path("/api/v4")
 @RegisterRestClient(configKey = "gitlab.api")

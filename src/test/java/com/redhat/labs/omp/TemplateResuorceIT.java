@@ -1,6 +1,6 @@
 package com.redhat.labs.omp;
 
-import com.redhat.labs.omp.models.GetMultipleFilesResponse;
+import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;

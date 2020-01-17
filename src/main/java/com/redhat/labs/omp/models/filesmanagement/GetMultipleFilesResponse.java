@@ -1,4 +1,6 @@
-package com.redhat.labs.omp.models;
+package com.redhat.labs.omp.models.filesmanagement;
+
+import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
 
 import javax.json.bind.annotation.JsonbProperty;
 import java.io.Serializable;
