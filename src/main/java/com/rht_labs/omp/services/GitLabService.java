@@ -2,7 +2,6 @@ package com.rht_labs.omp.services;
 
 import com.rht_labs.omp.models.GitLabCreateFileInRepositoryRequest;
 import com.rht_labs.omp.models.GitLabCreateProjectRequest;
-import com.rht_labs.omp.models.GitLabCreateProjectResponse;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
@@ -30,7 +29,7 @@ public interface GitLabService {
     @POST
     @Path("/projects")
     @Produces("application/json")
-    GitLabCreateProjectResponse createNewProject(GitLabCreateProjectRequest request);
+    Response createNewProject(GitLabCreateProjectRequest request);
 
     // reference: https://docs.gitlab.com/ee/api/repository_files.html#create-new-file-in-repository
     @POST
