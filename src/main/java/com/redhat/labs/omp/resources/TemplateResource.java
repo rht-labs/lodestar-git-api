@@ -28,7 +28,7 @@ public class TemplateResource {
 
     @Inject
     @RestClient
-    protected GitLabService gitLabService;
+    public GitLabService gitLabService;
 
 
     @ConfigProperty(name = "templateRepositoryId", defaultValue = "9407")
@@ -45,7 +45,7 @@ public class TemplateResource {
      */
     @GET
     @Logged
-    public GetMultipleFilesResponse updateCache() {
+    public GetMultipleFilesResponse getAllFilesFromGit() {
 
    /*     GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, metaFileLocation, "master" );
 
