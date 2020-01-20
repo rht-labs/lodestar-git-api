@@ -1,0 +1,7 @@
+{ "project_id" : "lab20/fpe", "file_path" : "employees.yaml", "content" : {
+  "employees":[
+    {"firstName":"John", "lastName":"Doe"},
+    {"firstName":"Anna", "lastName":"Smith"},
+    {"firstName":"Peter", "lastName":"Jones"}
+  ]
+}, "comment" : "creation requested by postman", "output_format" : "YAML" }
