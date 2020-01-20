@@ -45,4 +45,22 @@ public class Residency implements Serializable {
 
     @JsonbProperty("customer_contact_email")
     public String customerContactEmail;
+
+    @JsonbProperty("ocp_cloud_provider_name")
+    public String openShiftCloudProviderName;
+
+    @JsonbProperty("ocp_cloud_provider_region")
+    public String openShiftCloudProviderRegion;
+
+    @JsonbProperty("ocp_version")
+    public String openShiftVersion;
+
+    @JsonbProperty("ocp_sub_domain")
+    public String openShiftSubDomain;
+
+    @JsonbProperty("ocp_persistent_storage_size")
+    public String openShiftPersistentStorageSize;
+
+    @JsonbProperty("ocp_cluster_size")
+    public String openShiftClusterSize;
 }
