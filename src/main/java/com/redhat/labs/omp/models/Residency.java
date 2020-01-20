@@ -27,4 +27,22 @@ public class Residency implements Serializable {
 
     @JsonbProperty("archive_date")
     public String archiveDate;
+
+    @JsonbProperty("engagement_lead_name")
+    public String engagementLeadName;
+
+    @JsonbProperty("engagement_lead_email")
+    public String engagementLeadEmail;
+
+    @JsonbProperty("technical_lead_name")
+    public String technicalLeadName;
+
+    @JsonbProperty("technical_lead_email")
+    public String technicalLeadEmail;
+
+    @JsonbProperty("customer_contact_name")
+    public String customerContactName;
+
+    @JsonbProperty("customer_contact_email")
+    public String customerContactEmail;
 }
