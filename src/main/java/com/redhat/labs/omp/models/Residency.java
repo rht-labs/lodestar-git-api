@@ -2,6 +2,7 @@ package com.redhat.labs.omp.models;
 
 import javax.json.bind.annotation.JsonbProperty;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,7 +82,10 @@ public class Residency implements Serializable {
             Field[] fieldsOfThisClass = clazz.getDeclaredFields();
 
             for (Field oneField : fieldsOfThisClass) {
-                fieldDateWithNames.put(oneField.getName(), oneField.get(this));
+                if (oneField.isAnnotationPresent(JsonbProperty.class)) {
+                    JsonbProperty annotation = oneField.getAnnotation(JsonbProperty.class);
+                    fieldDateWithNames.put(annotation.value(), oneField.get(this));
+                }
 
             }
 

@@ -20,9 +20,6 @@ public class CreateCommitFileRequest implements Serializable {
     @JsonbProperty("file_path")
     public String filePath;
 
-    @JsonbProperty("content")
-    public Object content;
-
     // Change encoding to ‘base64’
     @JsonbProperty("encoding")
     public final String encoding = "base64";
@@ -57,13 +54,13 @@ public class CreateCommitFileRequest implements Serializable {
     }
 
 
-//    // File content
-//    @JsonbProperty("content")
-//    public String getBase64ContentAsString() {
-//        return new String(base64Content, StandardCharsets.UTF_8);
-//    }
+    // File content
+    @JsonbProperty("content")
+    public String getBase64ContentAsString() {
+        return new String(base64Content, StandardCharsets.UTF_8);
+    }
 
-
+    @JsonbTransient
     public String getContent() {
         return new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
     }
