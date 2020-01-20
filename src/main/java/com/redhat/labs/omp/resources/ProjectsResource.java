@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.redhat.labs.omp.models.*;
 import com.redhat.labs.omp.services.GitLabService;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.spi.NotImplementedYetException;
 import javax.ws.rs.core.Response;
@@ -52,10 +53,16 @@ public class ProjectsResource {
         GitLabCreateProjectRequest gitLabRequest = new GitLabCreateProjectRequest();
         gitLabRequest.name = request.residencyName;
 
-        gitLabRequest.namespace_id = 3060;
+        gitLabRequest.namespace_id = residenciesRepoId; //3060;
         //3060
         return gitLabService.createNewProject(gitLabRequest);
     }
+
+
+    @ConfigProperty(name = "residenciesRepoId", defaultValue = "3060")
+    public Integer residenciesRepoId;
+
+
 
     private static byte[] convert(CreateFileRequest request) throws IOException {
         ObjectMapper objectMapper;
