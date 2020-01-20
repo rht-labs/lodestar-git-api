@@ -30,7 +30,8 @@ public class ProjectsResource {
     @PUT
     public Object createFileInRepository(CreateFileRequest request) {
         try {
-            GitLabCreateFileInRepositoryRequest gitLabRequest = new GitLabCreateFileInRepositoryRequest(request.filePath, request.branch, request.comment, convert(request));
+            GitLabCreateFileInRepositoryRequest gitLabRequest = new GitLabCreateFileInRepositoryRequest(
+                    request.filePath, request.branch, request.comment, convert(request));
             return gitLabService.createFileInRepository(request.projectId, request.filePath, gitLabRequest).getEntity();
         } catch (NotImplementedYetException e) {
             return Response.status(Response.Status.NOT_IMPLEMENTED).build();
@@ -60,20 +61,21 @@ public class ProjectsResource {
         ObjectMapper objectMapper;
 
         switch (request.outputFormat) {
-            case YAML:
-                objectMapper = new ObjectMapper(new YAMLFactory());
-                break;
-            case JSON:
-                objectMapper = new ObjectMapper();
-                break;
-            default:
-                if (request.content instanceof String) {
-                    return ((String) request.content).getBytes(StandardCharsets.UTF_8);
-                } else {
-                    throw new NotImplementedYetException("Unsupported content format");
-                }
+        case YAML:
+            objectMapper = new ObjectMapper(new YAMLFactory());
+            break;
+        case JSON:
+            objectMapper = new ObjectMapper();
+            break;
+        default:
+            if (request.content instanceof String) {
+                return ((String) request.content).getBytes(StandardCharsets.UTF_8);
+            } else {
+                throw new NotImplementedYetException("Unsupported content format");
+            }
         }
 
         return objectMapper.writeValueAsBytes(request.content);
     }
+
 }

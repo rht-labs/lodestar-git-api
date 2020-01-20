@@ -53,7 +53,11 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-jsonb</artifactId>
     </dependency>
-
+    <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-resteasy-qute</artifactId>
+    </dependency>
+    
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-vertx</artifactId>
@@ -62,7 +66,6 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-infinispan-client</artifactId>
-
     </dependency>
 
     <dependency>
