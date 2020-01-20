@@ -2,7 +2,10 @@ package com.redhat.labs.omp.models;
 
 import javax.json.bind.annotation.JsonbProperty;
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Residency implements Serializable {
@@ -66,9 +69,31 @@ public class Residency implements Serializable {
     @JsonbProperty("ocp_cluster_size")
     public String openShiftClusterSize;
 
-    public Map<String, String> toMap() {
-        Map<String, String> r = new HashMap<>();
-        r.put("customer_name", customerName);
-        return r;
+    public Map<String, Object> toMap() throws IllegalAccessException {
+        try {
+
+
+            Class clazz = this.getClass();
+            Field[] fieldsOfThisClass = clazz.getDeclaredFields();
+
+            for (Field oneField : fieldsOfThisClass) {
+                fieldDateWithNames.put(oneField.getName(), oneField.get(this));
+
+            }
+
+            return fieldDateWithNames;
+        }finally{
+            isFieldsLoadedWithReflection = true;
+        }
+
+
+
+
     }
+
+    // error or not, this will get set once the toMap does reflection stuff.
+    private boolean isFieldsLoadedWithReflection = false;
+    private Map<String, Object> fieldDateWithNames = new HashMap<>();
+
+
 }
