@@ -20,6 +20,13 @@ public interface GitLabService {
     @Produces("application/json")
     Response getProjects();
 
+    // reference: https://docs.gitlab.com/ee/api/projects.html#search-for-projects-by-name
+    @GET
+    @Logged
+    @Path("/projects")
+    @Produces("application/json")
+    SearchProjectResponse searchProject(@PathParam("search") @Encoded String search);
+
     // reference: https://docs.gitlab.com/ee/api/projects.html#remove-project
     @DELETE
     @Path("/projects/{id}")
@@ -53,12 +60,20 @@ public interface GitLabService {
     @Produces("application/json")
     GetFileResponse getFile(@PathParam("id") @Encoded String projectId, @PathParam("file_path") @Encoded String filePath, @QueryParam("ref") @Encoded String ref);
 
+    // reference: https://docs.gitlab.com/ee/api/groups.html#new-group
     @POST
     @Logged
     @Path("/groups")
     @Produces("application/json")
     @Consumes("application/json")
     CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest);
+
+    // reference: https://docs.gitlab.com/ee/api/groups.html#search-for-group
+    @GET
+    @Logged
+    @Path("/groups")
+    @Produces("application/json")
+    SearchGroupResponse searchGroup(@PathParam("search") @Encoded String search);
 
 
 }
