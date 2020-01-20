@@ -1,9 +1,6 @@
 package com.redhat.labs.omp.mocks;
 
-import com.redhat.labs.omp.models.GetFileResponse;
-import com.redhat.labs.omp.models.GitLabCreateFileInRepositoryRequest;
-import com.redhat.labs.omp.models.GitLabCreateProjectRequest;
-import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
+import com.redhat.labs.omp.models.*;
 import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
 import com.redhat.labs.omp.services.GitLabService;
 import com.redhat.labs.utils.ResourceLoader;
@@ -49,5 +46,11 @@ public class MockGitLabService implements GitLabService {
     @Override
     public GetFileResponse getFile(String projectId, String filePath, String ref) {
         return null;
+    }
+
+    @Override
+    public CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest) {
+        CreateGroupResponse createGroupResponse = new CreateGroupResponse();
+        return createGroupResponse;
     }
 }

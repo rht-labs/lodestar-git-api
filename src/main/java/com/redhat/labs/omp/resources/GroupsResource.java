@@ -22,7 +22,25 @@ public class GroupsResource {
     @RestClient
     protected GitLabService gitLabService;
 
+    //
+
+    /**
+     * this mentod create a group for CUSTOMER_NAME and a sun-group with the PROJECT_NAME and a repo named iac inside it.
+     * return the id of the iac project repositoy
+     * @return
+     */
     @POST
+    public Integer createResidencyStructure(String customerName,  String projectName){
+        throw new RuntimeException("Noy implemented");
+
+        //first try to fetch the custoner_naem group and get tht eid, if doesnot exists create a group.
+        //then create the project . if project exists freak out
+        //cerate iac repo.
+
+
+    }
+
+
     public CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest){
         assert (createGroupRequest.name != null);
         return  gitLabService.createGroup(createGroupRequest);
