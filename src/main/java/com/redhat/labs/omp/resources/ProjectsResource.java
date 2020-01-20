@@ -2,10 +2,7 @@ package com.redhat.labs.omp.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.redhat.labs.omp.models.CreateFileRequest;
-import com.redhat.labs.omp.models.CreateProjectRequest;
-import com.redhat.labs.omp.models.GitLabCreateProjectRequest;
-import com.redhat.labs.omp.models.GitLabCreateFileInRepositoryRequest;
+import com.redhat.labs.omp.models.*;
 import com.redhat.labs.omp.services.GitLabService;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.spi.NotImplementedYetException;
@@ -50,10 +47,13 @@ public class ProjectsResource {
     }
 
     @POST
-    public Object createNewProject(CreateProjectRequest request) {
+    public GitLabCreateProjectResponse createNewProject(CreateProjectRequest request) {
         GitLabCreateProjectRequest gitLabRequest = new GitLabCreateProjectRequest();
         gitLabRequest.name = request.residencyName;
-        return gitLabService.createNewProject(gitLabRequest).getEntity();
+
+        gitLabRequest.namespace_id = 3060;
+        //3060
+        return gitLabService.createNewProject(gitLabRequest);
     }
 
     private static byte[] convert(CreateFileRequest request) throws IOException {
