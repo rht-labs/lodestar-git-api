@@ -3,7 +3,8 @@ package com.redhat.labs.omp.mocks;
 import com.redhat.labs.omp.models.GetFileResponse;
 import com.redhat.labs.omp.models.GitLabCreateFileInRepositoryRequest;
 import com.redhat.labs.omp.models.GitLabCreateProjectRequest;
-import com.redhat.labs.omp.models.filesmanagement.CreateCommitMultipleFilesRequest;
+import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
+import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
 import com.redhat.labs.omp.services.GitLabService;
 import com.redhat.labs.utils.ResourceLoader;
 import io.quarkus.test.Mock;
@@ -27,8 +28,12 @@ public class MockGitLabService implements GitLabService {
     }
 
     @Override
-    public Response createNewProject(GitLabCreateProjectRequest request) {
-        return Response.status(Response.Status.OK).entity(ResourceLoader.load("createProject-001-response.json")).build();
+    public GitLabCreateProjectResponse createNewProject(GitLabCreateProjectRequest request) {
+        GitLabCreateProjectResponse response = new GitLabCreateProjectResponse();
+        response.id = 1337;
+        response.description = "ut description";
+        response.name = "ut name";
+        return response;
     }
 
     @Override
@@ -37,7 +42,7 @@ public class MockGitLabService implements GitLabService {
     }
 
     @Override
-    public Response createFilesInRepository(String projectId, CreateCommitMultipleFilesRequest request) {
+    public Response createFilesInRepository(Integer projectId, CommitMultipleFilesInRepsitoryRequest request) {
         return null;
     }
 
