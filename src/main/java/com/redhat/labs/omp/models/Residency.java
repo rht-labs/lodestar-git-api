@@ -2,6 +2,8 @@ package com.redhat.labs.omp.models;
 
 import javax.json.bind.annotation.JsonbProperty;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Residency implements Serializable {
     @JsonbProperty("id")
@@ -63,4 +65,10 @@ public class Residency implements Serializable {
 
     @JsonbProperty("ocp_cluster_size")
     public String openShiftClusterSize;
+
+    public Map<String, String> toMap() {
+        Map<String, String> r = new HashMap<>();
+        r.put("customer_name", customerName);
+        return r;
+    }
 }
