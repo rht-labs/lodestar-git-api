@@ -22,38 +22,36 @@ public class TemplateCombobulatorTest {
     @BeforeEach
     public void setupTestData(){
         myMap = new HashMap();
-        myMap.put("RESIDENCY_CUSTOMER_NAME", "mickey-mouse");
-        myMap.put("RESIDENCY_TECHNICAL_LEAD_EMAIL", "michael.mouse@disney.com");
-        myMap.put("RESIDENCY_LOCATION", "Magic Kingdom");
-        exampleTemplate = "---\n"+
-                "\n"+
-                "residency:\n"+
-                "  customer_name: \"{RESIDENCY_CUSTOMER_NAME}\"\n"+
-                "  project_name: \"{RESIDENCY_PROJECT_NAME}\"\n"+
-                "  description: \"{RESIDENCY_DESCRIPTION}\"\n"+
-                "  location: \"{RESIDENCY_LOCATION}\"\n"+
-                "  start_date: \"{RESIDENCY_START_DATE}\"\n"+
-                "  end_date: \"{RESIDENCY_END_DATE}\"\n"+
-                "  archive_date: \"{RESIDENCY_ARCHIVE_DATE}\"\n"+
-                "  contacts:\n"+
-                "    engagement_lead:\n"+
-                "      name: \"{RESIDENCY_ENGAGEMENT_LEAD_NAME}\"\n"+
-                "      email: \"{RESIDENCY_ENGAGEMENT_LEAD_EMAIL}\"\n"+
-                "    technical_lead:\n"+
-                "      name: \"{RESIDENCY_TECHNICAL_LEAD_NAME}\"\n"+
-                "      email: \"{RESIDENCY_TECHNICAL_LEAD_EMAIL}\"\n"+
-                "    customer_contact:\n"+
-                "      name: \"{CUSTOMER_CONTACT_NAME}\"\n"+
-                "      email: \"{CUSTOMER_CONTACT_EMAIL}\"\n"+
-                "  openshift_cluster:\n"+
-                "    cloud-provider:\n"+
-                "      name: \"{OCP_CLOUD_PROVIDER_NAME}\"\n"+
-                "      region: \"{OCP_CLOUD_PROVIDER_REGION}\"\n"+
-                "    version: \"{OCP_VERSION}\"\n"+
-                "    sub-domain: \"{OCP_SUB_DOMAIN}\"\n"+
-                "    persistent-storage-size: \"{OCP_PV_SIZE}\"\n"+
-                "    cluster-size: \"{OCP_CLUSTER_SIZE}\"\n"+
-                "     \n";
+        myMap.put("customer_name", "mickey-mouse");
+        myMap.put("engagement_lead_email", "michael.mouse@disney.com");
+        myMap.put("location", "Magic Kingdom");
+        exampleTemplate = "residency:\n" +
+                "  id: \"{id}\"\n" +
+                "  customer_name: \"{customer_name}\"\n" +
+                "  project_name: \"{project_name}\"\n" +
+                "  description: \"{description}\"\n" +
+                "  location: \"{location}\"\n" +
+                "  start_date: \"{start_date}\"\n" +
+                "  end_date: \"{end_date}\"\n" +
+                "  archive_date: \"{archive_date}\"\n" +
+                "  contacts:\n" +
+                "    engagement_lead:\n" +
+                "      name: \"{engagement_lead_name}\"\n" +
+                "      email: \"{engagement_lead_email}\"\n" +
+                "    technical_lead:\n" +
+                "      name: \"{technical_lead_name}\"\n" +
+                "      email: \"{technical_lead_email}\"\n" +
+                "    customer_contact:\n" +
+                "      name: \"{customer_contact_name}\"\n" +
+                "      email: \"{customer_contact_email}\"\n" +
+                "  openshift_cluster:\n" +
+                "    cloud_provider:\n" +
+                "      name: \"{ocp_cloud_provider_name}\"\n" +
+                "      region: \"{ocp_cloud_provider_region}\"\n" +
+                "    version: \"{ocp_version}\"\n" +
+                "    sub_domain: \"{ocp_sub_domain}\"\n" +
+                "    persistent_storage_size: \"{ocp_persistent_storage_size}\"\n" +
+                "    cluster_size: \"{ocp_cluster_size}\"";
     }
 
     @Inject
@@ -69,22 +67,21 @@ public class TemplateCombobulatorTest {
         String result = templateInstance.render();
 
         Assertions.assertTrue(result.contains("mickey-mouse"));
-        Assertions.assertFalse(result.contains("RESIDENCY_CUSTOMER_NAME"));
 
         Assertions.assertTrue(result.contains("michael.mouse@disney.com"));
-        Assertions.assertFalse(result.contains("RESIDENCY_TECHNICAL_LEAD_EMAIL"));
 
         Assertions.assertTrue(result.contains("Magic Kingdom"));
-        Assertions.assertFalse(result.contains("RESIDENCY_LOCATION"));
 
     }
 
     @Test
     void processTemplate() {
         GetMultipleFilesResponse processedFiles = templateCombobulator.process(myMap);
-//      🤠 Dirty hack to get the first index of the files array 🤠
+        //      🤠 Dirty hack to get the first index of the files array 🤠
         Assertions.assertTrue(processedFiles.files.get(0).fileContent.contains("mickey-mouse"));
-        Assertions.assertFalse(processedFiles.files.get(0).fileContent.contains("RESIDENCY_CUSTOMER_NAME"));
 
+        Assertions.assertTrue(processedFiles.files.get(0).fileContent.contains("michael.mouse@disney.com"));
+
+        Assertions.assertTrue(processedFiles.files.get(0).fileContent.contains("Magic Kingdom"));
     }
 }
