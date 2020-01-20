@@ -1,6 +1,7 @@
 package com.redhat.labs.omp.services;
 
-import com.redhat.labs.omp.models.filesmanagement.CreateCommitMultipleFilesRequest;
+import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
+import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
 import com.redhat.labs.omp.models.GetFileResponse;
 import com.redhat.labs.omp.models.GitLabCreateProjectRequest;
 import com.redhat.labs.omp.models.GitLabCreateFileInRepositoryRequest;
@@ -32,7 +33,7 @@ public interface GitLabService {
     @POST
     @Path("/projects")
     @Produces("application/json")
-    Response createNewProject(GitLabCreateProjectRequest request);
+    GitLabCreateProjectResponse createNewProject(GitLabCreateProjectRequest request);
 
     // reference: https://docs.gitlab.com/ee/api/repository_files.html#create-new-file-in-repository
     @POST
@@ -44,7 +45,7 @@ public interface GitLabService {
     @POST
     @Path("/projects/{id}/repository/commits")
     @Produces("application/json")
-    Response createFilesInRepository(@PathParam("id") @Encoded String projectId, CreateCommitMultipleFilesRequest request);
+    Response createFilesInRepository(@PathParam("id") @Encoded Integer projectId, CommitMultipleFilesInRepsitoryRequest request);
 
 
     // reference https://docs.gitlab.com/ee/api/repository_files.html

@@ -17,7 +17,7 @@ public class CreateCommitFileRequest implements Serializable {
     public FileAction action;
 
 
-    @JsonbProperty("filePath")
+    @JsonbProperty("file_path")
     public String filePath;
 
     @JsonbProperty("content")
@@ -31,6 +31,11 @@ public class CreateCommitFileRequest implements Serializable {
     private byte[] base64Content;
     private String urlEncodedFilePath;
 
+
+    public CreateCommitFileRequest(){
+
+    }
+
     public CreateCommitFileRequest(String filePath, String content){
         this(FileAction.create, filePath, content);
 
@@ -43,7 +48,7 @@ public class CreateCommitFileRequest implements Serializable {
 
     }
 
-    public void setContent(byte[] content) {
+    private void setContent(byte[] content) {
         base64Content = Base64.getEncoder().encode(content);
     }
 
@@ -52,18 +57,18 @@ public class CreateCommitFileRequest implements Serializable {
     }
 
 
-    // File content
-    @JsonbProperty("content")
-    public String getBase64ContentAsString() {
-        return new String(base64Content, StandardCharsets.UTF_8);
-    }
+//    // File content
+//    @JsonbProperty("content")
+//    public String getBase64ContentAsString() {
+//        return new String(base64Content, StandardCharsets.UTF_8);
+//    }
 
-    @JsonbTransient
+
     public String getContent() {
         return new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
     }
 
-    @JsonbTransient
+
     public String getFilePath() {
         try {
             return URLDecoder.decode(urlEncodedFilePath, StandardCharsets.UTF_8.toString());
