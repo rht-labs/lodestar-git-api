@@ -70,6 +70,10 @@ public class Residency implements Serializable {
     public String openShiftClusterSize;
 
     public Map<String, Object> toMap() throws IllegalAccessException {
+        if (isFieldsLoadedWithReflection) {
+            return fieldDateWithNames;
+        }
+
         try {
 
 

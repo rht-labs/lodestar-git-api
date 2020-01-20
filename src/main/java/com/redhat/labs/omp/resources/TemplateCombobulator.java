@@ -21,13 +21,13 @@ public class TemplateCombobulator  {
     @Inject
     TemplateResource templateResource;
 
-    public TemplateInstance combobulateTemplateInstance(String fileContent, Map<String, String> templateVariables) {
+    public TemplateInstance combobulateTemplateInstance(String fileContent, Map<String, Object> templateVariables) {
 
 
         // String should be the template
         Template fetchedTemplate = engine.parse(fileContent);
         TemplateInstance processedTemplate = null;
-        for (Map.Entry<String, String> entry : templateVariables.entrySet()) {
+        for (Map.Entry<String, Object> entry : templateVariables.entrySet()) {
             if (processedTemplate == null) {
                 processedTemplate = fetchedTemplate.data(entry.getKey(), entry.getValue());
             } else {
@@ -37,14 +37,12 @@ public class TemplateCombobulator  {
         return processedTemplate;
     }
 
-    public String combobulateTemplateInstanceAsString(String templateName, Map<String, String> templateVariables) {
+    public String combobulateTemplateInstanceAsString(String templateName, Map<String, Object> templateVariables) {
         return this.combobulateTemplateInstance(templateName, templateVariables).render();
     }
 
-    // Get templates from location (wherever that is) based on name from meta.dat
-    public GetMultipleFilesResponse process( Map<String, String> templateVariables) {
+    public GetMultipleFilesResponse process( Map<String, Object> templateVariables) {
 //        1. Process should take a map of vars from frontend
-//        looks like this [{fileName, fileContent}....]
         GetMultipleFilesResponse allTemplateFiles = templateResource.getAllFilesFromGit();
         allTemplateFiles.files.parallelStream().forEach(singleFileResponse -> singleFileResponse.fileContent = combobulateTemplateInstanceAsString(singleFileResponse.getFileContent(), templateVariables));
         return allTemplateFiles;
