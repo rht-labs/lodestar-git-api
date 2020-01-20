@@ -1,10 +1,7 @@
 package com.redhat.labs.omp.services;
 
-import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
+import com.redhat.labs.omp.models.*;
 import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
-import com.redhat.labs.omp.models.GetFileResponse;
-import com.redhat.labs.omp.models.GitLabCreateProjectRequest;
-import com.redhat.labs.omp.models.GitLabCreateFileInRepositoryRequest;
 import com.redhat.labs.omp.resources.filters.Logged;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -55,6 +52,13 @@ public interface GitLabService {
     @Path("/projects/{id}/repository/files/{file_path}")
     @Produces("application/json")
     GetFileResponse getFile(@PathParam("id") @Encoded String projectId, @PathParam("file_path") @Encoded String filePath, @QueryParam("ref") @Encoded String ref);
+
+    @POST
+    @Logged
+    @Path("/groups")
+    @Produces("application/json")
+    @Consumes("application/json")
+    CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest);
 
 
 }
