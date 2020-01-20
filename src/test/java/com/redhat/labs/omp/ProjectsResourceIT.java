@@ -1,42 +1,24 @@
 package com.redhat.labs.omp;
 
+import com.redhat.labs.utils.ResourceLoader;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.*;
 
 import static io.restassured.RestAssured.given;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @QuarkusTest
 public class ProjectsResourceIT {
-    public static final String NAMESPACE = "lab20";
-    public static final String PROJECT_NAME = "quarkus-integration-test";
-
-    @BeforeEach
-    public void init() {
-        try {
-            createProject(false);
-        } catch (Throwable e) {
-            // ignored by design
-        }
-    }
-
-    @AfterEach
-    public void teardown() {
-        try {
-            deleteProject(false);
-            Thread.sleep(1000);
-        } catch (Throwable e) {
-            // ignored by design
-        }
-    }
-
     @Test
     public void testListAllProjects() {
-        given()
+        String projectList = given()
                 .when().get("/api/projects")
                 .then()
-                .statusCode(200);
+                .statusCode(200).extract().asString();
+
+        assertTrue(projectList.contains("https://gitlab.consulting.redhat.com/api/v4/projects/10816/events"));
     }
 
     @Test
@@ -45,13 +27,7 @@ public class ProjectsResourceIT {
         given()
                 .when()
                 .contentType(ContentType.JSON)
-                .body("{ \"project_id\" : \"" + NAMESPACE + "/" + PROJECT_NAME + "\", \"file_path\" : \"employees.yaml\", \"content\" : {\n" +
-                        "\"employees\":[\n" +
-                        "    {\"firstName\":\"John\", \"lastName\":\"Doe\"},\n" +
-                        "    {\"firstName\":\"Anna\", \"lastName\":\"Smith\"},\n" +
-                        "    {\"firstName\":\"Peter\", \"lastName\":\"Jones\"}\n" +
-                        "]\n" +
-                        "}, \"comment\" : \"created by OMP Git API integration tests\", \"output_format\": \"YAML\" }")
+                .body(ResourceLoader.load("createYAMLFile-001-request.json"))
                 .put("/api/projects")
                 .then()
                 .statusCode(200);
@@ -63,13 +39,7 @@ public class ProjectsResourceIT {
         given()
                 .when()
                 .contentType(ContentType.JSON)
-                .body("{ \"project_id\" : \"" + NAMESPACE + "/" + PROJECT_NAME + "\", \"file_path\" : \"employees.json\", \"content\" : {\n" +
-                        "\"employees\":[\n" +
-                        "    {\"firstName\":\"John\", \"lastName\":\"Doe\"},\n" +
-                        "    {\"firstName\":\"Anna\", \"lastName\":\"Smith\"},\n" +
-                        "    {\"firstName\":\"Peter\", \"lastName\":\"Jones\"}\n" +
-                        "]\n" +
-                        "}, \"comment\" : \"created by OMP Git API integration tests\", \"output_format\": \"JSON\" }")
+                .body(ResourceLoader.load("createJSONFile-001-request.json"))
                 .put("/api/projects")
                 .then()
                 .statusCode(200);
@@ -81,10 +51,7 @@ public class ProjectsResourceIT {
         given()
                 .when()
                 .contentType(ContentType.JSON)
-                .body("{ \"project_id\" : \"" + NAMESPACE + "/" + PROJECT_NAME + "\"," +
-                        " \"file_path\" : \"hello-world.txt\", " +
-                        "\"content\" : \"hello world!\", " +
-                        "\"comment\" : \"created by OMP Git API integration tests\" }")
+                .body(ResourceLoader.load("createTXTFile-001-request.json"))
                 .put("/api/projects")
                 .then()
                 .statusCode(200);
@@ -111,7 +78,7 @@ public class ProjectsResourceIT {
     private static void deleteProject(boolean doAssert) {
         ValidatableResponse r = given()
                 .when()
-                .pathParam("project_id", NAMESPACE + "/" + PROJECT_NAME)
+                .pathParam("project_id", "test/project")
                 .delete("/api/projects/{project_id}")
                 .then();
 
@@ -124,7 +91,7 @@ public class ProjectsResourceIT {
         ValidatableResponse r = given()
                 .when()
                 .contentType(ContentType.JSON)
-                .body("{ \"residency_name\" : \"" + PROJECT_NAME + "\" }")
+                .body(ResourceLoader.load("deleteProject-001-request.json"))
                 .post("/api/projects")
                 .then();
 
