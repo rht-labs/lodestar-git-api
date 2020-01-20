@@ -20,6 +20,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Map;
 
 @Path("/api/residencies")
 @Produces(MediaType.APPLICATION_JSON)
@@ -45,6 +46,7 @@ public class ResidenciesResource {
         cpr.projectName = residency.projectName;
 
         GitLabCreateProjectResponse glcpr = projects.createNewProject(cpr);
+        residency.id = glcpr.id;
         logger.info("Created project with Id {}", glcpr.id);
 
         // combobulate the template
@@ -55,9 +57,11 @@ public class ResidenciesResource {
         for (SingleFileResponse file : gmfr.files) {
             cmfirr.addFileRequest(new CreateCommitFileRequest(FileAction.create, file.fileName, file.fileContent));
         }
+        // TODO probably not useful...
         cmfirr.authorEmail = residency.engagementLeadEmail;
         cmfirr.authorName = residency.engagementLeadName;
-        cmfirr.commitMessage = "Created by OMP Git API";
+
+        cmfirr.commitMessage = "\uD83E\uDD84 Created by OMP Git API \uD83D\uDE80 \uD83C\uDFC1";
 
         // create the files in the repository
         return gitLabService.createFilesInRepository(glcpr.id, cmfirr);
