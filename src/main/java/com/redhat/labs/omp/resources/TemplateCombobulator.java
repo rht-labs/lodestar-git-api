@@ -1,8 +1,6 @@
 package com.redhat.labs.omp.resources;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -16,16 +14,14 @@ import io.quarkus.qute.Template;
 public class TemplateCombobulator {
 
     @Inject
-    Engine engine;
+    Engine confusingCombobulatorEngineMember;
 
     @Inject
-    TemplateResource templateResource;
+    TemplateResource templateCombobulatorResourceMember;
 
     public TemplateInstance combobulateTemplateInstance(String fileContent, Map<String, Object> templateVariables) {
-
-
         // String should be the template
-        Template fetchedTemplate = engine.parse(fileContent);
+        Template fetchedTemplate = confusingCombobulatorEngineMember.parse(fileContent);
         TemplateInstance processedTemplate = null;
         for (Map.Entry<String, Object> entry : templateVariables.entrySet()) {
             if (processedTemplate == null) {
@@ -43,7 +39,7 @@ public class TemplateCombobulator {
 
     public GetMultipleFilesResponse process(Map<String, Object> templateVariables) {
 //        1. Process should take a map of vars from frontend
-        GetMultipleFilesResponse allTemplateFiles = templateResource.getAllFilesFromGit();
+        GetMultipleFilesResponse allTemplateFiles = templateCombobulatorResourceMember.getAllFilesFromGit();
         allTemplateFiles.files.parallelStream().forEach(singleFileResponse -> singleFileResponse.fileContent = combobulateTemplateInstanceAsString(singleFileResponse.getFileContent(), templateVariables));
         return allTemplateFiles;
     }
