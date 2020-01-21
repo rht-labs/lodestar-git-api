@@ -13,7 +13,7 @@ import io.quarkus.qute.TemplateInstance;
 import io.quarkus.qute.Template;
 
 @ApplicationScoped
-public class TemplateCombobulator  {
+public class TemplateCombobulator {
 
     @Inject
     Engine engine;
@@ -41,10 +41,10 @@ public class TemplateCombobulator  {
         return this.combobulateTemplateInstance(templateName, templateVariables).render();
     }
 
-    public GetMultipleFilesResponse process( Map<String, Object> templateVariables) {
+    public GetMultipleFilesResponse process(Map<String, Object> templateVariables) {
 //        1. Process should take a map of vars from frontend
         GetMultipleFilesResponse allTemplateFiles = templateResource.getAllFilesFromGit();
         allTemplateFiles.files.parallelStream().forEach(singleFileResponse -> singleFileResponse.fileContent = combobulateTemplateInstanceAsString(singleFileResponse.getFileContent(), templateVariables));
         return allTemplateFiles;
-     }
+    }
 }
