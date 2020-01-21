@@ -16,7 +16,7 @@ class ResidencyTest {
 
         Map<String, Object> fieldValues = residency.toMap();
 
-        assertEquals("v4.3", fieldValues.get("openShiftVersion"));
+        assertEquals("v4.3", fieldValues.get("ocp_version"));
 
     }
 }

@@ -16,7 +16,7 @@ import java.util.Map;
 
 @QuarkusTest
 public class TemplateCombobulatorTest {
-    Map<String, String> myMap;
+    Map<String, Object> myMap;
     String exampleTemplate;
 
     @BeforeEach
