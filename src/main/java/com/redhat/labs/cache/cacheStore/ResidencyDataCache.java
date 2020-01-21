@@ -40,7 +40,11 @@ public class ResidencyDataCache implements ResidencyDataStore {
                     .jmxDomain("org.infinispan")
                     .addServer()
                     .host(cacheServerName)
-                    .port(11222);
+                    .port(11222)
+                    .security()
+                    .authentication()
+                    .username("omp")
+                    .password("omp");
         } catch (Exception e) {
             e.printStackTrace();
         }
