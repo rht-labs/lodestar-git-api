@@ -34,11 +34,8 @@ public class GitSyncManager {
     @Inject
     Vertx vertx;
 
-    @PostConstruct
-    public void init(){
-        this.dataCache = new ResidencyDataCache();
-    }
 
+    @Inject
     ResidencyDataCache dataCache;
 
     public void addEventHandler(String channelName, EventHandler eventHandler) {
