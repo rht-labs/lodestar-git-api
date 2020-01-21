@@ -17,7 +17,7 @@ import java.util.stream.StreamSupport;
 /**
  * A very simple facade to write the cache data to remote JDG caches.
  *
- * @author faisalmasood
+ * @author faisalmasood, Donal Spring & Fred Permantier ❤️
  */
 @Singleton
 public class ResidencyDataCache implements ResidencyDataStore {
@@ -52,9 +52,13 @@ public class ResidencyDataCache implements ResidencyDataStore {
     }
 
     //    @Inject @Remote("myCache")
-    RemoteCache<String, Object> cache;
+    private RemoteCache<String, Object> cache;
 
-    RemoteCacheManager remoteCacheManager;
+    public RemoteCacheManager getRemoteCacheManager() {
+        return remoteCacheManager;
+    }
+
+    private RemoteCacheManager remoteCacheManager;
 
 
     @Override
