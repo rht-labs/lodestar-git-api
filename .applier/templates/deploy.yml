@@ -35,6 +35,12 @@ objects:
         - image: "${IMAGE_NAME}:${IMAGE_TAG}"
           imagePullPolicy: Always
           name: "${NAME}"
+          env:
+          - name: GITLAB_PERSONAL_ACCESS_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: gitlab-token-secret
+                key: GITLAB_PERSONAL_ACCESS_TOKEN
           ports:
           - containerPort: 8080
             protocol: TCP
