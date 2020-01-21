@@ -10,7 +10,7 @@ build_vars:
   GIT_REF: master
   OUTPUT_IMAGE_NAME: '{{ app_name }}'
   OUTPUT_IMAGE_TAG: latest
-  BUILDER_IMAGE_NAME: quay.io/fuse7/fuse-java-openshift
+  BUILDER_IMAGE_NAME: registry.access.redhat.com/fuse7/fuse-java-openshift
   BUILDER_IMAGE_TAG: 1.5
 
 pipeline_vars:
