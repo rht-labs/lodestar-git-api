@@ -12,6 +12,8 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.core.Response;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Mock
 @ApplicationScoped
@@ -48,6 +50,16 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public GetFileResponse getFile(String projectId, String filePath, String ref) {
-        return null;
+        GetFileResponse gfr = new GetFileResponse();
+        if (filePath.endsWith("meta.dat")) {
+            gfr.fileName = filePath;
+            gfr.content = new String(Base64.getEncoder()
+                    .encode(ResourceLoader.load("meta.dat").getBytes(StandardCharsets.UTF_8)));
+        } else {
+            gfr.fileName = filePath;
+            gfr.content = new String(Base64.getEncoder()
+                    .encode(ResourceLoader.load("residency.yml").getBytes(StandardCharsets.UTF_8)));
+        }
+        return gfr;
     }
 }
