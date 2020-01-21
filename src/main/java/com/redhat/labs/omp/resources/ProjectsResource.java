@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.redhat.labs.omp.models.*;
 import com.redhat.labs.omp.services.GitLabService;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.spi.NotImplementedYetException;
 import javax.ws.rs.core.Response;
@@ -47,12 +48,18 @@ public class ProjectsResource {
         return gitLabService.deleteProject(projectId).getEntity();
     }
 
+    //residencies is 3060
+    @ConfigProperty(name = "residenciesParentRepositoryId", defaultValue = "6284")
+    private Integer residenciesParentRepositoryId;
+
+
+
     @POST
     public GitLabCreateProjectResponse createNewProject(CreateProjectRequest request) {
         GitLabCreateProjectRequest gitLabRequest = new GitLabCreateProjectRequest();
         gitLabRequest.name = request.residencyName;
 
-        gitLabRequest.namespace_id = 3060;
+        gitLabRequest.namespace_id = residenciesParentRepositoryId;
         //3060
         return gitLabService.createNewProject(gitLabRequest);
     }

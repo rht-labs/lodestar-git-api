@@ -25,7 +25,7 @@ public interface GitLabService {
     @Logged
     @Path("/projects")
     @Produces("application/json")
-    SearchProjectResponse searchProject(@PathParam("search") @Encoded String search);
+    SearchProjectResponse searchProject(@QueryParam("search") @Encoded String search);
 
     // reference: https://docs.gitlab.com/ee/api/projects.html#remove-project
     @DELETE
@@ -73,7 +73,7 @@ public interface GitLabService {
     @Logged
     @Path("/groups")
     @Produces("application/json")
-    SearchGroupResponse searchGroup(@PathParam("search") @Encoded String search);
+    SearchGroupResponse[] searchGroup(@QueryParam("search") @Encoded String search);
 
 
 }

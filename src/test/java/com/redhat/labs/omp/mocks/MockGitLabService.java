@@ -20,6 +20,11 @@ public class MockGitLabService implements GitLabService {
     }
 
     @Override
+    public SearchProjectResponse searchProject(String search) {
+        return null;
+    }
+
+    @Override
     public Response deleteProject(String projectId) {
         return Response.status(Response.Status.OK).entity(ResourceLoader.load("deleteProject-001-response.json")).build();
     }
@@ -51,6 +56,19 @@ public class MockGitLabService implements GitLabService {
     @Override
     public CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest) {
         CreateGroupResponse createGroupResponse = new CreateGroupResponse();
+        createGroupResponse.name = createGroupRequest.name;
+        createGroupResponse.id = 9;
+        createGroupResponse.parent_id = 7;
         return createGroupResponse;
+    }
+
+    @Override
+    public SearchGroupResponse[] searchGroup(String search) {
+        SearchGroupResponse searchGroupResponse = new SearchGroupResponse();
+        searchGroupResponse.id = 7;
+        searchGroupResponse.name = "customer-name";
+        searchGroupResponse.path = "Customer-name";
+
+        return new SearchGroupResponse[]{searchGroupResponse};
     }
 }

@@ -15,5 +15,5 @@ public class CreateGroupRequest implements Serializable {
     public String visibility = "private";
 
     @JsonbProperty("parent_id")
-    public Integer parent_id = 3060;
+    public Integer parent_id;
 }

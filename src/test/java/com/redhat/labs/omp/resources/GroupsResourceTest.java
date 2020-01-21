@@ -1,6 +1,8 @@
 package com.redhat.labs.omp.resources;
 
 import com.redhat.labs.omp.models.CreateGroupResponse;
+import com.redhat.labs.omp.models.CreateResidencyGroupStructure;
+import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
 import com.redhat.labs.utils.ResourceLoader;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
@@ -14,21 +16,43 @@ import static org.junit.jupiter.api.Assertions.*;
 class GroupsResourceTest {
 
     @Test
-    public void testCreateGroup() throws InterruptedException {
+    public void testCreateGroupStructure() throws InterruptedException {
 
-        CreateGroupResponse createGroupResponse = given()
+
+
+        CreateResidencyGroupStructure createResidencyGroupStructure = new CreateResidencyGroupStructure();
+        createResidencyGroupStructure.projectName = System.currentTimeMillis() + "quarkus-project-name";
+        createResidencyGroupStructure.customerName = "quarkus-customer-name" ;
+
+        GitLabCreateProjectResponse gitLabCreateProjectResponse =  given()
                 .when()
                 .contentType(ContentType.JSON)
-                .body(ResourceLoader.load("createGroup-001-request.json"))
+                .body(createResidencyGroupStructure)
                 .post("/api/groups")
                 .then()
-                .extract()
-                .as(CreateGroupResponse.class);
+        .extract()
+        .as(GitLabCreateProjectResponse.class)
+        ;
 
 
-           assertNotNull(createGroupResponse.id);
+        assertNotNull(gitLabCreateProjectResponse.id);
+
 
     }
+
+
+
+//    CreateGroupResponse createGroupResponse = given()
+//            .when()
+//            .contentType(ContentType.JSON)
+//            .body(ResourceLoader.load("createGroup-001-request.json"))
+//            .post("/api/groups")
+//            .then()
+//            .extract()
+//            .as(CreateGroupResponse.class);
+//
+//
+//    assertNotNull(createGroupResponse.id);
 
 
 }
