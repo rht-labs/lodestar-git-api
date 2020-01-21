@@ -35,10 +35,10 @@ public class TemplateResource {
 
 
     @ConfigProperty(name = "templateRepositoryId", defaultValue = "9407")
-    private String templateRepositoryId;
+    protected String templateRepositoryId;
 
     @ConfigProperty(name = "metaFileFolder", defaultValue = "schema")
-    private String metaFileFolder;
+    protected String metaFileFolder;
 
 
     /**
