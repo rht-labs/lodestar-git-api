@@ -42,13 +42,20 @@ public class ResidencyDataCache implements ResidencyDataStore {
                 .jmxDomain("org.infinispan")
                 .addServer()
                 .host(cacheServerName)
-                .port(11222);
+                .port(11222)
+        .security()
+        .authentication()
+        .username("omp")
+        .password("omp")
+        ;
 
 
         this.remoteCacheManager = new RemoteCacheManager(cb.build());
         logger.info("Trying to get the cache");
         this.cache = remoteCacheManager.getCache();
     }
+
+
 
 //    @Inject @Remote("myCache")
     RemoteCache<String,  Object> cache;
