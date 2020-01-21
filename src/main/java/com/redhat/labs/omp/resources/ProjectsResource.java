@@ -78,4 +78,9 @@ public class ProjectsResource {
         return objectMapper.writeValueAsBytes(request.content);
     }
 
+    public SearchProjectResponse searchProjectResponse(String search){
+        assert (search != null);
+        return  gitLabService.searchProject(search);
+    }
+
 }
