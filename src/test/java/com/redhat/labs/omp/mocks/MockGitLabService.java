@@ -1,9 +1,6 @@
 package com.redhat.labs.omp.mocks;
 
-import com.redhat.labs.omp.models.GetFileResponse;
-import com.redhat.labs.omp.models.GitLabCreateFileInRepositoryRequest;
-import com.redhat.labs.omp.models.GitLabCreateProjectRequest;
-import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
+import com.redhat.labs.omp.models.*;
 import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
 import com.redhat.labs.omp.services.GitLabService;
 import com.redhat.labs.utils.ResourceLoader;
@@ -22,6 +19,11 @@ public class MockGitLabService implements GitLabService {
     @Override
     public Response getProjects() {
         return Response.status(Response.Status.OK).entity(ResourceLoader.load("getProjects-001-response.json")).build();
+    }
+
+    @Override
+    public SearchProjectResponse searchProject(String search) {
+        return null;
     }
 
     @Override
@@ -61,5 +63,24 @@ public class MockGitLabService implements GitLabService {
                     .encode(ResourceLoader.load("residency.yml").getBytes(StandardCharsets.UTF_8)));
         }
         return gfr;
+    }
+
+    @Override
+    public CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest) {
+        CreateGroupResponse createGroupResponse = new CreateGroupResponse();
+        createGroupResponse.name = createGroupRequest.name;
+        createGroupResponse.id = 9;
+        createGroupResponse.parent_id = 7;
+        return createGroupResponse;
+    }
+
+    @Override
+    public SearchGroupResponse[] searchGroup(String search) {
+        SearchGroupResponse searchGroupResponse = new SearchGroupResponse();
+        searchGroupResponse.id = 7;
+        searchGroupResponse.name = "customer-name";
+        searchGroupResponse.path = "Customer-name";
+
+        return new SearchGroupResponse[]{searchGroupResponse};
     }
 }

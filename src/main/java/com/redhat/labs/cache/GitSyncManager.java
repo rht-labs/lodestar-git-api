@@ -35,7 +35,7 @@ public class GitSyncManager {
     Vertx vertx;
 
     @PostConstruct
-            public void init(){
+    public void init(){
         this.dataCache = new ResidencyDataCache();
     }
 

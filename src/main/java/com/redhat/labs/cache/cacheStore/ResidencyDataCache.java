@@ -4,6 +4,7 @@ import com.redhat.labs.cache.GitSyncManager;
 import com.redhat.labs.cache.ResidencyDataStore;
 import com.redhat.labs.cache.ResidencyInformation;
 import io.quarkus.infinispan.client.Remote;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.slf4j.Logger;
@@ -26,6 +27,8 @@ public class ResidencyDataCache implements ResidencyDataStore {
 
     public static Logger logger = LoggerFactory.getLogger(ResidencyDataCache.class);
 
+    @ConfigProperty(name = "cacheServerName", defaultValue = "127.0.0.1")
+    private String cacheServerName;
 
 
     public ResidencyDataCache() {
@@ -38,7 +41,7 @@ public class ResidencyDataCache implements ResidencyDataStore {
                 .enable()
                 .jmxDomain("org.infinispan")
                 .addServer()
-                .host("127.0.0.1")
+                .host(cacheServerName)
                 .port(11222);
 
 
@@ -48,7 +51,7 @@ public class ResidencyDataCache implements ResidencyDataStore {
     }
 
 //    @Inject @Remote("myCache")
-    RemoteCache<String,  ResidencyInformation> cache;
+    RemoteCache<String,  Object> cache;
 
     RemoteCacheManager remoteCacheManager;
 
@@ -60,9 +63,14 @@ public class ResidencyDataCache implements ResidencyDataStore {
         cache.put(key, residencyInformation);
     }
 
+
+    public void store(String key, String file) {
+        cache.put(key, file);
+    }
+
     @Override
     public ResidencyInformation fetch(String key) {
-        return cache.get(key);
+        return (ResidencyInformation) cache.get(key);
     }
 
     @Override

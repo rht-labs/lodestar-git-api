@@ -1,10 +1,7 @@
 package com.redhat.labs.omp.services;
 
-import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
+import com.redhat.labs.omp.models.*;
 import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
-import com.redhat.labs.omp.models.GetFileResponse;
-import com.redhat.labs.omp.models.GitLabCreateProjectRequest;
-import com.redhat.labs.omp.models.GitLabCreateFileInRepositoryRequest;
 import com.redhat.labs.omp.resources.filters.Logged;
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
@@ -22,6 +19,13 @@ public interface GitLabService {
     @Path("/projects")
     @Produces("application/json")
     Response getProjects();
+
+    // reference: https://docs.gitlab.com/ee/api/projects.html#search-for-projects-by-name
+    @GET
+    @Logged
+    @Path("/projects")
+    @Produces("application/json")
+    SearchProjectResponse searchProject(@QueryParam("search") @Encoded String search);
 
     // reference: https://docs.gitlab.com/ee/api/projects.html#remove-project
     @DELETE
@@ -55,6 +59,21 @@ public interface GitLabService {
     @Path("/projects/{id}/repository/files/{file_path}")
     @Produces("application/json")
     GetFileResponse getFile(@PathParam("id") @Encoded String projectId, @PathParam("file_path") @Encoded String filePath, @QueryParam("ref") @Encoded String ref);
+
+    // reference: https://docs.gitlab.com/ee/api/groups.html#new-group
+    @POST
+    @Logged
+    @Path("/groups")
+    @Produces("application/json")
+    @Consumes("application/json")
+    CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest);
+
+    // reference: https://docs.gitlab.com/ee/api/groups.html#search-for-group
+    @GET
+    @Logged
+    @Path("/groups")
+    @Produces("application/json")
+    SearchGroupResponse[] searchGroup(@QueryParam("search") @Encoded String search);
 
 
 }
