@@ -26,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
 class DataCacheTest {
+    @Inject
+    ResidencyDataCache residencyDataCache;
 
 //    @RegisterExtension
 //    static InfinispanServerExtension server = new InfinispanServerExtension();
@@ -70,11 +72,10 @@ class DataCacheTest {
 
     @Test
     public void testPut() {
-        ResidencyDataCache dataCache = new ResidencyDataCache();
         ResidencyInformation data = new ResidencyInformation("yaml fle", new String("some data"));
-        dataCache.store("a", data);
+        residencyDataCache.store("a", data);
 
-        assertEquals(data, dataCache.fetch("a"));
+        assertEquals(data, residencyDataCache.fetch("a"));
     }
 
 }
