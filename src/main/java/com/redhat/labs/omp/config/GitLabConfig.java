@@ -1,11 +1,13 @@
 package com.redhat.labs.omp.config;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
+@RegisterForReflection
 public class GitLabConfig {
     public static final String GITLAB_PERSONAL_ACCESS_TOKEN = "GITLAB_PERSONAL_ACCESS_TOKEN";
     public static Logger logger = LoggerFactory.getLogger(GitLabConfig.class);

@@ -1,7 +1,7 @@
 package com.redhat.labs.omp.resources;
 
 
-import com.redhat.labs.omp.models.CreateProjectRequest;
+import com.redhat.labs.omp.models.CreateResidencyGroupStructure;
 import com.redhat.labs.omp.models.FileAction;
 import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
 import com.redhat.labs.omp.models.Residency;
@@ -20,7 +20,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Map;
 
 @Path("/api/residencies")
 @Produces(MediaType.APPLICATION_JSON)
@@ -35,35 +34,38 @@ public class ResidenciesResource {
     protected ProjectsResource projects;
 
     @Inject
+    protected GroupsResource groups;
+
+    @Inject
     @RestClient
     protected GitLabService gitLabService;
 
     @POST
-    // TODO handle exception
-    public Object createResidency(Residency residency) throws Exception {
-        // create the project
-        CreateProjectRequest cpr = new CreateProjectRequest();
-        cpr.projectName = residency.projectName;
+    public Object createResidency(Residency residency) {
+        GitLabCreateProjectResponse gitLabCreateProjectResponse = createGitLabProject(residency);
 
-        GitLabCreateProjectResponse glcpr = projects.createNewProject(cpr);
-        residency.id = glcpr.id;
-        logger.info("Created project with Id {}", glcpr.id);
+        GetMultipleFilesResponse getMultipleFilesResponse = combobulator.process(residency.toMap());
 
-        // combobulate the template
-        GetMultipleFilesResponse gmfr = combobulator.process(residency.toMap());
+        CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest = getCommitMultipleFilesInRepositoryRequest(residency, getMultipleFilesResponse);
 
-        // build the files to be created
-        CommitMultipleFilesInRepsitoryRequest cmfirr = new CommitMultipleFilesInRepsitoryRequest();
-        for (SingleFileResponse file : gmfr.files) {
-            cmfirr.addFileRequest(new CreateCommitFileRequest(FileAction.create, file.fileName, file.fileContent));
-        }
-        // TODO probably not useful...
-        cmfirr.authorEmail = residency.engagementLeadEmail;
-        cmfirr.authorName = residency.engagementLeadName;
+        return gitLabService.createFilesInRepository(gitLabCreateProjectResponse.id, commitMultipleFilesInRepsitoryRequest);
+    }
 
-        cmfirr.commitMessage = "\uD83E\uDD84 Created by OMP Git API \uD83D\uDE80 \uD83C\uDFC1";
+    private CommitMultipleFilesInRepsitoryRequest getCommitMultipleFilesInRepositoryRequest(Residency residency, GetMultipleFilesResponse getMultipleFilesResponse) {
+        CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest = new CommitMultipleFilesInRepsitoryRequest();
+        getMultipleFilesResponse.files.stream().forEach(f -> {
+            commitMultipleFilesInRepsitoryRequest.addFileRequest(new CreateCommitFileRequest(FileAction.create, f.fileName, f.fileContent));
+        });
+        commitMultipleFilesInRepsitoryRequest.authorEmail = residency.engagementLeadEmail;
+        commitMultipleFilesInRepsitoryRequest.authorName = residency.engagementLeadName;
+        commitMultipleFilesInRepsitoryRequest.commitMessage = "\uD83E\uDD84 Created by OMP Git API \uD83D\uDE80 \uD83C\uDFC1";
+        return commitMultipleFilesInRepsitoryRequest;
+    }
 
-        // create the files in the repository
-        return gitLabService.createFilesInRepository(glcpr.id, cmfirr);
+    private GitLabCreateProjectResponse createGitLabProject(Residency residency) {
+        CreateResidencyGroupStructure createResidencyGroupStructure = new CreateResidencyGroupStructure();
+        createResidencyGroupStructure.projectName = residency.projectName;
+        createResidencyGroupStructure.customerName = residency.customerName;
+        return groups.createResidencyStructure(createResidencyGroupStructure);
     }
 }

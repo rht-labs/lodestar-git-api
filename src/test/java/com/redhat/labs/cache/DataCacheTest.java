@@ -13,6 +13,7 @@ import org.infinispan.server.hotrod.configuration.HotRodServerConfigurationBuild
 import org.infinispan.server.hotrod.test.HotRodTestingUtil;
 import org.infinispan.test.fwk.TestCacheManagerFactory;
 import org.infinispan.test.fwk.TestResourceTracker;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
 class DataCacheTest {
+    @Inject
+    ResidencyDataCache residencyDataCache;
+
+    private static HotRodServer hs;
 
 //    @RegisterExtension
 //    static InfinispanServerExtension server = new InfinispanServerExtension();
@@ -58,23 +63,25 @@ class DataCacheTest {
         // Client connects to a non default port
         HotRodServerConfigurationBuilder hcb = new HotRodServerConfigurationBuilder();
 
-        HotRodServer hs =  HotRodTestingUtil.startHotRodServer(ecm, 11222);
+        hs =  HotRodTestingUtil.startHotRodServer(ecm, 11222);
 //        hs.setMarshaller(new org.infinispan.commons.marshall.JavaSerializationMarshaller());
 
 
     }
 
-
-
-
+    @AfterAll
+    public static void teardown() {
+        if (hs != null) {
+            hs.stop();
+        }
+    }
 
     @Test
     public void testPut() {
-        ResidencyDataCache dataCache = new ResidencyDataCache();
         ResidencyInformation data = new ResidencyInformation("yaml fle", new String("some data"));
-        dataCache.store("a", data);
+        residencyDataCache.store("a", data);
 
-        assertEquals(data, dataCache.fetch("a"));
+        assertEquals(data, residencyDataCache.fetch("a"));
     }
 
 }

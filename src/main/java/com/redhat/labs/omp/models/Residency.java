@@ -70,38 +70,29 @@ public class Residency implements Serializable {
     @JsonbProperty("ocp_cluster_size")
     public String openShiftClusterSize;
 
-    public Map<String, Object> toMap() throws IllegalAccessException {
-        if (isFieldsLoadedWithReflection) {
-            return fieldDateWithNames;
+    public Map<String, Object> toMap() {
+        if (fieldsMap != null) {
+            return fieldsMap;
         }
 
+        fieldsMap = new HashMap<>();
+
         try {
-
-
             Class clazz = this.getClass();
             Field[] fieldsOfThisClass = clazz.getDeclaredFields();
-
             for (Field oneField : fieldsOfThisClass) {
                 if (oneField.isAnnotationPresent(JsonbProperty.class)) {
                     JsonbProperty annotation = oneField.getAnnotation(JsonbProperty.class);
-                    fieldDateWithNames.put(annotation.value(), oneField.get(this));
+                    fieldsMap.put(annotation.value(), oneField.get(this));
                 }
-
             }
-
-            return fieldDateWithNames;
-        }finally{
-            isFieldsLoadedWithReflection = true;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
 
-
-
-
+        return fieldsMap;
     }
 
-    // error or not, this will get set once the toMap does reflection stuff.
-    private boolean isFieldsLoadedWithReflection = false;
-    private Map<String, Object> fieldDateWithNames = new HashMap<>();
-
-
+    // lazy load fields
+    private Map<String, Object> fieldsMap;
 }

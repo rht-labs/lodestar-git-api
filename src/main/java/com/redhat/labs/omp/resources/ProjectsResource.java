@@ -7,6 +7,7 @@ import com.redhat.labs.omp.services.GitLabService;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.spi.NotImplementedYetException;
+
 import javax.ws.rs.core.Response;
 
 import javax.inject.Inject;
@@ -22,6 +23,12 @@ public class ProjectsResource {
     @Inject
     @RestClient
     protected GitLabService gitLabService;
+
+    @ConfigProperty(name = "residenciesRepoId", defaultValue = "3060")
+    protected Integer residenciesRepoId;
+
+    @ConfigProperty(name = "residenciesParentRepositoryId", defaultValue = "6284")
+    protected Integer residenciesParentRepositoryId;
 
     @GET
     public Object listAllProjects() {
@@ -48,12 +55,6 @@ public class ProjectsResource {
         return gitLabService.deleteProject(projectId).getEntity();
     }
 
-    //residencies is 3060
-    @ConfigProperty(name = "residenciesParentRepositoryId", defaultValue = "6284")
-    private Integer residenciesParentRepositoryId;
-
-
-
     @POST
     public GitLabCreateProjectResponse createNewProject(CreateProjectRequest request) {
         GitLabCreateProjectRequest gitLabRequest = new GitLabCreateProjectRequest();
@@ -64,35 +65,29 @@ public class ProjectsResource {
     }
 
 
-    @ConfigProperty(name = "residenciesRepoId", defaultValue = "3060")
-    public Integer residenciesRepoId;
-
-
-
     private static byte[] convert(CreateFileRequest request) throws IOException {
         ObjectMapper objectMapper;
 
         switch (request.outputFormat) {
-        case YAML:
-            objectMapper = new ObjectMapper(new YAMLFactory());
-            break;
-        case JSON:
-            objectMapper = new ObjectMapper();
-            break;
-        default:
-            if (request.content instanceof String) {
-                return ((String) request.content).getBytes(StandardCharsets.UTF_8);
-            } else {
-                throw new NotImplementedYetException("Unsupported content format");
-            }
+            case YAML:
+                objectMapper = new ObjectMapper(new YAMLFactory());
+                break;
+            case JSON:
+                objectMapper = new ObjectMapper();
+                break;
+            default:
+                if (request.content instanceof String) {
+                    return ((String) request.content).getBytes(StandardCharsets.UTF_8);
+                } else {
+                    throw new NotImplementedYetException("Unsupported content format");
+                }
         }
 
         return objectMapper.writeValueAsBytes(request.content);
     }
 
-    public SearchProjectResponse searchProjectResponse(String search){
+    public SearchProjectResponse searchProjectResponse(String search) {
         assert (search != null);
-        return  gitLabService.searchProject(search);
+        return gitLabService.searchProject(search);
     }
-
 }
