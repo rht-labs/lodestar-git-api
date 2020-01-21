@@ -201,6 +201,8 @@ pipeline{
                 sh "ansible-galaxy install -r .applier/requirements.yml --roles-path=.applier/roles"
                 sh "ansible-playbook .applier/apply.yml -i .applier/inventory/ -e include_tags=${NODE_ENV} -e ${NODE_ENV}_vars='{\"NAME\":\"${APP_NAME}\",\"IMAGE_NAME\":\"${APP_NAME}\",\"IMAGE_TAG\":\"${JENKINS_TAG}\"}'"
 
+                echo '### Create a Configmap ###'
+                sh "oc create configmap ${APP_NAME}-config --from-file=src/main/resources/application.properties"
                 echo '### tag image for namespace ###'
                 sh  '''
                     oc project ${PROJECT_NAMESPACE}
