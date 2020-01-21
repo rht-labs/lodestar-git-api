@@ -1,6 +1,7 @@
 package com.redhat.labs.omp.resources;
 
 import com.redhat.labs.omp.models.*;
+import com.redhat.labs.omp.resources.ProjectsResource;
 import com.redhat.labs.omp.services.GitLabService;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.jboss.resteasy.spi.NotImplementedYetException;
@@ -31,7 +32,7 @@ public class GroupsResource {
         throw new RuntimeException("Noy implemented");
 
         if (searchGroupResponse(customerName) != null){
-            if (searchProject(projectName) != null){
+            if (searchProjectResponse(projectName) != null){
 
             }
         }
