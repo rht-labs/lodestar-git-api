@@ -178,7 +178,7 @@ pipeline{
                         sh  '''
                                 oc project ${PIPELINES_NAMESPACE} # probs not needed
                                 oc patch bc ${APP_NAME} -p "{\\"spec\\":{\\"output\\":{\\"to\\":{\\"kind\\":\\"ImageStreamTag\\",\\"name\\":\\"${APP_NAME}:${JENKINS_TAG}\\"}}}}"
-                                oc start-build ${APP_NAME} --follow
+                                oc start-build ${APP_NAME} --from-file=target/*-runner.jar --follow
                             '''
                     }
                 }
