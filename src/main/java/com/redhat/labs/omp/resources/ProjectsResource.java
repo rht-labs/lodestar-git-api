@@ -48,13 +48,18 @@ public class ProjectsResource {
         return gitLabService.deleteProject(projectId).getEntity();
     }
 
+    //residencies is 3060
+    @ConfigProperty(name = "residenciesParentRepositoryId", defaultValue = "6284")
+    private Integer residenciesParentRepositoryId;
+
+
+
     @POST
     public GitLabCreateProjectResponse createNewProject(CreateProjectRequest request) {
         GitLabCreateProjectRequest gitLabRequest = new GitLabCreateProjectRequest();
         gitLabRequest.name = request.projectName;
 
         gitLabRequest.namespace_id = residenciesRepoId; //3060;
-        //3060
         return gitLabService.createNewProject(gitLabRequest);
     }
 
@@ -83,6 +88,11 @@ public class ProjectsResource {
         }
 
         return objectMapper.writeValueAsBytes(request.content);
+    }
+
+    public SearchProjectResponse searchProjectResponse(String search){
+        assert (search != null);
+        return  gitLabService.searchProject(search);
     }
 
 }
