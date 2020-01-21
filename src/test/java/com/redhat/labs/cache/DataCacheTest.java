@@ -1,6 +1,7 @@
 package com.redhat.labs.cache;
 
 import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
+import com.redhat.labs.omp.mocks.MockResidencyDataCache;
 import io.quarkus.test.junit.QuarkusTest;
 import io.vertx.core.json.JsonObject;
 import org.infinispan.configuration.cache.ConfigurationBuilder;
@@ -27,8 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
 class DataCacheTest {
+
     @Inject
-    ResidencyDataCache residencyDataCache;
+    MockResidencyDataCache residencyDataCache;
 
     private static HotRodServer hs;
 
@@ -37,6 +39,7 @@ class DataCacheTest {
 
     @BeforeAll
     public static void init() {
+/*
 //        Map<String, String> a = server.start();
 //
 //        RemoteCacheManager rcm = server.hotRodClient();
@@ -65,6 +68,7 @@ class DataCacheTest {
 
         hs =  HotRodTestingUtil.startHotRodServer(ecm, 11222);
 //        hs.setMarshaller(new org.infinispan.commons.marshall.JavaSerializationMarshaller());
+*/
 
 
     }
@@ -75,6 +79,7 @@ class DataCacheTest {
             hs.stop();
         }
     }
+
 
     @Test
     public void testPut() {

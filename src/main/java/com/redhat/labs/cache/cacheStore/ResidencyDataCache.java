@@ -19,7 +19,7 @@ import java.util.stream.StreamSupport;
  *
  * @author faisalmasood, Donal Spring & Fred Permantier ❤️
  */
-
+@Singleton
 public class ResidencyDataCache implements ResidencyDataStore {
 
     public static Logger logger = LoggerFactory.getLogger(ResidencyDataCache.class);
