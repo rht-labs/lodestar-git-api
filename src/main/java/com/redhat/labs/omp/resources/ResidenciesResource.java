@@ -10,6 +10,7 @@ import com.redhat.labs.omp.models.filesmanagement.CreateCommitFileRequest;
 import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
 import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
 import com.redhat.labs.omp.services.GitLabService;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,9 @@ import javax.ws.rs.core.MediaType;
 @Consumes(MediaType.APPLICATION_JSON)
 public class ResidenciesResource {
     public static Logger logger = LoggerFactory.getLogger(ResidenciesResource.class);
+
+    @ConfigProperty(name = "stripPathPrefix", defaultValue = "schema/")
+    protected String stripPathPrefix;
 
     @Inject
     protected TemplateCombobulator combobulator;
@@ -54,7 +58,13 @@ public class ResidenciesResource {
     private CommitMultipleFilesInRepsitoryRequest getCommitMultipleFilesInRepositoryRequest(Residency residency, GetMultipleFilesResponse getMultipleFilesResponse) {
         CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest = new CommitMultipleFilesInRepsitoryRequest();
         getMultipleFilesResponse.files.stream().forEach(f -> {
-            commitMultipleFilesInRepsitoryRequest.addFileRequest(new CreateCommitFileRequest(FileAction.create, f.fileName, f.fileContent));
+            // TODO improve this a bit
+            String[] splitFilePath = f.fileName.split(stripPathPrefix);
+            if (splitFilePath.length >= 1) {
+                commitMultipleFilesInRepsitoryRequest.addFileRequest(new CreateCommitFileRequest(FileAction.create, splitFilePath[1], f.fileContent));
+            } else {
+                commitMultipleFilesInRepsitoryRequest.addFileRequest(new CreateCommitFileRequest(FileAction.create, f.fileName, f.fileContent));
+            }
         });
         commitMultipleFilesInRepsitoryRequest.authorEmail = residency.engagementLeadEmail;
         commitMultipleFilesInRepsitoryRequest.authorName = residency.engagementLeadName;
