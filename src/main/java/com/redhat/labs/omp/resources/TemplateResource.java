@@ -27,18 +27,15 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TemplateResource {
-
-
     @Inject
     @RestClient
     public GitLabService gitLabService;
 
-
     @ConfigProperty(name = "templateRepositoryId", defaultValue = "9407")
-    private String templateRepositoryId;
+    protected String templateRepositoryId;
 
     @ConfigProperty(name = "metaFileFolder", defaultValue = "schema")
-    private String metaFileFolder;
+    protected String metaFileFolder;
 
 
     /**

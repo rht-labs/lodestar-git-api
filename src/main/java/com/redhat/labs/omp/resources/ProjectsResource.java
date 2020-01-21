@@ -57,12 +57,17 @@ public class ProjectsResource {
     @POST
     public GitLabCreateProjectResponse createNewProject(CreateProjectRequest request) {
         GitLabCreateProjectRequest gitLabRequest = new GitLabCreateProjectRequest();
-        gitLabRequest.name = request.residencyName;
+        gitLabRequest.name = request.projectName;
 
-        gitLabRequest.namespace_id = residenciesParentRepositoryId;
-        //3060
+        gitLabRequest.namespace_id = residenciesRepoId; //3060;
         return gitLabService.createNewProject(gitLabRequest);
     }
+
+
+    @ConfigProperty(name = "residenciesRepoId", defaultValue = "3060")
+    public Integer residenciesRepoId;
+
+
 
     private static byte[] convert(CreateFileRequest request) throws IOException {
         ObjectMapper objectMapper;

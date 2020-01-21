@@ -1,0 +1,29 @@
+---
+
+residency:
+  id: "{id}"
+  customer_name: "{customer_name}"
+  project_name: "{project_name}"
+  description: "{description}"
+  location: "{location}"
+  start_date: "{start_date}"
+  end_date: "{end_date}"
+  archive_date: "{archive_date}"
+  contacts:
+    engagement_lead:
+      name: "{engagement_lead_name}"
+      email: "{engagement_lead_email}"
+    technical_lead:
+      name: "{technical_lead_name}"
+      email: "{technical_lead_email}"
+    customer_contact:
+      name: "{customer_contact_name}"
+      email: "{customer_contact_email}"
+  openshift_cluster:
+    cloud_provider:
+      name: "{ocp_cloud_provider_name}"
+      region: "{ocp_cloud_provider_region}"
+    version: "{ocp_version}"
+    sub_domain: "{ocp_sub_domain}"
+    persistent_storage_size: "{ocp_persistent_storage_size}"
+    cluster_size: "{ocp_cluster_size}"

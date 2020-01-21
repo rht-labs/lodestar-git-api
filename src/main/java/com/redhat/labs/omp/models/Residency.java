@@ -1,8 +1,14 @@
 package com.redhat.labs.omp.models;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
 import javax.json.bind.annotation.JsonbProperty;
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
+@RegisterForReflection
 public class Residency implements Serializable {
     @JsonbProperty("id")
     public Integer id;
@@ -63,4 +69,39 @@ public class Residency implements Serializable {
 
     @JsonbProperty("ocp_cluster_size")
     public String openShiftClusterSize;
+
+    public Map<String, Object> toMap() throws IllegalAccessException {
+        if (isFieldsLoadedWithReflection) {
+            return fieldDateWithNames;
+        }
+
+        try {
+
+
+            Class clazz = this.getClass();
+            Field[] fieldsOfThisClass = clazz.getDeclaredFields();
+
+            for (Field oneField : fieldsOfThisClass) {
+                if (oneField.isAnnotationPresent(JsonbProperty.class)) {
+                    JsonbProperty annotation = oneField.getAnnotation(JsonbProperty.class);
+                    fieldDateWithNames.put(annotation.value(), oneField.get(this));
+                }
+
+            }
+
+            return fieldDateWithNames;
+        }finally{
+            isFieldsLoadedWithReflection = true;
+        }
+
+
+
+
+    }
+
+    // error or not, this will get set once the toMap does reflection stuff.
+    private boolean isFieldsLoadedWithReflection = false;
+    private Map<String, Object> fieldDateWithNames = new HashMap<>();
+
+
 }

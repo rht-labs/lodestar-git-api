@@ -178,7 +178,7 @@ pipeline{
                         sh  '''
                                 oc project ${PIPELINES_NAMESPACE} # probs not needed
                                 oc patch bc ${APP_NAME} -p "{\\"spec\\":{\\"output\\":{\\"to\\":{\\"kind\\":\\"ImageStreamTag\\",\\"name\\":\\"${APP_NAME}:${JENKINS_TAG}\\"}}}}"
-                                oc start-build ${APP_NAME} --follow
+                                oc start-build ${APP_NAME} --from-file=target/${ARTIFACTID}-${VERSION}-runner.jar --follow
                             '''
                     }
                 }
@@ -201,6 +201,8 @@ pipeline{
                 sh "ansible-galaxy install -r .applier/requirements.yml --roles-path=.applier/roles"
                 sh "ansible-playbook .applier/apply.yml -i .applier/inventory/ -e include_tags=${NODE_ENV} -e ${NODE_ENV}_vars='{\"NAME\":\"${APP_NAME}\",\"IMAGE_NAME\":\"${APP_NAME}\",\"IMAGE_TAG\":\"${JENKINS_TAG}\"}'"
 
+                echo '### Create a Configmap ###'
+                sh "oc create configmap ${APP_NAME}-config --from-file=src/main/resources/application.properties"
                 echo '### tag image for namespace ###'
                 sh  '''
                     oc project ${PROJECT_NAMESPACE}
@@ -208,7 +210,7 @@ pipeline{
                     '''
                 echo '### set env vars and image for deployment ###'
                 sh '''
-                    oc set env dc ${APP_NAME} NODE_ENV=${NODE_ENV}
+                    oc set env dc ${APP_NAME} NODE_ENV=${NODE_ENV} QUARKUS_PROFILE=${QUARKUS_PROFILE}
                     oc set image dc/${APP_NAME} ${APP_NAME}=docker-registry.default.svc:5000/${PROJECT_NAMESPACE}/${APP_NAME}:${JENKINS_TAG}
                     oc label --overwrite dc ${APP_NAME} stage=${NODE_ENV}
                     oc patch dc ${APP_NAME} -p "{\\"spec\\":{\\"template\\":{\\"metadata\\":{\\"labels\\":{\\"version\\":\\"${VERSION}\\",\\"release\\":\\"${RELEASE}\\",\\"stage\\":\\"${NODE_ENV}\\",\\"git-commit\\":\\"${GIT_COMMIT}\\",\\"jenkins-build\\":\\"${JENKINS_TAG}\\"}}}}}"
