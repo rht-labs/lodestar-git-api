@@ -18,16 +18,20 @@ import java.util.Date;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class GroupsResource {
+    //this variable defines the fixed name of the project which is iac (infra as code)
+    private static final String RESIDENCY_PROJECT_NAME = "iac";
+
     @Inject
     @RestClient
     protected GitLabService gitLabService;
 
-    //
+    @ConfigProperty(name = "residenciesParentRepositoryId", defaultValue = "6284")
+    protected Integer residenciesParentRepositoryId;
 
     /**
      * this mentod create a group for CUSTOMER_NAME and a sun-group with the PROJECT_NAME and a repo named iac inside it.
      * return the id of the iac project repositoy
-     *
+     * <p>
      * logic is as follows
      * - search for group - if none exists create one - this is the customerName
      * - create subgroup with the projectname
@@ -37,18 +41,19 @@ public class GroupsResource {
      * @return
      */
     @POST
-    public GitLabCreateProjectResponse createResidencyStructure(CreateResidencyGroupStructure createResidencyGroupStructure){
+    public GitLabCreateProjectResponse createResidencyStructure(CreateResidencyGroupStructure createResidencyGroupStructure) {
         // Search or Create Group
         Integer groupId = getOrCreateGroup(createResidencyGroupStructure.customerName);
-        if(groupId == null) throw new RuntimeException("Unable to searh/create customer name group in gitlab");
+        if (groupId == null) throw new RuntimeException("Unable to searh/create customer name group in gitlab");
 
         //Create subgroup
         CreateGroupRequest createSubGroupRequest = new CreateGroupRequest();
         createSubGroupRequest.name = createResidencyGroupStructure.projectName;
         createSubGroupRequest.path = createResidencyGroupStructure.projectName;
         createSubGroupRequest.parent_id = groupId;
-        CreateGroupResponse createSubGroupResponse =  gitLabService.createGroup(createSubGroupRequest);
-        if(createSubGroupResponse.id == null) throw new RuntimeException("Unable to searh/create project name group in gitlab");
+        CreateGroupResponse createSubGroupResponse = gitLabService.createGroup(createSubGroupRequest);
+        if (createSubGroupResponse.id == null)
+            throw new RuntimeException("Unable to searh/create project name group in gitlab");
 
         // Create Project
         GitLabCreateProjectRequest gitLabCreateProjectRequest = new GitLabCreateProjectRequest();
@@ -64,41 +69,33 @@ public class GroupsResource {
 
     }
 
-    //residencies repo id is 3060
-    @ConfigProperty(name = "residenciesParentRepositoryId", defaultValue = "6284")
-    private Integer residenciesParentRepositoryId;
-
-
-    //this variable defines the fixed name of the project which is iac (infra as code)
-    private static String RESIDENCY_PROJECT_NAME = "iac";
-
-    private Integer getOrCreateGroup(String groupName){
+    private Integer getOrCreateGroup(String groupName) {
         assert (groupName != null);
         SearchGroupResponse[] searchGroupResponse = gitLabService.searchGroup(groupName);
-        if(searchGroupResponse != null && searchGroupResponse.length > 1) throw new RuntimeException("Too many projects found for the requested name. Expected only one");
+        if (searchGroupResponse != null && searchGroupResponse.length > 1)
+            throw new RuntimeException("Too many projects found for the requested name. Expected only one");
 
-        if(searchGroupResponse == null || searchGroupResponse.length == 0){
+        if (searchGroupResponse == null || searchGroupResponse.length == 0) {
 
             CreateGroupRequest createGroupRequest = new CreateGroupRequest();
             createGroupRequest.name = groupName;
             createGroupRequest.path = groupName;
             createGroupRequest.parent_id = residenciesParentRepositoryId;
 
-            CreateGroupResponse createGroupResponse =  gitLabService.createGroup(createGroupRequest);
+            CreateGroupResponse createGroupResponse = gitLabService.createGroup(createGroupRequest);
 
             return createGroupResponse.id;
         }
         return searchGroupResponse[0].id;
     }
 
-    public CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest){
+    public CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest) {
         assert (createGroupRequest.name != null);
-        return  gitLabService.createGroup(createGroupRequest);
+        return gitLabService.createGroup(createGroupRequest);
     }
 
-    public SearchGroupResponse searchGroupResponse(String search){
+    public SearchGroupResponse searchGroupResponse(String search) {
         assert (search != null);
-        return  gitLabService.searchGroup(search)[0];
+        return gitLabService.searchGroup(search)[0];
     }
-
 }

@@ -2,7 +2,6 @@ package com.redhat.labs.omp.resources;
 
 import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
 import com.redhat.labs.omp.models.GetFileResponse;
-import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
 import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
 import com.redhat.labs.omp.resources.filters.Logged;
 import com.redhat.labs.omp.services.GitLabService;
@@ -17,9 +16,7 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.List;
 
 @Path("/api/cache")
 @Produces(MediaType.APPLICATION_JSON)
@@ -27,23 +24,19 @@ import java.util.List;
 @Liveness
 @Readiness
 public class CacheResource {
+    public static final Logger LOGGER = LoggerFactory.getLogger(CacheResource.class);
 
     @ConfigProperty(name = "templateRepositoryId", defaultValue = "9407")
-    private String templateRepositoryId;
-
+    protected String templateRepositoryId;
 
     @ConfigProperty(name = "configFileFolder", defaultValue = "schema")
-    private String configFileFolder;
+    protected String configFileFolder;
 
     @Inject
     @RestClient
     public GitLabService gitLabService;
 
-
-    public static Logger logger = LoggerFactory.getLogger(CacheResource.class);
-
-
-    public CacheResource(){
+    public CacheResource() {
         residencyDataCacheForConfig = new ResidencyDataCache();
     }
 
@@ -65,13 +58,11 @@ public class CacheResource {
         residencyDataCacheForConfig.store(CONFIG_FILE_CACHE_KEY, configFileContent.getFileContent());
     }
 
-
-
     private SingleFileResponse fetchContentFromGit(String fileName) {
         GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, "master");
         String base64Content = metaFileResponse.content;
         String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
-        logger.info("File {} content fetched {}", fileName, content);
+        LOGGER.info("File {} content fetched {}", fileName, content);
         return new SingleFileResponse(fileName, content);
     }
 }
