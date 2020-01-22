@@ -15,6 +15,14 @@ export GITLAB_PERSONAL_ACCESS_TOKEN=<GitLab Personal Access Token>
 ./mvnw quarkus:dev
 ```
 
+You could edit your bash profile and make your Quarkus quacky by adding this neat emoji alias, then all you need to fire up your  app is run 🦆
+```
+echo "alias 🦆='./mvnw quarkus:dev -Dquarkus.http.port=8080'" >> ~/.zshrc
+source ~/.zshrc
+
+🦆
+```
+
 ### Running with a profile 
 
 You can run your application using Quarkus profiles using:
