@@ -64,5 +64,5 @@ Deployment template will read from the above secret and inject following env var
 TEMPLATE_REPOSITORY_ID
 RESIDENCIES_PARENT_REPOSITORIES_ID
 GITLAB_API_URL
-
+GITLAB_PERSONAL_ACCESS_TOKEN
 
