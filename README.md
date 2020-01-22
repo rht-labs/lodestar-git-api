@@ -164,7 +164,3 @@ oc patch dc ${APP_NAME} -p "{\\"spec\\":{\\"template\\":{\\"metadata\\":{\\"labe
 oc rollout latest dc/${APP_NAME}
 
 ```
-
-From there Ansible will run a playbook called Openshift Applier
-
-
