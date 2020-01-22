@@ -46,11 +46,11 @@ objects:
               secretKeyRef:
                 name: omp-gitlab-configuration
                 key: TEMPLATE_REPOSITORY_ID
-          - name: RESIDENCIES_REPOSITORY_ID
+          - name: RESIDENCIES_PARENT_REPOSITORIES_ID
             valueFrom:
               secretKeyRef:
                 name: omp-gitlab-configuration
-                key: RESIDENCIES_REPOSITORY_ID
+                key: RESIDENCIES_PARENT_REPOSITORIES_ID
           - name: GITLAB_API_URL
             valueFrom:
               secretKeyRef:
