@@ -69,10 +69,10 @@ This info is stored in ocp-s11/labs-test/omp-gitlab-configuration.
 
 Deployment template will read from the above secret and inject following env variables. These are controlled from application.properries, so if a different env name is needed, change in the application propoerties file and the deployment template.
 
-TEMPLATE_REPOSITORY_ID
-RESIDENCIES_PARENT_REPOSITORIES_ID
-GITLAB_API_URL
-GITLAB_PERSONAL_ACCESS_TOKEN
+* TEMPLATE_REPOSITORY_ID
+* RESIDENCIES_PARENT_REPOSITORIES_ID
+* GITLAB_API_URL
+* GITLAB_PERSONAL_ACCESS_TOKEN
 
 ## Pipeline
 
@@ -81,6 +81,7 @@ The pipline expects the nexus is available nexus:8080. Make sure that nexus is a
 
 The first stage is going to set environment vars based on the branch selected to build:
 
+```groovy
 master - env.PROJECT_NAMESPACE = "${NAMESPACE_PREFIX}-test"
          env.NODE_ENV = "test"
          env.QUARKUS_PROFILE = "openshift-test"
@@ -89,6 +90,8 @@ master - env.PROJECT_NAMESPACE = "${NAMESPACE_PREFIX}-test"
 develop.* or feature.* - env.PROJECT_NAMESPACE = "${NAMESPACE_PREFIX}-dev"
 	                     env.NODE_ENV = "dev"
 	                     env.QUARKUS_PROFILE = "openshift-dev"
+```
+
 
 From there Ansible will run a playbook called Openshift Applier
 
