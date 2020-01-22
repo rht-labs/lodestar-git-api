@@ -52,3 +52,17 @@ oc new-app cache-service \
     -p EVICTION_POLICY=reject \
     -n <PROJECT_NAME>
 ```
+
+## Configuration
+The preferred place to store non-sensitive data is in the application.properties.
+
+Sensitive fields like git repo location, repository id for resdiencies, repository id for the config and the gitlab api token are stored in the secrets.
+This info is stored in ocp-s11/labs-test/omp-gitlab-configuration.
+
+Deployment template will read from the above secret and inject following env variables. These are controlled from application.properries, so if a different env name is needed, change in the application propoerties file and the deployment template.
+
+TEMPLATE_REPOSITORY_ID
+RESIDENCIES_PARENT_REPOSITORIES_ID
+GITLAB_API_URL
+
+
