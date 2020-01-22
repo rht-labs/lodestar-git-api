@@ -58,7 +58,7 @@ public class GroupsResource {
         // Create Project
         GitLabCreateProjectRequest gitLabCreateProjectRequest = new GitLabCreateProjectRequest();
         gitLabCreateProjectRequest.namespace_id = createSubGroupResponse.id;
-        gitLabCreateProjectRequest.description = "REpository Created on " + new Date();
+        gitLabCreateProjectRequest.description = "\uD83C\uDF7E\uD83C\uDF7E Repository Created on " + new Date()+ " \uD83C\uDF7E\uD83C\uDF7E";
         gitLabCreateProjectRequest.name = RESIDENCY_PROJECT_NAME;
         return gitLabService.createNewProject(gitLabCreateProjectRequest);
 
