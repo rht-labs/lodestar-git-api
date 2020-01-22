@@ -32,7 +32,7 @@ class DataCacheTest {
     @Inject
     MockResidencyDataCache residencyDataCache;
 
-    private static HotRodServer hs;
+//    private static HotRodServer hs;
 
 //    @RegisterExtension
 //    static InfinispanServerExtension server = new InfinispanServerExtension();
@@ -73,12 +73,12 @@ class DataCacheTest {
 
     }
 
-    @AfterAll
+/*    @AfterAll
     public static void teardown() {
         if (hs != null) {
             hs.stop();
         }
-    }
+    }*/
 
 
     @Test
