@@ -22,7 +22,7 @@ public class FileResource {
 
     @Inject
     @RestClient
-    GitLabService gitLabService;
+    protected GitLabService gitLabService;
 
     @GET
     @Logged
@@ -30,14 +30,14 @@ public class FileResource {
         return this.fetchContentFromGit(fileName, repoId, branch);
     }
 
-
     public SingleFileResponse fetchContentFromGit(String fileName, String templateRepositoryId, String branch) {
         GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, branch == null ? "master" : branch);
         String base64Content = metaFileResponse.content;
         String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
-        logger.info("File {} content fetched {}", fileName, content);
+        logger.debug("File {} content fetched {}", fileName, content);
         return new SingleFileResponse(fileName, content);
     }
+
     public SingleFileResponse fetchContentFromGit(String fileName, String templateRepositoryId) {
         return this.fetchContentFromGit(fileName, templateRepositoryId, null);
     }

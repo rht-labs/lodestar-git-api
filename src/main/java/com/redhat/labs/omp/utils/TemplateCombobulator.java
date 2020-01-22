@@ -1,4 +1,4 @@
-package com.redhat.labs.omp.resources;
+package com.redhat.labs.omp.utils;
 
 import java.util.Map;
 
@@ -6,23 +6,22 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
+import com.redhat.labs.omp.resources.TemplateResource;
 import io.quarkus.qute.Engine;
 import io.quarkus.qute.TemplateInstance;
 import io.quarkus.qute.Template;
 
 @ApplicationScoped
 public class TemplateCombobulator {
-
-    //the person who name this SUCKS.
     @Inject
-    Engine confusingCombobulatorEngineMember;
+    protected Engine quteEngine;
 
     @Inject
-    TemplateResource templateCombobulatorResourceMember;
+    protected TemplateResource quteTemplateResource;
 
     public TemplateInstance combobulateTemplateInstance(String fileContent, Map<String, Object> templateVariables) {
         // String should be the template
-        Template fetchedTemplate = confusingCombobulatorEngineMember.parse(fileContent);
+        Template fetchedTemplate = quteEngine.parse(fileContent);
         TemplateInstance processedTemplate = null;
         for (Map.Entry<String, Object> entry : templateVariables.entrySet()) {
             if (processedTemplate == null) {
@@ -39,9 +38,10 @@ public class TemplateCombobulator {
     }
 
     public GetMultipleFilesResponse process(Map<String, Object> templateVariables) {
-//        1. Process should take a map of vars from frontend
-        GetMultipleFilesResponse allTemplateFiles = templateCombobulatorResourceMember.getAllFilesFromGit();
-        allTemplateFiles.files.parallelStream().forEach(singleFileResponse -> singleFileResponse.fileContent = combobulateTemplateInstanceAsString(singleFileResponse.getFileContent(), templateVariables));
+        GetMultipleFilesResponse allTemplateFiles = quteTemplateResource.getAllFilesFromGit();
+        allTemplateFiles.files.parallelStream()
+                .forEach(singleFileResponse -> singleFileResponse.fileContent = combobulateTemplateInstanceAsString(singleFileResponse.getFileContent(),
+                        templateVariables));
         return allTemplateFiles;
     }
 }

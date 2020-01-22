@@ -13,18 +13,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Path("/api/cache")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-@Liveness
-@Readiness
 public class CacheResource {
-    public static final Logger LOGGER = LoggerFactory.getLogger(CacheResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CacheResource.class);
 
     @ConfigProperty(name = "templateRepositoryId", defaultValue = "9407")
     protected String templateRepositoryId;
@@ -34,7 +36,7 @@ public class CacheResource {
 
     @Inject
     @RestClient
-    public GitLabService gitLabService;
+    protected GitLabService gitLabService;
 
     public CacheResource() {
         residencyDataCacheForConfig = new ResidencyDataCache();
@@ -51,11 +53,10 @@ public class CacheResource {
      */
     @POST
     @Logged
-    public void updateConfigFromCache() {
-
+    public Response updateConfigFromCache() {
         SingleFileResponse configFileContent = fetchContentFromGit(configFileFolder + "/config.yaml");
-
         residencyDataCacheForConfig.store(CONFIG_FILE_CACHE_KEY, configFileContent.getFileContent());
+        return Response.ok().build();
     }
 
     private SingleFileResponse fetchContentFromGit(String fileName) {

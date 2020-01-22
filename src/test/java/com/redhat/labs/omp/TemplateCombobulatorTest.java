@@ -1,8 +1,7 @@
 package com.redhat.labs.omp;
 
 import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
-import com.redhat.labs.omp.resources.TemplateCombobulator;
-import com.redhat.labs.omp.resources.TemplateResource;
+import com.redhat.labs.omp.utils.TemplateCombobulator;
 import io.quarkus.qute.TemplateInstance;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Assertions;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import javax.inject.Inject;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @QuarkusTest

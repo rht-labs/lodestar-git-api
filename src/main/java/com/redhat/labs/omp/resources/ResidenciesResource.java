@@ -8,8 +8,8 @@ import com.redhat.labs.omp.models.Residency;
 import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
 import com.redhat.labs.omp.models.filesmanagement.CreateCommitFileRequest;
 import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
-import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
 import com.redhat.labs.omp.services.GitLabService;
+import com.redhat.labs.omp.utils.TemplateCombobulator;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Counted;
@@ -48,33 +48,34 @@ public class ResidenciesResource {
     protected GitLabService gitLabService;
 
     @POST
-    @Counted(name = "residencies", description = "How many residencies reuquest have been requested")
+    @Counted(name = "residencies", description = "How many residencies request have been requested")
     @Timed(name = "performedChecks", description = "How much time it takes to create residency", unit = MetricUnits.MILLISECONDS)
-    public Object createResidency(Residency residency) {
+    public String createResidency(Residency residency) {
         GitLabCreateProjectResponse gitLabCreateProjectResponse = createGitLabProject(residency);
 
         GetMultipleFilesResponse getMultipleFilesResponse = combobulator.process(residency.toMap());
 
         CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest = getCommitMultipleFilesInRepositoryRequest(residency, getMultipleFilesResponse);
 
-        return gitLabService.createFilesInRepository(gitLabCreateProjectResponse.id, commitMultipleFilesInRepsitoryRequest);
+        return gitLabService.createFilesInRepository(gitLabCreateProjectResponse.id, commitMultipleFilesInRepsitoryRequest).readEntity(String.class);
     }
 
     private CommitMultipleFilesInRepsitoryRequest getCommitMultipleFilesInRepositoryRequest(Residency residency, GetMultipleFilesResponse getMultipleFilesResponse) {
         CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest = new CommitMultipleFilesInRepsitoryRequest();
         getMultipleFilesResponse.files.stream().forEach(f -> {
-            // TODO improve this a bit
-            String[] splitFilePath = f.fileName.split(stripPathPrefix);
-            if (splitFilePath.length >= 1) {
-                commitMultipleFilesInRepsitoryRequest.addFileRequest(new CreateCommitFileRequest(FileAction.create, splitFilePath[1], f.fileContent));
-            } else {
-                commitMultipleFilesInRepsitoryRequest.addFileRequest(new CreateCommitFileRequest(FileAction.create, f.fileName, f.fileContent));
-            }
+            commitMultipleFilesInRepsitoryRequest.addFileRequest(new CreateCommitFileRequest(FileAction.create, stripPrefix(f.fileName), f.fileContent));
         });
         commitMultipleFilesInRepsitoryRequest.authorEmail = residency.engagementLeadEmail;
         commitMultipleFilesInRepsitoryRequest.authorName = residency.engagementLeadName;
         commitMultipleFilesInRepsitoryRequest.commitMessage = "\uD83E\uDD84 Created by OMP Git API \uD83D\uDE80 \uD83C\uDFC1";
         return commitMultipleFilesInRepsitoryRequest;
+    }
+
+    public String stripPrefix(String in) {
+        if (in != null && in.startsWith(stripPathPrefix)) {
+            return in.split(stripPathPrefix)[1];
+        }
+        return in;
     }
 
     private GitLabCreateProjectResponse createGitLabProject(Residency residency) {

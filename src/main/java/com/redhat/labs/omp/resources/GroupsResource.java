@@ -29,12 +29,12 @@ public class GroupsResource {
     protected Integer residenciesParentRepositoryId;
 
     /**
-     * this mentod create a group for CUSTOMER_NAME and a sun-group with the PROJECT_NAME and a repo named iac inside it.
-     * return the id of the iac project repositoy
+     * this method creates a group for CUSTOMER_NAME and a sun-group with the PROJECT_NAME and a repo named iac inside it.
+     * return the id of the iac project repository
      * <p>
      * logic is as follows
      * - search for group - if none exists create one - this is the customerName
-     * - create subgroup with the projectname
+     * - create subgroup with the project name
      * - create project with the name iac inside the subgroup
      * - enjoy
      *
@@ -44,7 +44,7 @@ public class GroupsResource {
     public GitLabCreateProjectResponse createResidencyStructure(CreateResidencyGroupStructure createResidencyGroupStructure) {
         // Search or Create Group
         Integer groupId = getOrCreateGroup(createResidencyGroupStructure.customerName);
-        if (groupId == null) throw new RuntimeException("Unable to searh/create customer name group in gitlab");
+        if (groupId == null) throw new RuntimeException("Unable to search/create customer name group in gitlab");
 
         //Create subgroup
         CreateGroupRequest createSubGroupRequest = new CreateGroupRequest();
@@ -53,20 +53,17 @@ public class GroupsResource {
         createSubGroupRequest.parent_id = groupId;
         CreateGroupResponse createSubGroupResponse = gitLabService.createGroup(createSubGroupRequest);
         if (createSubGroupResponse.id == null)
-            throw new RuntimeException("Unable to searh/create project name group in gitlab");
+            throw new RuntimeException("Unable to search/create project name group in gitlab");
 
         // Create Project
         GitLabCreateProjectRequest gitLabCreateProjectRequest = new GitLabCreateProjectRequest();
         gitLabCreateProjectRequest.namespace_id = createSubGroupResponse.id;
-        gitLabCreateProjectRequest.description = "\uD83C\uDF7E\uD83C\uDF7E Repository Created on " + new Date()+ " \uD83C\uDF7E\uD83C\uDF7E";
         gitLabCreateProjectRequest.name = RESIDENCY_PROJECT_NAME;
         return gitLabService.createNewProject(gitLabCreateProjectRequest);
 
-        //first try to fetch the custoner_naem group and get tht eid, if doesnot exists create a group.
+        //first try to fetch the customer_name group and get the eid, if doesn't exists create a group.
         //then create the project . if project exists freak out
-        //cerate iac repo.
-
-
+        //create iac repo.
     }
 
     private Integer getOrCreateGroup(String groupName) {
@@ -87,15 +84,5 @@ public class GroupsResource {
             return createGroupResponse.id;
         }
         return searchGroupResponse[0].id;
-    }
-
-    public CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest) {
-        assert (createGroupRequest.name != null);
-        return gitLabService.createGroup(createGroupRequest);
-    }
-
-    public SearchGroupResponse searchGroupResponse(String search) {
-        assert (search != null);
-        return gitLabService.searchGroup(search)[0];
     }
 }

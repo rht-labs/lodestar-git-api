@@ -40,7 +40,7 @@ public class TemplateResource {
     protected String metaFileFolder;
 
     @Inject
-    FileResource fileResource;
+    protected FileResource fileResource;
 
     /**
      * This method returns a map which contains filename to filecontent rows
