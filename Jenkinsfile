@@ -8,7 +8,7 @@ pipeline{
     environment {
         // Global Vars
 
-        NAMESPACE_PREFIX="labs"
+        NAMESPACE_PREFIX="omp"
 
         PIPELINES_NAMESPACE = "${NAMESPACE_PREFIX}-ci-cd"
         APP_NAME = "omp-git-api"
@@ -99,7 +99,7 @@ pipeline{
         stage("Test/Build/Nexus/OpenShift Build"){
             agent {
                 node {
-                    label "jenkins-slave-graal"
+                    label "jenkins-slave-mvn"
                 }
             }
             stages{
