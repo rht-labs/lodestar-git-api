@@ -11,6 +11,9 @@ import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
 import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
 import com.redhat.labs.omp.services.GitLabService;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.metrics.MetricUnits;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +48,8 @@ public class ResidenciesResource {
     protected GitLabService gitLabService;
 
     @POST
+    @Counted(name = "residencies", description = "How many residencies reuquest have been requested")
+    @Timed(name = "performedChecks", description = "How much time it takes to create residency", unit = MetricUnits.MILLISECONDS)
     public Object createResidency(Residency residency) {
         GitLabCreateProjectResponse gitLabCreateProjectResponse = createGitLabProject(residency);
 
