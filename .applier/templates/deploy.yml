@@ -39,8 +39,23 @@ objects:
           - name: GITLAB_PERSONAL_ACCESS_TOKEN
             valueFrom:
               secretKeyRef:
-                name: gitlab-token-secret
+                name: omp-gitlab-configuration
                 key: GITLAB_PERSONAL_ACCESS_TOKEN
+          - name: TEMPLATE_REPOSITORY_ID
+            valueFrom:
+              secretKeyRef:
+                name: omp-gitlab-configuration
+                key: TEMPLATE_REPOSITORY_ID
+          - name: RESIDENCIES_REPOSITORY_ID
+            valueFrom:
+              secretKeyRef:
+                name: omp-gitlab-configuration
+                key: RESIDENCIES_REPOSITORY_ID
+          - name: GITLAB_API_URL
+            valueFrom:
+              secretKeyRef:
+                name: omp-gitlab-configuration
+                key: GITLAB_API_URL
           ports:
           - containerPort: 8080
             protocol: TCP
