@@ -65,4 +65,19 @@ TEMPLATE_REPOSITORY_ID
 RESIDENCIES_PARENT_REPOSITORIES_ID
 GITLAB_API_URL
 
+## Pipeline
+
+The deployment pipeline is running through a Jenkinsfile located in the root folder of the project. This Jenksinfile is written in groovy.
+The first stage is going to set environment vars based on the branch selected to build:
+
+master - env.PROJECT_NAMESPACE = "${NAMESPACE_PREFIX}-test"
+         env.NODE_ENV = "test"
+         env.QUARKUS_PROFILE = "openshift-test"
+         env.RELEASE = true
+
+develop.* or feature.* - env.PROJECT_NAMESPACE = "${NAMESPACE_PREFIX}-dev"
+	                     env.NODE_ENV = "dev"
+	                     env.QUARKUS_PROFILE = "openshift-dev"
+
+From there Ansible will run a playbook called Openshift Applier
 
