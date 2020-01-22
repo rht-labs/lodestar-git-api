@@ -27,6 +27,8 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TemplateResource {
+    public static Logger logger = LoggerFactory.getLogger(TemplateResource.class);
+
     @Inject
     @RestClient
     public GitLabService gitLabService;
@@ -37,6 +39,8 @@ public class TemplateResource {
     @ConfigProperty(name = "metaFileFolder", defaultValue = "schema")
     protected String metaFileFolder;
 
+    @Inject
+    FileResource fileResource;
 
     /**
      * This method returns a map which contains filename to filecontent rows
@@ -47,24 +51,15 @@ public class TemplateResource {
     @Logged
     public GetMultipleFilesResponse getAllFilesFromGit() {
 
-   /*     GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, metaFileLocation, "master" );
-
-//        Object fileObject = metaFileResponse.getEntity();
-
-        logger.info("logger {}", metaFileResponse);
-
-        String base64Content = metaFileResponse.content;
-        String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);*/
-
         List<SingleFileResponse> allFiles = new ArrayList<>(10);
 
-        SingleFileResponse metaFileContent = fetchContentFromGit(metaFileFolder + "/meta.dat");
+        SingleFileResponse metaFileContent = fileResource.fetchContentFromGit(metaFileFolder + "/meta.dat", templateRepositoryId);
 
         String[] lines = metaFileContent.getFileContent().split("\\r?\\n");
         for (String line : lines) {
             String fileName = line;
             logger.info("line " + " : " + metaFileFolder + fileName.substring(1));
-            SingleFileResponse fileResponse = fetchContentFromGit(metaFileFolder + line.substring(1));
+            SingleFileResponse fileResponse = fileResource.fetchContentFromGit(metaFileFolder + line.substring(1), templateRepositoryId);
             allFiles.add(fileResponse);
         }
 
@@ -72,26 +67,8 @@ public class TemplateResource {
         getMultipleFilesResponse.files = allFiles; //.toArray(new SingleFileResponse[allFiles.size()]);
         return getMultipleFilesResponse;
 
-
     }
 
-    private SingleFileResponse fetchContentFromGit(String fileName) {
-        GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, "master");
-        String base64Content = metaFileResponse.content;
-        String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
-        logger.info("File {} content fetched {}", fileName, content);
-        return new SingleFileResponse(fileName, content);
-    }
-
-
-    public static Logger logger = LoggerFactory.getLogger(TemplateResource.class);
-
-
-    /**
-     * repositoryId is an Integer
-     *
-     * @param repositoryName
-     */
 
     public void commitMultipleFilesToRepository(Integer repositoryId, CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest) {
         assert (repositoryId != null);

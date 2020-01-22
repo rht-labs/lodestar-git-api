@@ -9,8 +9,6 @@ pipeline{
         // Global Vars
 
         NAMESPACE_PREFIX="labs"
-        GIT_DOMAIN = "github.com"
-        GIT_ORG = "rht-labs"
 
         PIPELINES_NAMESPACE = "${NAMESPACE_PREFIX}-ci-cd"
         APP_NAME = "omp-git-api"
@@ -137,13 +135,6 @@ pipeline{
             
                     }
                 }
-//                stage("Sonar Quality Gate"){
-//                    steps {
-//                        timeout(time: 1, unit: 'HOURS') {
-//                            waitForQualityGate abortPipeline: false
-//                        }
-//                    }
-//                }
                 stage("Deploy to Nexus"){
                     when {
                         expression { currentBuild.result != 'UNSTABLE' }
