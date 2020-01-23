@@ -52,6 +52,7 @@ public class ResidenciesResource {
     @Timed(name = "performedChecks", description = "How much time it takes to create residency", unit = MetricUnits.MILLISECONDS)
     public String createResidency(Residency residency) {
         GitLabCreateProjectResponse gitLabCreateProjectResponse = createGitLabProject(residency);
+        residency.id = gitLabCreateProjectResponse.id;
 
         GetMultipleFilesResponse getMultipleFilesResponse = combobulator.process(residency.toMap());
 
