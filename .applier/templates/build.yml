@@ -20,6 +20,8 @@ objects:
     failedBuildsHistoryLimit: 5
     nodeSelector: null
     output:
+      pushSecret:
+        name: ${PUSH_SECRET}
       to:
         kind: ImageStreamTag
         name: "${OUTPUT_IMAGE_NAME}:${OUTPUT_IMAGE_TAG}"
