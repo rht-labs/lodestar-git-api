@@ -1,6 +1,7 @@
 package com.redhat.labs.omp.resources;
 
 
+import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
 import com.redhat.labs.omp.models.CreateResidencyGroupStructure;
 import com.redhat.labs.omp.models.FileAction;
 import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
@@ -28,8 +29,8 @@ import javax.ws.rs.core.MediaType;
 @Path("/api/residencies")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class ResidenciesResource {
-    public static Logger logger = LoggerFactory.getLogger(ResidenciesResource.class);
+public class EngagementResource {
+    public static Logger logger = LoggerFactory.getLogger(EngagementResource.class);
 
     @ConfigProperty(name = "stripPathPrefix", defaultValue = "schema/")
     protected String stripPathPrefix;

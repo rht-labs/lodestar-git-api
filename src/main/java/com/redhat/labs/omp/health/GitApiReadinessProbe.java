@@ -36,7 +36,6 @@ public class GitApiReadinessProbe implements HealthCheck{
 
     private boolean checkGitLabConnection() {
         Response r = gitLabService.getProjects();
-//        return r.getStatus() == 200 ? true : false;
         return r.getStatus() == 200;
     }
 }
