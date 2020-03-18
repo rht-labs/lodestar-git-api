@@ -1,7 +1,6 @@
 package com.redhat.labs.omp.resources;
 
 
-import com.redhat.labs.omp.models.GetFileResponse;
 import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
 import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
 import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
@@ -18,9 +17,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 @Path("/api/templates")

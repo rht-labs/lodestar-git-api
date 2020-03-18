@@ -1,7 +1,8 @@
 package com.redhat.labs.cache;
 
 import java.util.List;
-import java.util.Map;
+
+import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
 
 /**
  * This interface defines the contract to store data for the received events.
@@ -21,6 +22,8 @@ public interface ResidencyDataStore {
      */
     public void store(String key, ResidencyInformation residencyInformation);
 
+    public void store(String key, SingleFileResponse file);
+
     /**
      * return NULL if the key is not present
      * there are two entries in the values map
@@ -36,5 +39,7 @@ public interface ResidencyDataStore {
      * @return
      */
     public List<String> getAllKeys();
+
+    public void cleanCache();
 
 }

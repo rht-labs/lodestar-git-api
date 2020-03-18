@@ -1,18 +1,13 @@
 package com.redhat.labs.omp.resources;
 
 import com.redhat.labs.omp.models.*;
-import com.redhat.labs.omp.resources.ProjectsResource;
 import com.redhat.labs.omp.services.GitLabService;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.jboss.resteasy.spi.NotImplementedYetException;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.util.Date;
 
 @Path("/api/groups")
 @Produces(MediaType.APPLICATION_JSON)
@@ -67,7 +62,7 @@ public class GroupsResource {
     }
 
     private Integer getOrCreateGroup(String groupName) {
-        assert (groupName != null);
+        assert groupName != null;
         SearchGroupResponse[] searchGroupResponse = gitLabService.searchGroup(groupName);
         if (searchGroupResponse != null && searchGroupResponse.length > 1)
             throw new RuntimeException("Too many projects found for the requested name. Expected only one");

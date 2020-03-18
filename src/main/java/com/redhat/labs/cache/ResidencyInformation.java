@@ -1,6 +1,5 @@
 package com.redhat.labs.cache;
 
-import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,16 +7,17 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * A utility class to hold the rediency data
+ * A utility class to hold the residency data
  */
 public class ResidencyInformation implements Serializable {
+	public static Logger logger = LoggerFactory.getLogger(ResidencyInformation.class);
 
     private final String residencyYaml;
 
     //TODO - Change it to a more stricter object
     private final Object metadata;
 
-    private static final long serialversionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public ResidencyInformation(String residencyYaml, Object metadata) {
 
@@ -27,7 +27,7 @@ public class ResidencyInformation implements Serializable {
         explodeData();
     }
 
-    //a utlitu method to read meta data and stoe them as value for easier access
+    //a utlity method to read meta data and store them as value for easier access
     private void explodeData() {
         logger.info("Not exploding ATM");
     }
@@ -41,7 +41,6 @@ public class ResidencyInformation implements Serializable {
         return metadata;
     }
 
-    public static Logger logger = LoggerFactory.getLogger(ResidencyInformation.class);
 
     @Override
     public boolean equals(Object o) {
