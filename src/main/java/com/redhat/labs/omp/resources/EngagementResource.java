@@ -1,7 +1,27 @@
 package com.redhat.labs.omp.resources;
 
 
-import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
+import java.net.URI;
+
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.metrics.MetricUnits;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Timed;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.redhat.labs.omp.models.CreateResidencyGroupStructure;
 import com.redhat.labs.omp.models.FileAction;
 import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
@@ -11,26 +31,12 @@ import com.redhat.labs.omp.models.filesmanagement.CreateCommitFileRequest;
 import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
 import com.redhat.labs.omp.services.GitLabService;
 import com.redhat.labs.omp.utils.TemplateCombobulator;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.metrics.MetricUnits;
-import org.eclipse.microprofile.metrics.annotation.Counted;
-import org.eclipse.microprofile.metrics.annotation.Timed;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 @Path("/api/residencies")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class EngagementResource {
-    public static Logger logger = LoggerFactory.getLogger(EngagementResource.class);
+    public static Logger LOGGER = LoggerFactory.getLogger(EngagementResource.class);
 
     @ConfigProperty(name = "stripPathPrefix", defaultValue = "schema/")
     protected String stripPathPrefix;
@@ -51,7 +57,7 @@ public class EngagementResource {
     @POST
     @Counted(name = "residencies", description = "How many residencies request have been requested")
     @Timed(name = "performedChecks", description = "How much time it takes to create residency", unit = MetricUnits.MILLISECONDS)
-    public String createResidency(Residency residency) {
+    public Response createResidency(Residency residency, @Context UriInfo uriInfo) {
         GitLabCreateProjectResponse gitLabCreateProjectResponse = createGitLabProject(residency);
         residency.id = gitLabCreateProjectResponse.id;
 
@@ -59,7 +65,16 @@ public class EngagementResource {
 
         CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest = getCommitMultipleFilesInRepositoryRequest(residency, getMultipleFilesResponse);
 
-        return gitLabService.createFilesInRepository(gitLabCreateProjectResponse.id, commitMultipleFilesInRepsitoryRequest).readEntity(String.class);
+        Response gitResponse = gitLabService.createFilesInRepository(gitLabCreateProjectResponse.id, commitMultipleFilesInRepsitoryRequest);
+
+        if(gitResponse.getStatus() == 201) {
+            UriBuilder builder = uriInfo.getAbsolutePathBuilder();
+            builder.path(Integer.toString(gitLabCreateProjectResponse.id));
+            return Response.created(builder.build()).build();
+        }
+
+        return gitResponse;
+
     }
 
     private CommitMultipleFilesInRepsitoryRequest getCommitMultipleFilesInRepositoryRequest(Residency residency, GetMultipleFilesResponse getMultipleFilesResponse) {

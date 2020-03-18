@@ -36,6 +36,8 @@ public class FileResource {
     }
 
     public SingleFileResponse fetchContentFromGit(String fileName, String templateRepositoryId, String branch) {
+        LOGGER.debug(String.format("Template Repo %s filename %s branch %s", templateRepositoryId, fileName, branch));
+
         GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, branch == null ? "master" : branch);
         String base64Content = metaFileResponse.content;
         String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
