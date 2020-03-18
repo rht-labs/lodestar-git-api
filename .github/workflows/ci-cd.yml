@@ -21,7 +21,7 @@ jobs:
         java-version: 13.0.1
     - name: Build with Maven & Quarkus
       run: mvn test
-    - uses: jacobsee/s2i-github-action@master
+    - uses: redhat-cop/github-actions/s2i@master
       with:
         base: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift
         output_image: "quay.io/rht-labs/omp-git-api:build-${{ github.run_number }}"
