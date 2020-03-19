@@ -5,6 +5,8 @@ import com.redhat.labs.omp.models.GetFileResponse;
 import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
 import com.redhat.labs.omp.resources.filters.Logged;
 import com.redhat.labs.omp.services.GitLabService;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +29,10 @@ public class FileResource {
     protected GitLabService gitLabService;
     
     @Inject
-    private ResidencyDataCache cache;
+    protected ResidencyDataCache cache;
+
+    @ConfigProperty(name = "file_branch", defaultValue = "master")
+    protected String defaultBranch;
 
     @GET
     @Logged
@@ -36,9 +41,11 @@ public class FileResource {
     }
 
     public SingleFileResponse fetchContentFromGit(String fileName, String templateRepositoryId, String branch) {
-        LOGGER.debug(String.format("Template Repo %s filename %s branch %s", templateRepositoryId, fileName, branch));
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug(String.format("Template Repo %s filename %s branch %s", templateRepositoryId, fileName, branch));
+        }
 
-        GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, branch == null ? "master" : branch);
+        GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, branch == null ? defaultBranch : branch);
         String base64Content = metaFileResponse.content;
         String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
         LOGGER.debug("File {} content fetched {}", fileName, content);

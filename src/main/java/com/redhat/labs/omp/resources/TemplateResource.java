@@ -24,7 +24,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class TemplateResource {
-    public static Logger logger = LoggerFactory.getLogger(TemplateResource.class);
+    public static Logger LOGGER = LoggerFactory.getLogger(TemplateResource.class);
 
     @Inject
     @RestClient
@@ -54,14 +54,15 @@ public class TemplateResource {
 
         String[] lines = metaFileContent.getFileContent().split("\\r?\\n");
         for (String line : lines) {
-            String fileName = line;
-            logger.info("line " + " : " + metaFileFolder + fileName.substring(1));
+            if(LOGGER.isDebugEnabled()) {
+                LOGGER.debug("line " + " : " + metaFileFolder + line.substring(1));
+            }
             SingleFileResponse fileResponse = fileResource.fetchContentFromGit(metaFileFolder + line.substring(1), templateRepositoryId);
             allFiles.add(fileResponse);
         }
 
         GetMultipleFilesResponse getMultipleFilesResponse = new GetMultipleFilesResponse();
-        getMultipleFilesResponse.files = allFiles; //.toArray(new SingleFileResponse[allFiles.size()]);
+        getMultipleFilesResponse.files = allFiles;
         return getMultipleFilesResponse;
 
     }
@@ -71,7 +72,7 @@ public class TemplateResource {
         assert (repositoryId != null);
         assert (commitMultipleFilesInRepsitoryRequest.branch != null);
         assert (commitMultipleFilesInRepsitoryRequest.commitMessage != null);
-        logger.info("Trying to commit upload files {} into reqoistory {}", commitMultipleFilesInRepsitoryRequest, repositoryId);
+        LOGGER.info("Trying to commit upload files {} into repository {}", commitMultipleFilesInRepsitoryRequest, repositoryId);
         gitLabService.createFilesInRepository(repositoryId, commitMultipleFilesInRepsitoryRequest);
 
     }

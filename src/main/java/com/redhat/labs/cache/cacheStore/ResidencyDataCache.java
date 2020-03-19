@@ -32,7 +32,7 @@ public class ResidencyDataCache implements ResidencyDataStore {
     protected RemoteCacheManager cacheManager;
     
     @Inject @Remote("omp")
-    private RemoteCache<String, Object> cache;
+    protected RemoteCache<String, Object> cache;
 
     public RemoteCacheManager getRemoteCacheManager() {
         return cacheManager;
