@@ -1,29 +1,29 @@
 ---
 
 residency:
-  id: "{id}"
-  customer_name: "{customer_name}"
-  project_name: "{project_name}"
-  description: "{description}"
-  location: "{location}"
-  start_date: "{start_date}"
-  end_date: "{end_date}"
-  archive_date: "{archive_date}"
+  id: "{engagement.id}"
+  customer_name: "{engagement.customerName}"
+  project_name: "{engagement.projectName}"
+  description: "{engagement.description}"
+  location: "{engagement.location}"
+  start_date: "{engagement.startDate}"
+  end_date: "{engagement.endDate}"
+  archive_date: "{engagement.archiveDate}"
   contacts:
     engagement_lead:
-      name: "{engagement_lead_name}"
-      email: "{engagement_lead_email}"
+      name: "{engagement.engagementLeadName}"
+      email: "{engagement.engagementLeadEmail}"
     technical_lead:
-      name: "{technical_lead_name}"
-      email: "{technical_lead_email}"
+      name: "{engagement.technicalLeadName}"
+      email: "{engagement.technicalLeadEmail}"
     customer_contact:
-      name: "{customer_contact_name}"
-      email: "{customer_contact_email}"
+      name: "{engagement.customerContactName}"
+      email: "{engagement.customerContactEmail}"
   openshift_cluster:
     cloud_provider:
-      name: "{ocp_cloud_provider_name}"
-      region: "{ocp_cloud_provider_region}"
-    version: "{ocp_version}"
-    sub_domain: "{ocp_sub_domain}"
-    persistent_storage_size: "{ocp_persistent_storage_size}"
-    cluster_size: "{ocp_cluster_size}"
+      name: "{engagement.ocpCloudProviderName}"
+      region: "{engagement.ocpCloudProviderRegion}"
+    version: "{engagement.ocpVersion}"
+    sub_domain: "{engagement.ocpSubDomain}"
+    persistent_storage_size: "{engagement.ocpPersistentStorageSize}"
+    cluster_size: "{engagement.ocpClusterSize}"

@@ -1,28 +1,23 @@
 package com.redhat.labs.omp;
 
-import com.redhat.labs.omp.mocks.MockHotRodServer;
-import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
-import com.redhat.labs.omp.utils.TemplateCombobulator;
-import io.quarkus.qute.TemplateInstance;
-import io.quarkus.test.junit.QuarkusTest;
+import javax.inject.Inject;
 
 import org.infinispan.server.hotrod.HotRodServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
+import com.redhat.labs.omp.mocks.MockHotRodServer;
+import com.redhat.labs.omp.models.Engagement;
+import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
+import com.redhat.labs.omp.utils.TemplateCombobulator;
+
+import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 public class TemplateCombobulatorTest {
     private static HotRodServer hs;
-
-    Map<String, Object> myMap;
-    String exampleTemplate;
 
     @Inject
     TemplateCombobulator templateCombobulator;
@@ -37,63 +32,67 @@ public class TemplateCombobulatorTest {
         hs.stop();
     }
 
-    @BeforeEach
-    public void setupTestData(){
-        myMap = new HashMap<>();
-        myMap.put("customer_name", "mickey-mouse");
-        myMap.put("engagement_lead_email", "michael.mouse@disney.com");
-        myMap.put("location", "Magic Kingdom");
-        exampleTemplate = "residency:\n" +
-                "  id: \"{id}\"\n" +
-                "  customer_name: \"{customer_name}\"\n" +
-                "  project_name: \"{project_name}\"\n" +
-                "  description: \"{description}\"\n" +
-                "  location: \"{location}\"\n" +
-                "  start_date: \"{start_date}\"\n" +
-                "  end_date: \"{end_date}\"\n" +
-                "  archive_date: \"{archive_date}\"\n" +
-                "  contacts:\n" +
-                "    engagement_lead:\n" +
-                "      name: \"{engagement_lead_name}\"\n" +
-                "      email: \"{engagement_lead_email}\"\n" +
-                "    technical_lead:\n" +
-                "      name: \"{technical_lead_name}\"\n" +
-                "      email: \"{technical_lead_email}\"\n" +
-                "    customer_contact:\n" +
-                "      name: \"{customer_contact_name}\"\n" +
-                "      email: \"{customer_contact_email}\"\n" +
-                "  openshift_cluster:\n" +
-                "    cloud_provider:\n" +
-                "      name: \"{ocp_cloud_provider_name}\"\n" +
-                "      region: \"{ocp_cloud_provider_region}\"\n" +
-                "    version: \"{ocp_version}\"\n" +
-                "    sub_domain: \"{ocp_sub_domain}\"\n" +
-                "    persistent_storage_size: \"{ocp_persistent_storage_size}\"\n" +
-                "    cluster_size: \"{ocp_cluster_size}\"";
-    }
-
-    @Test
-    void templateCombobulator(){
-        TemplateInstance templateInstance = templateCombobulator.combobulateTemplateInstance(exampleTemplate, myMap);
-        Assertions.assertNotNull(templateInstance);
-        String result = templateInstance.render();
-
-        Assertions.assertTrue(result.contains("mickey-mouse"));
-
-        Assertions.assertTrue(result.contains("michael.mouse@disney.com"));
-
-        Assertions.assertTrue(result.contains("Magic Kingdom"));
-
-    }
-
     @Test
     void processTemplate() {
-        GetMultipleFilesResponse processedFiles = templateCombobulator.process(myMap);
+        Engagement eng = new Engagement();
+        eng.id = 1;
+        eng.archiveDate = "20201225";
+        eng.startDate = "20200101";
+        eng.endDate = "20200404";
+        eng.customerContactEmail = "jim@redhat.com";
+        eng.customerContactName = "mickey-mouse";
+        eng.customerName = "Santa";
+        eng.description = "North Pole Inventroy";
+        eng.engagementLeadEmail = "michael.mouse@disney.com";
+        eng.engagementLeadEmail = "joe@redhat.com";
+        eng.location = "Magic Kingdom";
+        eng.ocpCloudProviderName = "GCP";
+        eng.ocpCloudProviderRegion = "west";
+        eng.ocpClusterSize = "medium";
+        eng.ocpPersistentStorageSize = "50TB";
+        eng.ocpSubDomain = "claws";
+        eng.ocpVersion = "1.0.0";
+        eng.projectName = "Gift gifts";
+        eng.technicalLeadEmail = "michael.mouse@disney.com";
+        eng.technicalLeadName = "Mitch";
+        GetMultipleFilesResponse processedFiles = templateCombobulator.process(eng);
+
+        String expected = "---\n" +
+                "\n" +
+                "residency:\n" +
+                "  id: \"1\"\n" +
+                "  customer_name: \"Santa\"\n" +
+                "  project_name: \"Gift gifts\"\n" +
+                "  description: \"North Pole Inventroy\"\n" +
+                "  location: \"Magic Kingdom\"\n" +
+                "  start_date: \"20200101\"\n" +
+                "  end_date: \"20200404\"\n" +
+                "  archive_date: \"20201225\"\n" +
+                "  contacts:\n" +
+                "    engagement_lead:\n" +
+                "      name: \"\"\n" +
+                "      email: \"joe@redhat.com\"\n" +
+                "    technical_lead:\n" +
+                "      name: \"Mitch\"\n" +
+                "      email: \"michael.mouse@disney.com\"\n" +
+                "    customer_contact:\n" +
+                "      name: \"mickey-mouse\"\n" +
+                "      email: \"jim@redhat.com\"\n" +
+                "  openshift_cluster:\n" +
+                "    cloud_provider:\n" +
+                "      name: \"GCP\"\n" +
+                "      region: \"west\"\n" +
+                "    version: \"1.0.0\"\n" +
+                "    sub_domain: \"claws\"\n" +
+                "    persistent_storage_size: \"50TB\"\n" +
+                "    cluster_size: \"medium\"\n";
+
+        String content = processedFiles.files.get(0).fileContent;
+
+        Assertions.assertEquals(expected, content);
         //      🤠 Dirty hack to get the first index of the files array 🤠
-        Assertions.assertTrue(processedFiles.files.get(0).fileContent.contains("mickey-mouse"));
-
-        Assertions.assertTrue(processedFiles.files.get(0).fileContent.contains("michael.mouse@disney.com"));
-
-        Assertions.assertTrue(processedFiles.files.get(0).fileContent.contains("Magic Kingdom"));
+        Assertions.assertTrue(content.contains("mickey-mouse"));
+        Assertions.assertTrue(content.contains("michael.mouse@disney.com"));
+        Assertions.assertTrue(content.contains("Magic Kingdom"));
     }
 }

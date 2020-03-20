@@ -1,9 +1,9 @@
 package com.redhat.labs.omp.resources;
 
-
-import java.net.URI;
-
 import javax.inject.Inject;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
+import javax.json.bind.config.PropertyNamingStrategy;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.redhat.labs.omp.models.CreateResidencyGroupStructure;
 import com.redhat.labs.omp.models.FileAction;
 import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
-import com.redhat.labs.omp.models.Residency;
+import com.redhat.labs.omp.models.Engagement;
 import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
 import com.redhat.labs.omp.models.filesmanagement.CreateCommitFileRequest;
 import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
@@ -55,15 +55,19 @@ public class EngagementResource {
     protected GitLabService gitLabService;
 
     @POST
-    @Counted(name = "residencies", description = "How many residencies request have been requested")
-    @Timed(name = "performedChecks", description = "How much time it takes to create residency", unit = MetricUnits.MILLISECONDS)
-    public Response createResidency(Residency residency, @Context UriInfo uriInfo) {
-        GitLabCreateProjectResponse gitLabCreateProjectResponse = createGitLabProject(residency);
-        residency.id = gitLabCreateProjectResponse.id;
+    @Counted(name = "engagement", description = "How many engagements request have been requested")
+    @Timed(name = "performedChecks", description = "How much time it takes to create an engagement", unit = MetricUnits.MILLISECONDS)
+    public Response createEngagement(Engagement engagement, @Context UriInfo uriInfo) {
 
-        GetMultipleFilesResponse getMultipleFilesResponse = combobulator.process(residency.toMap());
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("{}", JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES)).toJson(engagement));
+        }
+        GitLabCreateProjectResponse gitLabCreateProjectResponse = createGitLabProject(engagement);
+        engagement.id = gitLabCreateProjectResponse.id;
 
-        CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest = getCommitMultipleFilesInRepositoryRequest(residency, getMultipleFilesResponse);
+        GetMultipleFilesResponse getMultipleFilesResponse = combobulator.process(engagement);
+
+        CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest = getCommitMultipleFilesInRepositoryRequest(engagement, getMultipleFilesResponse);
 
         Response gitResponse = gitLabService.createFilesInRepository(gitLabCreateProjectResponse.id, commitMultipleFilesInRepsitoryRequest);
 
@@ -77,13 +81,13 @@ public class EngagementResource {
 
     }
 
-    private CommitMultipleFilesInRepsitoryRequest getCommitMultipleFilesInRepositoryRequest(Residency residency, GetMultipleFilesResponse getMultipleFilesResponse) {
+    private CommitMultipleFilesInRepsitoryRequest getCommitMultipleFilesInRepositoryRequest(Engagement engagement, GetMultipleFilesResponse getMultipleFilesResponse) {
         CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest = new CommitMultipleFilesInRepsitoryRequest();
         getMultipleFilesResponse.files.stream().forEach(f -> {
             commitMultipleFilesInRepsitoryRequest.addFileRequest(new CreateCommitFileRequest(FileAction.create, stripPrefix(f.fileName), f.fileContent));
         });
-        commitMultipleFilesInRepsitoryRequest.authorEmail = residency.engagementLeadEmail;
-        commitMultipleFilesInRepsitoryRequest.authorName = residency.engagementLeadName;
+        commitMultipleFilesInRepsitoryRequest.authorEmail = engagement.engagementLeadEmail;
+        commitMultipleFilesInRepsitoryRequest.authorName = engagement.engagementLeadName;
         commitMultipleFilesInRepsitoryRequest.commitMessage = "\uD83E\uDD84 Created by OMP Git API \uD83D\uDE80 \uD83C\uDFC1";
         return commitMultipleFilesInRepsitoryRequest;
     }
@@ -95,7 +99,7 @@ public class EngagementResource {
         return in;
     }
 
-    private GitLabCreateProjectResponse createGitLabProject(Residency residency) {
+    private GitLabCreateProjectResponse createGitLabProject(Engagement residency) {
         CreateResidencyGroupStructure createResidencyGroupStructure = new CreateResidencyGroupStructure();
         createResidencyGroupStructure.projectName = residency.projectName;
         createResidencyGroupStructure.customerName = residency.customerName;
