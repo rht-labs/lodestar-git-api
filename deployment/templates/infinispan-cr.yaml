@@ -1,0 +1,13 @@
+apiVersion: infinispan.org/v1
+kind: Infinispan
+metadata:
+  name: omp-cache
+spec:
+  replicas: 1
+  image: infinispan/server:10.1
+  logging:
+    categories:
+      org.infinispan: info
+      org.jgroups: info
+  security:
+    endpointSecretName: omp-cache-secret
