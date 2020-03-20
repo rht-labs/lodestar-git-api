@@ -141,25 +141,25 @@ mvn deploy
 
 ##### OpenShift Build
 
+The OpenShift build is going to start after the Nexus deployment is complet and successful.
+
+###### OpenShift Atomic Registry
+
+If you're pushing from the master branch the build will create a container image and push it to the Openshift internal registry.
+
 ```
 oc project ${PIPELINES_NAMESPACE}
 oc patch bc ${APP_NAME} -p "{\\"spec\\":{\\"output\\":{\\"to\\":{\\"kind\\":\\"ImageStreamTag\\",\\"name\\":\\"${APP_NAME}:${JENKINS_TAG}\\"}}}}"
 oc start-build ${APP_NAME} --from-file=target/${ARTIFACTID}-${VERSION}-runner.jar --follow
 ```
 
-#### OpenShift Deployment
+###### Quay
 
-Jenkins will spin up an Ansible agent that will run a playbook called OpenShift Applier (https://github.com/redhat-cop/openshift-applier). The `openshift-applier` is used to apply OpenShift objects to an OpenShift Cluster. 
-
-This agent is going to download the playbook dependencies using Ansible Galaxy and apply the playbook using **environment** as a *filter_tag*. This is going to create the necessary resources for our application deploy in an OpenShift cluster. 
-
-Once the resources are ready the pipeline is going to patch the DC with the new image and start a rollout deployment.
+If you're pushing from a release tag the build will create a container image and push it to Quay.
 
 ```
-oc set env dc ${APP_NAME} NODE_ENV=${NODE_ENV} QUARKUS_PROFILE=${QUARKUS_PROFILE}
-oc set image dc/${APP_NAME} ${APP_NAME}=docker-registry.default.svc:5000/${PROJECT_NAMESPACE}/${APP_NAME}:${JENKINS_TAG}
-oc label --overwrite dc ${APP_NAME} stage=${NODE_ENV}
-oc patch dc ${APP_NAME} -p "{\\"spec\\":{\\"template\\":{\\"metadata\\":{\\"labels\\":{\\"version\\":\\"${VERSION}\\",\\"release\\":\\"${RELEASE}\\",\\"stage\\":\\"${NODE_ENV}\\",\\"git-commit\\":\\"${GIT_COMMIT}\\",\\"jenkins-build\\":\\"${JENKINS_TAG}\\"}}}}}"
-oc rollout latest dc/${APP_NAME}
+oc project ${PIPELINES_NAMESPACE} # probs not needed
+oc patch bc ${APP_NAME} -p "{\\"spec\\":{\\"output\\":{\\"to\\":{\\"kind\\":\\"DockerImage\\",\\"name\\":\\"quay.io/rht-labs/${APP_NAME}:${JENKINS_TAG}\\"}}}}"
+oc start-build ${APP_NAME} --from-file=target/${ARTIFACTID}-${VERSION}-runner.jar --follow
 ```
 
