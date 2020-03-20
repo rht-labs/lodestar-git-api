@@ -1,4 +1,4 @@
-name: omp-backend
+name: omp-git-api
 
 servicePort: 8080
 
