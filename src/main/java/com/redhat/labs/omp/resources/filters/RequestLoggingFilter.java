@@ -1,6 +1,5 @@
 package com.redhat.labs.omp.resources.filters;
 
-import com.redhat.labs.cache.GitSyncManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

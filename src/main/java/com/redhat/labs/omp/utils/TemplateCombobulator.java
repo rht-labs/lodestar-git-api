@@ -33,7 +33,7 @@ public class TemplateCombobulator {
         return processedTemplate;
     }
 
-    public String combobulateTemplateInstanceAsString(String templateName, Map<String, Object> templateVariables) {
+    private String combobulateTemplateInstanceAsString(String templateName, Map<String, Object> templateVariables) {
         return this.combobulateTemplateInstance(templateName, templateVariables).render();
     }
 

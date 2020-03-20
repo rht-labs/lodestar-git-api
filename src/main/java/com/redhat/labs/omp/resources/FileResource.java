@@ -1,5 +1,6 @@
 package com.redhat.labs.omp.resources;
 
+import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
 import com.redhat.labs.omp.models.GetFileResponse;
 import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
 import com.redhat.labs.omp.resources.filters.Logged;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.nio.charset.StandardCharsets;
@@ -18,11 +20,14 @@ import java.util.Base64;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class FileResource {
-    public static Logger logger = LoggerFactory.getLogger(FileResource.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(FileResource.class);
 
     @Inject
     @RestClient
     protected GitLabService gitLabService;
+    
+    @Inject
+    private ResidencyDataCache cache;
 
     @GET
     @Logged
@@ -31,11 +36,19 @@ public class FileResource {
     }
 
     public SingleFileResponse fetchContentFromGit(String fileName, String templateRepositoryId, String branch) {
+        LOGGER.debug(String.format("Template Repo %s filename %s branch %s", templateRepositoryId, fileName, branch));
+
         GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, branch == null ? "master" : branch);
         String base64Content = metaFileResponse.content;
         String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
-        logger.debug("File {} content fetched {}", fileName, content);
-        return new SingleFileResponse(fileName, content);
+        LOGGER.debug("File {} content fetched {}", fileName, content);
+        SingleFileResponse response = new SingleFileResponse(fileName, content);
+        if(content != null) {
+            String cacheJson = JsonbBuilder.create().toJson(response);
+            LOGGER.info("adding {} to cache", fileName);
+            cache.store(fileName, cacheJson);
+        }
+        return response;
     }
 
     public SingleFileResponse fetchContentFromGit(String fileName, String templateRepositoryId) {
