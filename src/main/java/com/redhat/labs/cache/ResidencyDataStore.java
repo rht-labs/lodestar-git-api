@@ -22,7 +22,7 @@ public interface ResidencyDataStore {
      */
     public void store(String key, ResidencyInformation residencyInformation);
 
-    public void store(String key, SingleFileResponse file);
+    public void store(SingleFileResponse file);
 
     /**
      * return NULL if the key is not present
@@ -32,7 +32,7 @@ public interface ResidencyDataStore {
      * @param key
      * @return
      */
-    public ResidencyInformation fetch(String key);
+    public String fetch(String key);
 
     /**
      * return all the KEYS stored in the cahe.
