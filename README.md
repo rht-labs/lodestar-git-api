@@ -83,8 +83,13 @@ Create a secret file named `omp-cache-secret.yaml`. This secret will create an `
 
 ```
 apiVersion: v1
-data:
-  identities.yaml: Y3JlZGVudGlhbHM6Ci0gdXNlcm5hbWU6IG9tcAogIHBhc3N3b3JkOiBvbXAKLSB1c2VybmFtZTogb3BlcmF0b3IKICBwYXNzd29yZDogTDdFYXZOQklBRXhORDVHdAo=
+stringData:
+  identities.yaml: |+
+    credentials:
+    - username: omp
+      password: omp
+    - username: operator
+      password: operator1
 kind: Secret
 metadata:
   labels:
