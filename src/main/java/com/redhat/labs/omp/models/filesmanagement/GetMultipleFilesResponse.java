@@ -9,4 +9,8 @@ import java.util.List;
 public class GetMultipleFilesResponse implements Serializable {
     @JsonbProperty("files")
     public List<SingleFileResponse> files;
+
+    public String toString() {
+        return GetMultipleFilesResponse.class.getName() + " :: " + files;
+    }
 }

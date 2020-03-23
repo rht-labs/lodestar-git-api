@@ -1,11 +1,14 @@
 package com.redhat.labs.omp.resources;
 
-
+import com.redhat.labs.cache.GitSyncService;
 import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
 import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
 import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
 import com.redhat.labs.omp.resources.filters.Logged;
 import com.redhat.labs.omp.services.GitLabService;
+
+import io.vertx.axle.core.eventbus.EventBus;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
@@ -39,6 +42,9 @@ public class TemplateResource {
     @Inject
     protected FileResource fileResource;
 
+    @Inject
+    protected EventBus bus;
+
     /**
      * This method returns a map which contains filename to filecontent rows
      *
@@ -50,7 +56,10 @@ public class TemplateResource {
 
         List<SingleFileResponse> allFiles = new ArrayList<>(10);
 
+        //TODO cache this
         SingleFileResponse metaFileContent = fileResource.fetchContentFromGit(metaFileFolder + "/meta.dat", templateRepositoryId);
+
+        bus.publish(GitSyncService.FILE_CACHE_EVENT, metaFileContent);
 
         String[] lines = metaFileContent.getFileContent().split("\\r?\\n");
         for (String line : lines) {

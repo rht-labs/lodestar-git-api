@@ -23,6 +23,7 @@ import javax.inject.Singleton;
  *
  * @author faisalmasood
  */
+@Deprecated
 @Singleton
 public class GitSyncManager {
 

@@ -11,8 +11,8 @@ build_vars:
   OUTPUT_IMAGE_NAME: '{{ app_name }}'
   OUTPUT_IMAGE_TAG: latest
   PUSH_SECRET: quay-registry-secret
-  BUILDER_IMAGE_NAME: registry.access.redhat.com/fuse7/fuse-java-openshift
-  BUILDER_IMAGE_TAG: 1.5
+  BUILDER_IMAGE_NAME: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift
+  BUILDER_IMAGE_TAG: 1.8
 
 pipeline_vars:
   PIPELINE_SOURCE_REPOSITORY_URL: https://github.com/rht-labs/open-management-portal-git-api.git

@@ -84,7 +84,7 @@ public class CacheResource {
         GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, "master");
         String base64Content = metaFileResponse.content;
         String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
-        LOGGER.info("File {} content fetched {}", fileName, content);
+        LOGGER.debug("File {} content fetched {}", fileName, content);
         return new SingleFileResponse(fileName, content);
     }
 }
