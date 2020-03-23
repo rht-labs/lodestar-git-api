@@ -27,27 +27,9 @@ spec:
         deploymentconfig: {{ .Values.name }}
     spec:
       containers:
-      - env:
-        - name: GITLAB_PERSONAL_ACCESS_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: omp-gitlab-configuration
-              key: GITLAB_PERSONAL_ACCESS_TOKEN
-        - name: TEMPLATE_REPOSITORY_ID
-          valueFrom:
-            secretKeyRef:
-              name: omp-gitlab-configuration
-              key: TEMPLATE_REPOSITORY_ID
-        - name: RESIDENCIES_PARENT_REPOSITORIES_ID
-          valueFrom:
-            secretKeyRef:
-              name: omp-gitlab-configuration
-              key: RESIDENCIES_PARENT_REPOSITORIES_ID
-        - name: GITLAB_API_URL
-          valueFrom:
-            secretKeyRef:
-              name: omp-gitlab-configuration
-              key: GITLAB_API_URL
+      - envFrom:
+        - secretRef:
+            name: omp-gitlab-configuration
         image: "{{ .Values.imageName }}:{{ .Values.imageTag }}"
         imagePullPolicy: Always
         name: {{ .Values.name }}
