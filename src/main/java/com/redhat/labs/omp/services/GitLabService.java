@@ -39,6 +39,12 @@ public interface GitLabService {
     @Produces("application/json")
     GitLabCreateProjectResponse createNewProject(GitLabCreateProjectRequest request);
 
+    // reference: https://docs.gitlab.com/ce/api/deploy_keys.html#enable-a-deploy-key
+    @POST
+    @Path("/projects/{id}/deploy_keys/{deploy_key}/enable")
+    @Produces("application/json")
+    Response enableDeployKey(@PathParam("id") @Encoded Integer projectId, @PathParam("deploy_key") @Encoded Integer deployKey);
+
     // reference: https://docs.gitlab.com/ee/api/repository_files.html#create-new-file-in-repository
     @POST
     @Path("/projects/{id}/repository/files/{file_path}")
