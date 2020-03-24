@@ -6,8 +6,10 @@ import com.redhat.labs.omp.services.GitLabService;
 import com.redhat.labs.utils.ResourceLoader;
 import io.quarkus.test.Mock;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.core.Response;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -38,6 +40,11 @@ public class MockGitLabService implements GitLabService {
         response.description = "ut description";
         response.name = "ut name";
         return response;
+    }
+
+    @Override
+    public Response enableDeployKey(Integer projectId, Integer deployKey){
+        return Response.status(Response.Status.OK).entity(ResourceLoader.load("enableDeployKey-001-response.json")).build();
     }
 
     @Override
