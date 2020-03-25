@@ -23,6 +23,9 @@ public class GroupsResource {
     @ConfigProperty(name = "residenciesParentRepositoryId", defaultValue = "6284")
     protected Integer residenciesParentRepositoryId;
 
+    @ConfigProperty(name = "deployKey")
+    protected Integer deployKey;
+
     /**
      * this method creates a group for CUSTOMER_NAME and a sun-group with the PROJECT_NAME and a repo named iac inside it.
      * return the id of the iac project repository
@@ -54,7 +57,9 @@ public class GroupsResource {
         GitLabCreateProjectRequest gitLabCreateProjectRequest = new GitLabCreateProjectRequest();
         gitLabCreateProjectRequest.namespace_id = createSubGroupResponse.id;
         gitLabCreateProjectRequest.name = RESIDENCY_PROJECT_NAME;
-        return gitLabService.createNewProject(gitLabCreateProjectRequest);
+        GitLabCreateProjectResponse gitLabProject = gitLabService.createNewProject(gitLabCreateProjectRequest);
+        gitLabService.enableDeployKey(gitLabProject.id, deployKey);
+        return gitLabProject;
 
         //first try to fetch the customer_name group and get the eid, if doesn't exists create a group.
         //then create the project . if project exists freak out
