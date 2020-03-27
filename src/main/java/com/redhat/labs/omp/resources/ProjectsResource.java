@@ -25,6 +25,9 @@ public class ProjectsResource {
     @ConfigProperty(name = "residenciesParentRepositoryId", defaultValue = "6284")
     protected Integer residenciesParentRepositoryId;
 
+    @ConfigProperty(name = "deployKey")
+    protected Integer deployKey;
+
     @GET
     public String listAllProjects() {
         return gitLabService.getProjects().readEntity(String.class);
@@ -41,6 +44,8 @@ public class ProjectsResource {
         GitLabCreateProjectRequest gitLabRequest = new GitLabCreateProjectRequest();
         gitLabRequest.name = request.projectName;
         gitLabRequest.namespace_id = residenciesRepoId;
-        return gitLabService.createNewProject(gitLabRequest);
+        GitLabCreateProjectResponse gitLabProject = gitLabService.createNewProject(gitLabRequest);
+        gitLabService.enableDeployKey(gitLabProject.id, deployKey);
+        return gitLabProject;
     }
 }
