@@ -2,6 +2,9 @@ package com.redhat.labs.omp.models.filesmanagement;
 
 import org.junit.jupiter.api.Test;
 
+import com.redhat.labs.omp.models.gitlab.request.CommitMultipleFilesInRepsitoryRequest;
+import com.redhat.labs.omp.models.gitlab.request.CreateCommitFileRequest;
+
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 

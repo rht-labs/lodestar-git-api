@@ -1,12 +1,13 @@
 package com.redhat.labs.omp.health;
 
 
-import com.redhat.labs.omp.services.GitLabService;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
 import org.eclipse.microprofile.health.Readiness;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+
+import com.redhat.labs.omp.rest.client.GitLabService;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;

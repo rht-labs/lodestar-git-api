@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.cache.ResidencyDataStore;
 import com.redhat.labs.cache.ResidencyInformation;
-import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
+import com.redhat.labs.omp.models.gitlab.response.RepositoryFile;
 
 import io.quarkus.infinispan.client.Remote;
 import io.quarkus.runtime.StartupEvent;
@@ -55,8 +55,8 @@ public class ResidencyDataCache implements ResidencyDataStore {
     }
 
     @Override
-    public void store(SingleFileResponse file) {
-        cache.put(file.cacheKey,  file.fileContent);
+    public void store(RepositoryFile file) {
+        cache.put(file.getCacheKey(),  file.getFileContent());
     }
 
     public void store(String key, String file) {

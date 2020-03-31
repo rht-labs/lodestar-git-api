@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
-import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
+import com.redhat.labs.omp.models.gitlab.response.RepositoryFile;
 
 import io.quarkus.vertx.ConsumeEvent;
 
@@ -21,8 +21,8 @@ public class GitSyncService {
     ResidencyDataCache cache;
     
     @ConsumeEvent(FILE_CACHE_EVENT)
-    public void consumeTemplate(SingleFileResponse message) {
-        LOGGER.warn("Caching repo file event::::  {} ", message.cacheKey);
+    public void consumeTemplate(RepositoryFile message) {
+        LOGGER.warn("Caching repo file event::::  {} ", message.getCacheKey());
         cache.store(message);
     }
 }

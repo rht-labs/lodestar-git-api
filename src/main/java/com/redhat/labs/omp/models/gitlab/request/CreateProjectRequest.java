@@ -1,4 +1,4 @@
-package com.redhat.labs.omp.models;
+package com.redhat.labs.omp.models.gitlab.request;
 
 import javax.json.bind.annotation.JsonbProperty;
 

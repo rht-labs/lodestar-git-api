@@ -1,9 +1,10 @@
 package com.redhat.labs.omp.resources;
 
-import com.redhat.labs.omp.models.CreateProjectRequest;
-import com.redhat.labs.omp.models.GitLabCreateProjectRequest;
-import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
-import com.redhat.labs.omp.services.GitLabService;
+import com.redhat.labs.omp.models.gitlab.request.CreateProjectRequest;
+import com.redhat.labs.omp.models.gitlab.request.GitLabCreateProjectRequest;
+import com.redhat.labs.omp.models.gitlab.response.GitLabCreateProjectResponse;
+import com.redhat.labs.omp.rest.client.GitLabService;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 

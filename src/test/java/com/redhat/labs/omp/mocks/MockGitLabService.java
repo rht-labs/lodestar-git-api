@@ -1,8 +1,17 @@
 package com.redhat.labs.omp.mocks;
 
 import com.redhat.labs.omp.models.*;
-import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
-import com.redhat.labs.omp.services.GitLabService;
+import com.redhat.labs.omp.models.gitlab.Group;
+import com.redhat.labs.omp.models.gitlab.request.CommitMultipleFilesInRepsitoryRequest;
+import com.redhat.labs.omp.models.gitlab.request.CreateGroupRequest;
+import com.redhat.labs.omp.models.gitlab.request.GitLabCreateFileInRepositoryRequest;
+import com.redhat.labs.omp.models.gitlab.request.GitLabCreateProjectRequest;
+import com.redhat.labs.omp.models.gitlab.response.CreateGroupResponse;
+import com.redhat.labs.omp.models.gitlab.response.GetFileResponse;
+import com.redhat.labs.omp.models.gitlab.response.GitLabCreateProjectResponse;
+import com.redhat.labs.omp.models.gitlab.response.SearchGroupResponse;
+import com.redhat.labs.omp.models.gitlab.response.SearchProjectResponse;
+import com.redhat.labs.omp.rest.client.GitLabService;
 import com.redhat.labs.utils.ResourceLoader;
 import io.quarkus.test.Mock;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -13,6 +22,7 @@ import javax.ws.rs.Encoded;
 import javax.ws.rs.core.Response;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 
 @Mock
 @ApplicationScoped
@@ -89,5 +99,29 @@ public class MockGitLabService implements GitLabService {
         searchGroupResponse.path = "Customer-name";
 
         return new SearchGroupResponse[]{searchGroupResponse};
+    }
+
+    @Override
+    public Group createGroup(Group group) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Group updateGroup(Integer groupId, Group group) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Group> getGroupByName(String name) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void deleteGroupById(Integer groupId) {
+        // TODO Auto-generated method stub
+        
     }
 }

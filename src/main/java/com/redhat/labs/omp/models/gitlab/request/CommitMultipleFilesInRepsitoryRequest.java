@@ -1,4 +1,4 @@
-package com.redhat.labs.omp.models.filesmanagement;
+package com.redhat.labs.omp.models.gitlab.request;
 
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;

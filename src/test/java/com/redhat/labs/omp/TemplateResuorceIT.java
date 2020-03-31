@@ -1,9 +1,9 @@
 package com.redhat.labs.omp;
 
-import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
-import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
-import com.redhat.labs.omp.models.filesmanagement.CreateCommitFileRequest;
-import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
+import com.redhat.labs.omp.models.gitlab.request.CommitMultipleFilesInRepsitoryRequest;
+import com.redhat.labs.omp.models.gitlab.request.CreateCommitFileRequest;
+import com.redhat.labs.omp.models.gitlab.response.GetMultipleFilesResponse;
+import com.redhat.labs.omp.models.gitlab.response.GitLabCreateProjectResponse;
 import com.redhat.labs.omp.resources.TemplateResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;

@@ -24,12 +24,12 @@ import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.omp.models.CreateResidencyGroupStructure;
 import com.redhat.labs.omp.models.FileAction;
-import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
 import com.redhat.labs.omp.models.Engagement;
-import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
-import com.redhat.labs.omp.models.filesmanagement.CreateCommitFileRequest;
-import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
-import com.redhat.labs.omp.services.GitLabService;
+import com.redhat.labs.omp.models.gitlab.request.CommitMultipleFilesInRepsitoryRequest;
+import com.redhat.labs.omp.models.gitlab.request.CreateCommitFileRequest;
+import com.redhat.labs.omp.models.gitlab.response.GetMultipleFilesResponse;
+import com.redhat.labs.omp.models.gitlab.response.GitLabCreateProjectResponse;
+import com.redhat.labs.omp.rest.client.GitLabService;
 import com.redhat.labs.omp.utils.TemplateCombobulator;
 
 @Path("/api/residencies")
@@ -59,19 +59,25 @@ public class EngagementResource {
     @Timed(name = "performedChecks", description = "How much time it takes to create an engagement", unit = MetricUnits.MILLISECONDS)
     public Response createEngagement(Engagement engagement, @Context UriInfo uriInfo) {
 
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("{}", JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES)).toJson(engagement));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("{}",
+                    JsonbBuilder
+                            .create(new JsonbConfig()
+                                    .withPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES))
+                            .toJson(engagement));
         }
         GitLabCreateProjectResponse gitLabCreateProjectResponse = createGitLabProject(engagement);
         engagement.id = gitLabCreateProjectResponse.id;
 
         GetMultipleFilesResponse getMultipleFilesResponse = combobulator.process(engagement);
 
-        CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest = getCommitMultipleFilesInRepositoryRequest(engagement, getMultipleFilesResponse);
+        CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest = getCommitMultipleFilesInRepositoryRequest(
+                engagement, getMultipleFilesResponse);
 
-        Response gitResponse = gitLabService.createFilesInRepository(gitLabCreateProjectResponse.id, commitMultipleFilesInRepsitoryRequest);
+        Response gitResponse = gitLabService.createFilesInRepository(gitLabCreateProjectResponse.id,
+                commitMultipleFilesInRepsitoryRequest);
 
-        if(gitResponse.getStatus() == 201) {
+        if (gitResponse.getStatus() == 201) {
             UriBuilder builder = uriInfo.getAbsolutePathBuilder();
             builder.path(Integer.toString(gitLabCreateProjectResponse.id));
             return Response.created(builder.build()).build();
@@ -81,10 +87,12 @@ public class EngagementResource {
 
     }
 
-    private CommitMultipleFilesInRepsitoryRequest getCommitMultipleFilesInRepositoryRequest(Engagement engagement, GetMultipleFilesResponse getMultipleFilesResponse) {
+    private CommitMultipleFilesInRepsitoryRequest getCommitMultipleFilesInRepositoryRequest(Engagement engagement,
+            GetMultipleFilesResponse getMultipleFilesResponse) {
         CommitMultipleFilesInRepsitoryRequest commitMultipleFilesInRepsitoryRequest = new CommitMultipleFilesInRepsitoryRequest();
         getMultipleFilesResponse.files.stream().forEach(f -> {
-            commitMultipleFilesInRepsitoryRequest.addFileRequest(new CreateCommitFileRequest(FileAction.create, stripPrefix(f.fileName), f.fileContent));
+            commitMultipleFilesInRepsitoryRequest.addFileRequest(
+                    new CreateCommitFileRequest(FileAction.create, stripPrefix(f.getFileName()), f.getFileContent()));
         });
         commitMultipleFilesInRepsitoryRequest.authorEmail = engagement.engagementLeadEmail;
         commitMultipleFilesInRepsitoryRequest.authorName = engagement.engagementLeadName;

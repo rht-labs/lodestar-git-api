@@ -19,10 +19,10 @@ import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.cache.ResidencyInformation;
 import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
-import com.redhat.labs.omp.models.GetFileResponse;
-import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
+import com.redhat.labs.omp.models.gitlab.response.GetFileResponse;
+import com.redhat.labs.omp.models.gitlab.response.RepositoryFile;
 import com.redhat.labs.omp.resources.filters.Logged;
-import com.redhat.labs.omp.services.GitLabService;
+import com.redhat.labs.omp.rest.client.GitLabService;
 
 @Path("/api/cache")
 @Produces(MediaType.APPLICATION_JSON)
@@ -59,7 +59,7 @@ public class CacheResource {
     @POST
     @Logged
     public Response updateConfigFromCache() {
-        SingleFileResponse configFileContent = fetchContentFromGit(configFileFolder + "/config.yaml");
+        RepositoryFile configFileContent = fetchContentFromGit(configFileFolder + "/config.yaml");
         residencyDataCacheForConfig.store(CONFIG_FILE_CACHE_KEY, configFileContent.getFileContent());
         return Response.ok().build();
     }
@@ -72,7 +72,7 @@ public class CacheResource {
         return Response.ok().build();
     }
 
-    //TODO this method here showing ResInfo is not set up for caching
+    // TODO this method here showing ResInfo is not set up for caching
     @GET
     public Response testResCache() {
         ResidencyInformation ri = new ResidencyInformation("yaml", new Object());
@@ -80,11 +80,11 @@ public class CacheResource {
         return Response.ok().build();
     }
 
-    private SingleFileResponse fetchContentFromGit(String fileName) {
+    private RepositoryFile fetchContentFromGit(String fileName) {
         GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, "master");
         String base64Content = metaFileResponse.content;
         String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
         LOGGER.debug("File {} content fetched {}", fileName, content);
-        return new SingleFileResponse(fileName, content);
+        return RepositoryFile.builder().fileName(fileName).fileContent(content).build();
     }
 }

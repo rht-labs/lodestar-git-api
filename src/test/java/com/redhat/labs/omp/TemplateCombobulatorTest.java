@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import com.redhat.labs.omp.mocks.MockHotRodServer;
 import com.redhat.labs.omp.models.Engagement;
-import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
+import com.redhat.labs.omp.models.gitlab.response.GetMultipleFilesResponse;
 import com.redhat.labs.omp.utils.TemplateCombobulator;
 
 import io.quarkus.test.junit.QuarkusTest;
@@ -87,7 +87,7 @@ public class TemplateCombobulatorTest {
                 "    persistent_storage_size: \"50TB\"\n" +
                 "    cluster_size: \"medium\"\n";
 
-        String content = processedFiles.files.get(0).fileContent;
+        String content = processedFiles.files.get(0).getFileContent();
 
         Assertions.assertEquals(expected, content);
         //      🤠 Dirty hack to get the first index of the files array 🤠

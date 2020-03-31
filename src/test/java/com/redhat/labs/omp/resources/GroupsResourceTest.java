@@ -1,7 +1,8 @@
 package com.redhat.labs.omp.resources;
 
 import com.redhat.labs.omp.models.CreateResidencyGroupStructure;
-import com.redhat.labs.omp.models.GitLabCreateProjectResponse;
+import com.redhat.labs.omp.models.gitlab.response.GitLabCreateProjectResponse;
+
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;

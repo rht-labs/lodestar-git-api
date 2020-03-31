@@ -2,7 +2,7 @@ package com.redhat.labs.cache;
 
 import java.util.List;
 
-import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
+import com.redhat.labs.omp.models.gitlab.response.RepositoryFile;
 
 /**
  * This interface defines the contract to store data for the received events.
@@ -22,7 +22,7 @@ public interface ResidencyDataStore {
      */
     public void store(String key, ResidencyInformation residencyInformation);
 
-    public void store(SingleFileResponse file);
+    public void store(RepositoryFile file);
 
     /**
      * return NULL if the key is not present

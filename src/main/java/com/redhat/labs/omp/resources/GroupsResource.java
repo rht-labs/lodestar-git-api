@@ -1,7 +1,13 @@
 package com.redhat.labs.omp.resources;
 
 import com.redhat.labs.omp.models.*;
-import com.redhat.labs.omp.services.GitLabService;
+import com.redhat.labs.omp.models.gitlab.request.CreateGroupRequest;
+import com.redhat.labs.omp.models.gitlab.request.GitLabCreateProjectRequest;
+import com.redhat.labs.omp.models.gitlab.response.CreateGroupResponse;
+import com.redhat.labs.omp.models.gitlab.response.GitLabCreateProjectResponse;
+import com.redhat.labs.omp.models.gitlab.response.SearchGroupResponse;
+import com.redhat.labs.omp.rest.client.GitLabService;
+
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 

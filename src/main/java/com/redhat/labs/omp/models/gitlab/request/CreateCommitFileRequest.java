@@ -1,55 +1,58 @@
-package com.redhat.labs.omp.models;
+package com.redhat.labs.omp.models.gitlab.request;
+
+import com.redhat.labs.omp.models.FileAction;
 
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-public class GitLabCreateFileInRepositoryRequest {
-    // Name of the branch
-    @JsonbProperty("branch")
-    public String branch;
+public class CreateCommitFileRequest implements Serializable {
 
-    // Name of the branch to start the new commit from
-    @JsonbProperty("start_branch")
-    public String startBranch;
+    @JsonbProperty("action")
+    public FileAction action;
 
-    // Commit message
-    @JsonbProperty("commit_message")
-    public String commitMessage;
 
-    // Specify the commit author’s email address
-    @JsonbProperty("author_email")
-    public String authorEmail;
-
-    // Specify the commit author’s name
-    @JsonbProperty("author_name")
-    public String authorName;
+    @JsonbProperty("file_path")
+    public String filePath;
 
     // Change encoding to ‘base64’
     @JsonbProperty("encoding")
     public final String encoding = "base64";
 
+
     private byte[] base64Content;
     private String urlEncodedFilePath;
 
-    public GitLabCreateFileInRepositoryRequest(String filePath, String branch, String commitMessage, byte[] content) {
-        this.branch = branch;
-        this.commitMessage = commitMessage;
-        setContent(content);
-        setFilePath(filePath);
+
+    public CreateCommitFileRequest(){
+
     }
 
-    public void setContent(byte[] content) {
+    public CreateCommitFileRequest(String filePath, String content){
+        this(FileAction.create, filePath, content);
+
+    }
+
+    public CreateCommitFileRequest(FileAction action, String filePath, String content){
+        this.action = action;
+        setContent(content);
+        setFilePath(filePath);
+
+    }
+
+    private void setContent(byte[] content) {
         base64Content = Base64.getEncoder().encode(content);
     }
 
     public void setContent(String content) {
         setContent(content.getBytes(StandardCharsets.UTF_8));
     }
+
 
     // File content
     @JsonbProperty("content")
@@ -62,13 +65,7 @@ public class GitLabCreateFileInRepositoryRequest {
         return new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
     }
 
-    // Url encoded full path to new file. Ex. lib%2Fclass%2Erb
-    @JsonbProperty("file_path")
-    public String getUrlEncodedFilePath() {
-        return urlEncodedFilePath;
-    }
 
-    @JsonbTransient
     public String getFilePath() {
         try {
             return URLDecoder.decode(urlEncodedFilePath, StandardCharsets.UTF_8.toString());
@@ -84,4 +81,6 @@ public class GitLabCreateFileInRepositoryRequest {
             throw new RuntimeException(e);
         }
     }
+
+
 }

@@ -1,11 +1,11 @@
 package com.redhat.labs.omp.resources;
 
 import com.redhat.labs.cache.GitSyncService;
-import com.redhat.labs.omp.models.filesmanagement.CommitMultipleFilesInRepsitoryRequest;
-import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
-import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
+import com.redhat.labs.omp.models.gitlab.request.CommitMultipleFilesInRepsitoryRequest;
+import com.redhat.labs.omp.models.gitlab.response.GetMultipleFilesResponse;
+import com.redhat.labs.omp.models.gitlab.response.RepositoryFile;
 import com.redhat.labs.omp.resources.filters.Logged;
-import com.redhat.labs.omp.services.GitLabService;
+import com.redhat.labs.omp.rest.client.GitLabService;
 
 import io.vertx.axle.core.eventbus.EventBus;
 
@@ -54,10 +54,10 @@ public class TemplateResource {
     @Logged
     public GetMultipleFilesResponse getAllFilesFromGit() {
 
-        List<SingleFileResponse> allFiles = new ArrayList<>(10);
+        List<RepositoryFile> allFiles = new ArrayList<>(10);
 
         //TODO cache this
-        SingleFileResponse metaFileContent = fileResource.fetchContentFromGit(metaFileFolder + "/meta.dat", templateRepositoryId);
+        RepositoryFile metaFileContent = fileResource.fetchContentFromGit(metaFileFolder + "/meta.dat", templateRepositoryId);
 
         bus.publish(GitSyncService.FILE_CACHE_EVENT, metaFileContent);
 
@@ -66,7 +66,7 @@ public class TemplateResource {
             if(LOGGER.isDebugEnabled()) {
                 LOGGER.debug("line " + " : " + metaFileFolder + line.substring(1));
             }
-            SingleFileResponse fileResponse = fileResource.fetchContentFromGit(metaFileFolder + line.substring(1), templateRepositoryId);
+            RepositoryFile fileResponse = fileResource.fetchContentFromGit(metaFileFolder + line.substring(1), templateRepositoryId);
             allFiles.add(fileResponse);
         }
 

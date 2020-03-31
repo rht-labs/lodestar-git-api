@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
 import com.redhat.labs.omp.models.Engagement;
-import com.redhat.labs.omp.models.filesmanagement.GetMultipleFilesResponse;
-import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
+import com.redhat.labs.omp.models.gitlab.response.GetMultipleFilesResponse;
+import com.redhat.labs.omp.models.gitlab.response.RepositoryFile;
 import com.redhat.labs.omp.resources.TemplateResource;
 
 import io.quarkus.qute.Engine;
@@ -28,20 +28,19 @@ public class TemplateCombobulator {
     @Inject
     protected ResidencyDataCache cache;
 
-    private String combobulateTemplate(SingleFileResponse file, Engagement engagement) {
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Content: {} Engagement {}", file.fileContent, engagement);
+    private String combobulateTemplate(RepositoryFile file, Engagement engagement) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Content: {} Engagement {}", file.getFileContent(), engagement);
         }
 
-        Template gitTemplate = quteEngine.parse(file.fileContent);
+        Template gitTemplate = quteEngine.parse(file.getFileContent());
         return gitTemplate.data("engagement", engagement).render();
     }
 
     public GetMultipleFilesResponse process(Engagement engagement) {
         GetMultipleFilesResponse allTemplateFiles = quteTemplateResource.getAllFilesFromGit();
-        allTemplateFiles.files.parallelStream()
-                .forEach(singleFileResponse -> singleFileResponse.fileContent = combobulateTemplate(singleFileResponse,
-                        engagement));
+        allTemplateFiles.files.parallelStream().forEach(singleFileResponse -> singleFileResponse
+                .setFileContent(combobulateTemplate(singleFileResponse, engagement)));
         return allTemplateFiles;
     }
 }
