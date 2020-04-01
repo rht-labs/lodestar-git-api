@@ -67,10 +67,23 @@ public class FileService {
 
         Optional<File> optional = Optional.empty();
 
-        File updatedFile = gitLabService.updateFile(projectId, filePath, file);
+        try {
 
-        if (null != updatedFile) {
-            optional = Optional.of(updatedFile);
+            // encode file
+            EncodingUtils.encodeFile(file);
+
+            // update file
+            File updatedFile = gitLabService.updateFile(projectId, filePath, file);
+
+            // decode file
+            EncodingUtils.decodeFile(updatedFile);
+
+            if (null != updatedFile) {
+                optional = Optional.of(updatedFile);
+            }
+
+        } catch (UnsupportedEncodingException e) {
+            return optional;
         }
 
         return optional;
