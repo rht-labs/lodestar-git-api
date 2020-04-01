@@ -1,6 +1,6 @@
 package com.redhat.labs.exception;
 
-public class UnexpectedGitLabResponseException extends Exception {
+public class UnexpectedGitLabResponseException extends RuntimeException {
 
     private static final long serialVersionUID = -2450016825084220551L;
 

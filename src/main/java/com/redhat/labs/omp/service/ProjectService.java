@@ -97,4 +97,9 @@ public class ProjectService {
         gitLabService.deleteProjectById(projectId);
     }
 
+    // enable deployment key
+    public void enableDeploymentKeyOnProject(Integer projectId, Integer deployKey) {
+        gitLabService.enableDeployKey(projectId, deployKey);
+    }
+
 }

@@ -2,28 +2,26 @@ package com.redhat.labs.omp.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.redhat.labs.cache.GitSyncService;
 import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
+import com.redhat.labs.exception.FileNotFoundException;
+import com.redhat.labs.omp.models.Engagement;
 import com.redhat.labs.omp.models.gitlab.File;
-import com.redhat.labs.omp.models.gitlab.response.GetMultipleFilesResponse;
-import com.redhat.labs.omp.models.gitlab.response.RepositoryFile;
 import com.redhat.labs.omp.rest.client.GitLabService;
 
+import io.quarkus.qute.Engine;
+import io.quarkus.qute.Template;
 import io.vertx.axle.core.eventbus.EventBus;
 
 @ApplicationScoped
 public class TemplateService {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(TemplateService.class);
 
     @ConfigProperty(name = "templateRepositoryId", defaultValue = "9407")
     Integer templateRepositoryId;
@@ -42,39 +40,86 @@ public class TemplateService {
     FileService fileService;
 
     @Inject
+    protected Engine quteEngine;
+
+    @Inject
     EventBus bus;
 
     @Inject
     ResidencyDataCache cache;
 
-    public GetMultipleFilesResponse getAllFilesFromGit() {
+    public List<File> getAllFilesFromTemplateInventory() {
 
-//        // TODO cache this
-//        // get template files from meta.dat file in git
-//        File metaFile = fileService.getFile(templateRepositoryId, metaFileFolder + "/" + metaFileName);
-//        // save file to cache
-//        bus.publish(GitSyncService.FILE_CACHE_EVENT, metaFile);
-//
-//        // parse meta file for list of repository files
-//        List<RepositoryFile> repositoryFiles = new ArrayList<>();
-//
-//        String[] lines = metaFile.getContent().split("\\r?\\n");
-//        for (String line : lines) {
-//            if (LOGGER.isDebugEnabled()) {
-//                LOGGER.debug("line " + " : " + metaFileFolder + line.substring(1));
-//            }
-//
-//            // get file from git
-//            RepositoryFile fileResponse = fileService.getFileFromRespository(metaFileFolder + line.substring(1),
-//                    templateRepositoryId);
-//            repositoryFiles.add(fileResponse);
-//        }
-//
-//        GetMultipleFilesResponse getMultipleFilesResponse = new GetMultipleFilesResponse();
-//        getMultipleFilesResponse.files = repositoryFiles;
-//        return getMultipleFilesResponse;
+        // get inventory file
+        File inventoryFile = getTemplateInventoryFile();
 
-        return null;
+        // parse and get all template files
+        return getTemplateInventoryFiles(inventoryFile);
+
+    }
+
+    public File getTemplateInventoryFile() {
+
+        // inventory file
+        String inventoryFileName = metaFileFolder + "/" + metaFileName;
+
+        // get inventory file
+        Optional<File> optional = fileService.getFile(templateRepositoryId, inventoryFileName);
+
+        if (optional.isEmpty()) {
+            throw new FileNotFoundException("could not get template inventory file from gitlab.");
+        }
+
+        // decode file attributes
+        File inventoryFile = optional.get();
+        inventoryFile.decodeFileAttributes();
+
+        return inventoryFile;
+
+    }
+
+    public List<File> getTemplateInventoryFiles(File file) {
+
+        List<File> templateFiles = new ArrayList<>();
+
+        // parse template inventory file
+        String[] lines = file.getContent().split("\\r?\\n");
+
+        for (String line : lines) {
+
+            String fileName = metaFileFolder + line.substring(1);
+
+            Optional<File> optional = fileService.getFile(templateRepositoryId, fileName);
+            if (optional.isEmpty()) {
+                throw new FileNotFoundException("could not get template file '" + fileName + "' from gitlab.");
+            }
+
+            // decode file attributes
+            File templateFile = optional.get();
+
+            templateFile.decodeFileAttributes();
+
+            // add template file to list
+            templateFiles.add(templateFile);
+
+        }
+
+        return templateFiles;
+
+    }
+
+    public void processTemplatesForEngagement(List<File> templateFiles, Engagement engagement) {
+
+        templateFiles.parallelStream()
+                .forEach(templateFile -> templateFile.setContent(processTemplate(templateFile, engagement)));
+
+    }
+
+    public String processTemplate(File file, Engagement engagement) {
+
+        Template gitTemplate = quteEngine.parse(file.getContent());
+        return gitTemplate.data("engagement", engagement).render();
+
     }
 
 }

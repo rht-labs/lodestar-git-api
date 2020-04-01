@@ -1,8 +1,5 @@
 package com.redhat.labs.omp.resources;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -19,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.cache.ResidencyInformation;
 import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
-import com.redhat.labs.omp.models.gitlab.response.GetFileResponse;
 import com.redhat.labs.omp.models.gitlab.response.RepositoryFile;
 import com.redhat.labs.omp.resources.filters.Logged;
 import com.redhat.labs.omp.rest.client.GitLabService;

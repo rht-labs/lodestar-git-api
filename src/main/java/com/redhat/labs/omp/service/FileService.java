@@ -1,6 +1,5 @@
 package com.redhat.labs.omp.service;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -10,7 +9,6 @@ import javax.ws.rs.core.Response;
 import org.apache.http.HttpStatus;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import com.redhat.labs.exception.EncodingException;
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.rest.client.GitLabService;
@@ -27,22 +25,17 @@ public class FileService {
 
         Optional<File> optional = Optional.empty();
 
-        try {
-            // encode before sending to gitlab
-            file.encodeFileAttributes();
+        // encode before sending to gitlab
+        file.encodeFileAttributes();
 
-            // create new file
-            File createdFile = gitLabService.createFile(projectId, filePath, file);
+        // create new file
+        File createdFile = gitLabService.createFile(projectId, filePath, file);
 
-            // decode file after creation
-            file.decodeFileAttributes();
+        // decode file after creation
+        file.decodeFileAttributes();
 
-            if (null != createdFile) {
-                optional = Optional.of(createdFile);
-            }
-
-        } catch (UnsupportedEncodingException e) {
-            throw new EncodingException("failed to encode or decode file attributes.", e);
+        if (null != createdFile) {
+            optional = Optional.of(createdFile);
         }
 
         return optional;
@@ -77,23 +70,17 @@ public class FileService {
 
         Optional<File> optional = Optional.empty();
 
-        try {
+        // encode file
+        file.encodeFileAttributes();
 
-            // encode file
-            file.encodeFileAttributes();
+        // update file
+        File updatedFile = gitLabService.updateFile(projectId, filePath, file);
 
-            // update file
-            File updatedFile = gitLabService.updateFile(projectId, filePath, file);
+        // decode file
+        file.decodeFileAttributes();
 
-            // decode file
-            file.decodeFileAttributes();
-
-            if (null != updatedFile) {
-                optional = Optional.of(updatedFile);
-            }
-
-        } catch (UnsupportedEncodingException e) {
-            throw new EncodingException("failed to encode or decode file attributes.", e);
+        if (null != updatedFile) {
+            optional = Optional.of(updatedFile);
         }
 
         return optional;
@@ -133,21 +120,15 @@ public class FileService {
 
         Optional<File> optional = Optional.empty();
 
-        try {
+        // get file
+        File file = gitLabService.getFile(projectId, filePath, ref);
 
-            // get file
-            File file = gitLabService.getFile(projectId, filePath, ref);
+        if (null != file) {
 
-            if (null != file) {
+            // decode file
+            file.decodeFileAttributes();
+            optional = Optional.of(file);
 
-                // decode file
-                file.decodeFileAttributes();
-                optional = Optional.of(file);
-
-            }
-
-        } catch (UnsupportedEncodingException e) {
-            throw new EncodingException("failed to encode or decode file attributes.", e);
         }
 
         return optional;

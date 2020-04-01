@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.validation.constraints.NotBlank;
 
+import com.redhat.labs.exception.EncodingException;
 import com.redhat.labs.omp.utils.EncodingUtils;
 
 import lombok.AllArgsConstructor;
@@ -42,11 +43,16 @@ public class File {
     @JsonbProperty("author_name")
     private String authorName;
 
-    public void encodeFileAttributes() throws UnsupportedEncodingException {
+    public void encodeFileAttributes() {
 
         // encode file path
         if (null != filePath) {
-            String encodedFilePath = EncodingUtils.urlEncode(this.filePath);
+            String encodedFilePath;
+            try {
+                encodedFilePath = EncodingUtils.urlEncode(this.filePath);
+            } catch (UnsupportedEncodingException e) {
+                throw new EncodingException("failed to encode url." + filePath);
+            }
             this.filePath = encodedFilePath;
         }
 
@@ -58,11 +64,16 @@ public class File {
 
     }
 
-    public void decodeFileAttributes() throws UnsupportedEncodingException {
+    public void decodeFileAttributes() {
 
         // decode file path
         if (null != filePath) {
-            String decodedFilePath = EncodingUtils.urlDecode(this.filePath);
+            String decodedFilePath;
+            try {
+                decodedFilePath = EncodingUtils.urlDecode(this.filePath);
+            } catch (UnsupportedEncodingException e) {
+                throw new EncodingException("failed to decodej url " + filePath);
+            }
             this.filePath = decodedFilePath;
         }
 
