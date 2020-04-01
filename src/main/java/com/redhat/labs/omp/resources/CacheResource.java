@@ -1,5 +1,7 @@
 package com.redhat.labs.omp.resources;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -10,31 +12,27 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.cache.ResidencyInformation;
 import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
-import com.redhat.labs.omp.models.gitlab.response.RepositoryFile;
+import com.redhat.labs.exception.FileNotFoundException;
+import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.resources.filters.Logged;
-import com.redhat.labs.omp.rest.client.GitLabService;
+import com.redhat.labs.omp.service.FileService;
 
 @Path("/api/cache")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class CacheResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CacheResource.class);
 
     @ConfigProperty(name = "templateRepositoryId", defaultValue = "9407")
-    protected String templateRepositoryId;
+    protected Integer templateRepositoryId;
 
     @ConfigProperty(name = "configFileFolder", defaultValue = "schema")
     protected String configFileFolder;
 
     @Inject
-    @RestClient
-    protected GitLabService gitLabService;
+    FileService fileService;
 
     @Inject
     protected ResidencyDataCache cache;
@@ -55,8 +53,8 @@ public class CacheResource {
     @POST
     @Logged
     public Response updateConfigFromCache() {
-        RepositoryFile configFileContent = fetchContentFromGit(configFileFolder + "/config.yaml");
-        residencyDataCacheForConfig.store(CONFIG_FILE_CACHE_KEY, configFileContent.getFileContent());
+        File configFileContent = fetchContentFromGit(configFileFolder + "/config.yaml");
+        residencyDataCacheForConfig.store(CONFIG_FILE_CACHE_KEY, configFileContent.getContent());
         return Response.ok().build();
     }
 
@@ -76,12 +74,17 @@ public class CacheResource {
         return Response.ok().build();
     }
 
-    private RepositoryFile fetchContentFromGit(String fileName) {
-//        GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, "master");
-//        String base64Content = metaFileResponse.content;
-//        String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
-//        LOGGER.debug("File {} content fetched {}", fileName, content);
-//        return RepositoryFile.builder().fileName(fileName).fileContent(content).build();
-        return null;
+    private File fetchContentFromGit(String fileName) {
+
+        Optional<File> optional = fileService.getFile(templateRepositoryId, fileName);
+        if (optional.isEmpty()) {
+            throw new FileNotFoundException("file not found in gitlab.");
+        }
+
+        // decode
+        File file = optional.get();
+        file.decodeFileAttributes();
+        return file;
+
     }
 }

@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbTransient;
 import javax.validation.constraints.NotBlank;
 
 import com.redhat.labs.exception.EncodingException;
@@ -42,6 +43,9 @@ public class File {
     private String authorEmail;
     @JsonbProperty("author_name")
     private String authorName;
+
+    @JsonbTransient
+    private String cacheKey;
 
     public void encodeFileAttributes() {
 
