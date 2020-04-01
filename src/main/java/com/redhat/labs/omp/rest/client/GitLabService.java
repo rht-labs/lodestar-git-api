@@ -17,6 +17,8 @@ import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
+import com.redhat.labs.omp.models.gitlab.CommitMultiple;
+import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.Group;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.models.gitlab.request.CommitMultipleFilesInRepsitoryRequest;
@@ -24,7 +26,6 @@ import com.redhat.labs.omp.models.gitlab.request.CreateGroupRequest;
 import com.redhat.labs.omp.models.gitlab.request.GitLabCreateFileInRepositoryRequest;
 import com.redhat.labs.omp.models.gitlab.request.GitLabCreateProjectRequest;
 import com.redhat.labs.omp.models.gitlab.response.CreateGroupResponse;
-import com.redhat.labs.omp.models.gitlab.response.GetFileResponse;
 import com.redhat.labs.omp.models.gitlab.response.GitLabCreateProjectResponse;
 import com.redhat.labs.omp.models.gitlab.response.SearchGroupResponse;
 import com.redhat.labs.omp.models.gitlab.response.SearchProjectResponse;
@@ -43,7 +44,8 @@ public interface GitLabService {
     @Produces("application/json")
     Response getProjects();
 
-    // reference: https://docs.gitlab.com/ee/api/projects.html#search-for-projects-by-name
+    // reference:
+    // https://docs.gitlab.com/ee/api/projects.html#search-for-projects-by-name
     @GET
     @Logged
     @Path("/projects")
@@ -64,34 +66,39 @@ public interface GitLabService {
 
     // Deploy Keys
 
-    // reference: https://docs.gitlab.com/ce/api/deploy_keys.html#enable-a-deploy-key
+    // reference:
+    // https://docs.gitlab.com/ce/api/deploy_keys.html#enable-a-deploy-key
     @POST
     @Path("/projects/{id}/deploy_keys/{deploy_key}/enable")
     @Produces("application/json")
-    Response enableDeployKey(@PathParam("id") @Encoded Integer projectId, @PathParam("deploy_key") @Encoded Integer deployKey);
+    Response enableDeployKey(@PathParam("id") @Encoded Integer projectId,
+            @PathParam("deploy_key") @Encoded Integer deployKey);
 
     // Files
 
-    // reference: https://docs.gitlab.com/ee/api/repository_files.html#create-new-file-in-repository
+    // reference:
+    // https://docs.gitlab.com/ee/api/repository_files.html#create-new-file-in-repository
     @POST
     @Path("/projects/{id}/repository/files/{file_path}")
     @Produces("application/json")
-    Response createFileInRepository(@PathParam("id") @Encoded String projectId, @PathParam("file_path") @Encoded String filePath, GitLabCreateFileInRepositoryRequest request);
+    Response createFileInRepository(@PathParam("id") @Encoded String projectId,
+            @PathParam("file_path") @Encoded String filePath, GitLabCreateFileInRepositoryRequest request);
 
-    // reference https://docs.gitlab.com/ee/api/commits.html#create-a-commit-with-multiple-files-and-actions
+    // reference
+    // https://docs.gitlab.com/ee/api/commits.html#create-a-commit-with-multiple-files-and-actions
     @POST
     @Path("/projects/{id}/repository/commits")
     @Produces("application/json")
-    Response createFilesInRepository(@PathParam("id") @Encoded Integer projectId, CommitMultipleFilesInRepsitoryRequest request);
-
+    Response createFilesInRepository(@PathParam("id") @Encoded Integer projectId,
+            CommitMultipleFilesInRepsitoryRequest request);
 
     // reference https://docs.gitlab.com/ee/api/repository_files.html
-    //https://gitlab.consulting.redhat.com/api/v4/projects/9407/repository/files/schema%2Fmeta.dat?ref=master
-    @GET
-    @Logged
-    @Path("/projects/{id}/repository/files/{file_path}")
-    @Produces("application/json")
-    GetFileResponse getFile(@PathParam("id") @Encoded String projectId, @PathParam("file_path") @Encoded String filePath, @QueryParam("ref") @Encoded String ref);
+    // https://gitlab.consulting.redhat.com/api/v4/projects/9407/repository/files/schema%2Fmeta.dat?ref=master
+//    @GET
+//    @Logged
+//    @Path("/projects/{id}/repository/files/{file_path}")
+//    @Produces("application/json")
+//    GetFileResponse getFile(@PathParam("id") @Encoded String projectId, @PathParam("file_path") @Encoded String filePath, @QueryParam("ref") @Encoded String ref);
 
     // Groups - CRUD
 
@@ -116,6 +123,8 @@ public interface GitLabService {
      * 
      * 
      */
+
+    // GROUPS
 
     // reference: https://docs.gitlab.com/ee/api/groups.html#new-group
     @POST
@@ -143,12 +152,14 @@ public interface GitLabService {
     @Path("/groups/{id}")
     void deleteGroupById(@PathParam("id") @Encoded Integer groupId);
 
+    // PROJECTS
+
     @GET
     @Logged
     @Path("/projects")
     @Produces("application/json")
     List<Project> getProjectByName(@QueryParam("search") @Encoded String name);
- 
+
     @GET
     @Logged
     @Path("/projects/{id}")
@@ -171,5 +182,38 @@ public interface GitLabService {
     @Logged
     @Path("/projects/{id}")
     void deleteProjectById(@PathParam("id") @Encoded Integer projectId);
+
+    // FILES
+
+    @GET
+    @Logged
+    @Path("/projects/{id}/repository/files/{file_path}")
+    @Produces("application/json")
+    File getFile(@PathParam("id") @Encoded Integer projectId, @PathParam("file_path") @Encoded String filePath,
+            @QueryParam("ref") @Encoded String ref);
+
+    @POST
+    @Path("/projects/{id}/repository/files/{file_path}")
+    @Produces("application/json")
+    File createFile(@PathParam("id") @Encoded Integer projectId, @PathParam("file_path") @Encoded String filePath,
+            File file);
+
+    @PUT
+    @Path("/projects/{id}/repository/files/{file_path}")
+    @Produces("application/json")
+    File updateFile(@PathParam("id") @Encoded Integer projectId, @PathParam("file_path") @Encoded String filePath,
+            File file);
+
+    @DELETE
+    @Logged
+    @Path("/projects/{id}/repository/files/{file_path}")
+    void deleteFile(@PathParam("id") @Encoded Integer projectId, @PathParam("file_path") @Encoded String filePath, File file);
+
+    // COMMITS
+
+    @POST
+    @Path("/projects/{id}/repository/commits")
+    @Produces("application/json")
+    Response commitMultipleFiles(@PathParam("id") @Encoded Integer projectId, CommitMultiple commit);
 
 }

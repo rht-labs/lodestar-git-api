@@ -1,83 +1,86 @@
 package com.redhat.labs.omp.resources;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.http.HttpStatus;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
-import com.redhat.labs.cache.GitSyncService;
-import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
-import com.redhat.labs.omp.models.gitlab.response.GetFileResponse;
-import com.redhat.labs.omp.models.gitlab.response.RepositoryFile;
-import com.redhat.labs.omp.resources.filters.Logged;
-import com.redhat.labs.omp.rest.client.GitLabService;
+import com.redhat.labs.omp.models.gitlab.File;
+import com.redhat.labs.omp.service.FileService;
 
-import io.vertx.axle.core.eventbus.EventBus;
-
-@Path("/api/file")
+@Path("/api/v1/projects/{projectId}/files")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class FileResource {
-    public static final Logger LOGGER = LoggerFactory.getLogger(FileResource.class);
 
     @Inject
-    @RestClient
-    protected GitLabService gitLabService;
-    
-    @Inject
-    protected EventBus bus;
+    FileService fileService;
 
-    @Inject
-    protected ResidencyDataCache cache;
+    @POST
+    public Response post(@PathParam("projectId") Integer projectId, @Valid File file) {
 
-    @ConfigProperty(name = "file_branch", defaultValue = "master")
-    protected String defaultBranch;
+        Optional<File> optional = fileService.createFile(projectId, file.getFilePath(), file);
+
+        if (optional.isPresent()) {
+            return Response.status(HttpStatus.SC_CREATED).entity(optional.get()).build();
+        }
+
+        return Response.serverError().build();
+
+    }
+
+    @PUT
+    public File put(@PathParam("projectId") Integer projectId, @Valid File file) {
+
+        Optional<File> optional = fileService.updateFile(projectId, file.getFilePath(), file);
+
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+
+        throw new WebApplicationException("resource not updated.", HttpStatus.SC_INTERNAL_SERVER_ERROR);
+
+    }
 
     @GET
-    @Logged
-    public RepositoryFile getFileFromGitByName(@QueryParam("name") String fileName, @QueryParam("repo_id") String repoId, @QueryParam("branch") String branch) {
-        return this.fetchContentFromGit(fileName, repoId, branch);
-    }
+    @Path("/{filePath}")
+    public File get(@PathParam("projectId") Integer projectId, @PathParam("filePath") String filePath) {
 
-    public RepositoryFile fetchContentFromGit(String fileName, String templateRepositoryId, String branch) {
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug(String.format("Template Repo %s filename %s branch %s", templateRepositoryId, fileName, branch));
+        Optional<File> optional = fileService.getFile(projectId, filePath);
+
+        if (optional.isPresent()) {
+            return optional.get();
         }
 
-        String key = String.format("%s:%s:%s", fileName, templateRepositoryId, branch == null ? defaultBranch : branch);
+        throw new WebApplicationException("no resource found.", HttpStatus.SC_NOT_FOUND);
 
-        String fileContent = cache.fetch(key);
-        if(fileContent != null) {
-            LOGGER.debug("Cache hit for key {}", key);
-            return RepositoryFile.builder().fileName(fileName).fileContent(fileContent).build();
-        }
-
-        LOGGER.info("Cache miss for key: {}", key);
-        GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, branch == null ? defaultBranch : branch);
-        String base64Content = metaFileResponse.content;
-        String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
-        LOGGER.debug("File {} content fetched {}", fileName, content);
-        RepositoryFile response = RepositoryFile.builder().fileName(fileName).fileContent(fileContent).build();
-        if(content != null) {
-            LOGGER.info("adding {} to cache", fileName);
-            response.setCacheKey(key);
-            bus.publish(GitSyncService.FILE_CACHE_EVENT, response);
-        }
-        return response;
     }
 
-    public RepositoryFile fetchContentFromGit(String fileName, String templateRepositoryId) {
-        return this.fetchContentFromGit(fileName, templateRepositoryId, null);
+    @DELETE
+    @Path("/{filePath}")
+    public Response delete(@PathParam("projectId") Integer projectId, @PathParam("filePath") String filePath) {
+
+        try {
+            fileService.deleteFile(projectId, filePath);
+        } catch (Exception e) {
+            return Response.serverError().build();
+        }
+
+        return Response.noContent().build();
+
     }
+
 }

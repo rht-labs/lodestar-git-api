@@ -81,10 +81,11 @@ public class CacheResource {
     }
 
     private RepositoryFile fetchContentFromGit(String fileName) {
-        GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, "master");
-        String base64Content = metaFileResponse.content;
-        String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
-        LOGGER.debug("File {} content fetched {}", fileName, content);
-        return RepositoryFile.builder().fileName(fileName).fileContent(content).build();
+//        GetFileResponse metaFileResponse = gitLabService.getFile(templateRepositoryId, fileName, "master");
+//        String base64Content = metaFileResponse.content;
+//        String content = new String(Base64.getDecoder().decode(base64Content), StandardCharsets.UTF_8);
+//        LOGGER.debug("File {} content fetched {}", fileName, content);
+//        return RepositoryFile.builder().fileName(fileName).fileContent(content).build();
+        return null;
     }
 }

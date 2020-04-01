@@ -40,7 +40,7 @@ public class TemplateResource {
     protected String metaFileFolder;
 
     @Inject
-    protected FileResource fileResource;
+    protected FileResourceOld fileResource;
 
     @Inject
     protected EventBus bus;

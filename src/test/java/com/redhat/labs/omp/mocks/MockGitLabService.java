@@ -1,7 +1,10 @@
 package com.redhat.labs.omp.mocks;
 
 import com.redhat.labs.omp.models.*;
+import com.redhat.labs.omp.models.gitlab.CommitMultiple;
+import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.Group;
+import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.models.gitlab.request.CommitMultipleFilesInRepsitoryRequest;
 import com.redhat.labs.omp.models.gitlab.request.CreateGroupRequest;
 import com.redhat.labs.omp.models.gitlab.request.GitLabCreateFileInRepositoryRequest;
@@ -67,20 +70,20 @@ public class MockGitLabService implements GitLabService {
         return null;
     }
 
-    @Override
-    public GetFileResponse getFile(String projectId, String filePath, String ref) {
-        GetFileResponse gfr = new GetFileResponse();
-        if (filePath.endsWith("meta.dat")) {
-            gfr.fileName = filePath;
-            gfr.content = new String(Base64.getEncoder()
-                    .encode(ResourceLoader.load("meta.dat").getBytes(StandardCharsets.UTF_8)));
-        } else {
-            gfr.fileName = filePath;
-            gfr.content = new String(Base64.getEncoder()
-                    .encode(ResourceLoader.load("residency.yml").getBytes(StandardCharsets.UTF_8)));
-        }
-        return gfr;
-    }
+//    @Override
+//    public GetFileResponse getFile(String projectId, String filePath, String ref) {
+//        GetFileResponse gfr = new GetFileResponse();
+//        if (filePath.endsWith("meta.dat")) {
+//            gfr.fileName = filePath;
+//            gfr.content = new String(Base64.getEncoder()
+//                    .encode(ResourceLoader.load("meta.dat").getBytes(StandardCharsets.UTF_8)));
+//        } else {
+//            gfr.fileName = filePath;
+//            gfr.content = new String(Base64.getEncoder()
+//                    .encode(ResourceLoader.load("residency.yml").getBytes(StandardCharsets.UTF_8)));
+//        }
+//        return gfr;
+//    }
 
     @Override
     public CreateGroupResponse createGroup(CreateGroupRequest createGroupRequest) {
@@ -123,5 +126,65 @@ public class MockGitLabService implements GitLabService {
     public void deleteGroupById(Integer groupId) {
         // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public List<Project> getProjectByName(String name) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Project getProjectById(Integer projectId) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Project createProject(Project project) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Project updateProject(Integer projectId, Project project) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void deleteProjectById(Integer projectId) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public File getFile(Integer projectId, String filePath, String ref) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public File createFile(Integer projectId, String filePath, File file) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public File updateFile(Integer projectId, String filePath, File file) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void deleteFile(Integer projectId, String filePath, File file) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public Response commitMultipleFiles(Integer projectId, CommitMultiple commit) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
