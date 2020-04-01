@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import org.apache.http.HttpStatus;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
+import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.service.FileService;
 
@@ -39,6 +40,24 @@ public class FileResource {
         }
 
         return Response.serverError().build();
+
+    }
+
+    @POST
+    @Path("/commit/multiple")
+    public Response postMultiple(@PathParam("projectId") Integer projectId, @Valid CommitMultiple commit) {
+
+        Response response = Response.serverError().build();
+
+        try {
+            if(fileService.createFiles(projectId, commit)) {
+                response = Response.status(HttpStatus.SC_CREATED).entity(commit).build();
+            }
+        } catch(Exception e) {
+            // return server error
+        }
+
+        return response;
 
     }
 

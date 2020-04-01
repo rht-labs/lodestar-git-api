@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.omp.models.CreateResidencyGroupStructure;
-import com.redhat.labs.omp.models.FileAction;
 import com.redhat.labs.omp.models.Engagement;
+import com.redhat.labs.omp.models.gitlab.FileAction;
 import com.redhat.labs.omp.models.gitlab.request.CommitMultipleFilesInRepsitoryRequest;
 import com.redhat.labs.omp.models.gitlab.request.CreateCommitFileRequest;
 import com.redhat.labs.omp.models.gitlab.response.GetMultipleFilesResponse;

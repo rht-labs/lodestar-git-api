@@ -6,8 +6,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
-import com.redhat.labs.omp.models.gitlab.File;
-
 public class EncodingUtils {
 
     public static boolean isDecodable(String val) {
@@ -19,32 +17,6 @@ public class EncodingUtils {
         }
 
         return true;
-
-    }
-
-    public static void encodeFile(File file) throws UnsupportedEncodingException {
-
-        // encode file path
-        String encodedFilePath = urlEncode(file.getFilePath());
-        file.setFilePath(encodedFilePath);
-
-        // encode contents
-        byte[] encodedContents = base64Encode(file.getContent().getBytes());
-        file.setContent(new String(encodedContents, StandardCharsets.UTF_8));
-
-    }
-
-    public static void decodeFile(File file) throws UnsupportedEncodingException {
-
-        // decode file path
-        String decodedFilePath = urlDecode(file.getFilePath());
-        file.setFilePath(decodedFilePath);
-
-        // decode contents if it exists
-        if (null != file.getContent()) {
-            byte[] decodedContents = base64Decode(file.getContent());
-            file.setContent(new String(decodedContents, StandardCharsets.UTF_8));
-        }
 
     }
 

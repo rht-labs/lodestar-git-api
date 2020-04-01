@@ -1,9 +1,10 @@
 package com.redhat.labs.omp.models.gitlab.request;
 
-import com.redhat.labs.omp.models.FileAction;
-
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
+
+import com.redhat.labs.omp.models.gitlab.FileAction;
+
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
