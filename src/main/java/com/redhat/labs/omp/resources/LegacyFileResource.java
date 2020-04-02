@@ -33,7 +33,7 @@ public class LegacyFileResource {
     @Logged
     public Response getFileFromGitByName(@QueryParam("name") String fileName, @QueryParam("repo_id") Integer repoId,
             @QueryParam("branch") String branch) {
-        Optional<File> optional = fileService.getFile(repoId, fileName, branch);
+        Optional<File> optional = fileService.getFile(repoId, fileName, (null == branch) ? defaultBranch : branch);
         if (!optional.isPresent()) {
             return Response.status(HttpStatus.SC_NOT_FOUND).build();
         }
