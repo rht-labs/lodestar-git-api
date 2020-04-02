@@ -59,7 +59,8 @@ public class EngagementService {
         templateService.processTemplatesForEngagement(templateFiles, engagement);
 
         // create actions for multiple commit
-        CommitMultiple commit = createCommitMultiple(templateFiles, project.getId(), DEFAULT_BRANCH);
+        CommitMultiple commit = createCommitMultiple(templateFiles, project.getId(), DEFAULT_BRANCH,
+                engagement.getEngagementLeadName(), engagement.getEngagementLeadEmail());
 
         // send commit to gitlab
         if (!fileService.createFiles(project.getId(), commit)) {
@@ -131,14 +132,16 @@ public class EngagementService {
 
     }
 
-    private CommitMultiple createCommitMultiple(List<File> filesToCommit, Integer projectId, String branch) {
+    private CommitMultiple createCommitMultiple(List<File> filesToCommit, Integer projectId, String branch,
+            String authorName, String authorEmail) {
 
         List<Action> actions = new ArrayList<>();
 
         // convert each file to action
         filesToCommit.parallelStream().forEach(file -> actions.add(createAction(file, FileAction.create)));
 
-        return CommitMultiple.builder().id(projectId).branch(branch).commitMessage(COMMIT_MSG).actions(actions).build();
+        return CommitMultiple.builder().id(projectId).branch(branch).commitMessage(COMMIT_MSG).actions(actions)
+                .authorName(authorName).authorEmail(authorEmail).build();
 
     }
 
