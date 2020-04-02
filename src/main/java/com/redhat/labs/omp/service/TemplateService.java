@@ -29,7 +29,7 @@ public class TemplateService {
     @ConfigProperty(name = "metaFileFolder", defaultValue = "schema")
     String metaFileFolder;
 
-    @ConfigProperty(name = "metaFileName", defaultValue = "schema")
+    @ConfigProperty(name = "metaFileName", defaultValue = "meta.dat")
     String metaFileName;
 
     @Inject
@@ -70,11 +70,7 @@ public class TemplateService {
             throw new FileNotFoundException("could not get template inventory file from gitlab.");
         }
 
-        // decode file attributes
-        File inventoryFile = optional.get();
-        inventoryFile.decodeFileAttributes();
-
-        return inventoryFile;
+        return optional.get();
 
     }
 
@@ -96,8 +92,6 @@ public class TemplateService {
 
             // decode file attributes
             File templateFile = optional.get();
-
-            templateFile.decodeFileAttributes();
 
             // add template file to list
             templateFiles.add(templateFile);

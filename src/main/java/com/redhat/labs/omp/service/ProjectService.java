@@ -10,6 +10,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.redhat.labs.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.omp.models.gitlab.Project;
+import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
 import com.redhat.labs.omp.rest.client.GitLabService;
 
 @ApplicationScoped
@@ -20,31 +21,31 @@ public class ProjectService {
     GitLabService gitLabService;
 
     // get a project
-    // TODO:  This method needs to be name and group, or something unique.  Currently, can 
-    //        return the wrong one if multiple projects with the same name exists (i.e. iac)
-    public Optional<Project> getProjectByName(String name) throws UnexpectedGitLabResponseException {
+    public Optional<Project> getProjectByName(Integer namespaceId, String name)
+            throws UnexpectedGitLabResponseException {
 
         Optional<Project> optional = Optional.empty();
 
-        List<Project> projectList = gitLabService.getProjectByName(name);
+        List<ProjectSearchResults> resultList = gitLabService.getProjectByName(name);
 
-        if (null == projectList || projectList.isEmpty()) {
+        if (null == resultList || resultList.isEmpty()) {
             return optional;
         }
 
-        if (1 == projectList.size()) {
-            return Optional.of(projectList.get(0));
+        if (1 == resultList.size()) {
+            return Optional.of(Project.from(resultList.get(0)));
         }
 
         // found more than one project with name in either 'name' or 'path' attribute
         // should match path
-        for (Project project : projectList) {
-            if (name.equalsIgnoreCase(project.getPath())) {
-                return Optional.of(project);
+        // TODO: This is checking parent id here. can this be part of the search?
+        for (ProjectSearchResults result : resultList) {
+            if (namespaceId.equals(result.getNamespace().getId()) && name.equalsIgnoreCase(result.getPath())) {
+                return Optional.of(Project.from(result));
             }
         }
 
-        throw new UnexpectedGitLabResponseException("No resource found with name equal to path attribute.");
+        return optional;
 
     }
 
@@ -54,7 +55,7 @@ public class ProjectService {
 
         Project project = gitLabService.getProjectById(projectId);
 
-        if(null != project) {
+        if (null != project) {
             optional = Optional.of(project);
         }
 

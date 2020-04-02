@@ -21,6 +21,7 @@ import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.Group;
 import com.redhat.labs.omp.models.gitlab.Project;
+import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
 import com.redhat.labs.omp.resources.filters.Logged;
 
 @Path("/api/v4")
@@ -143,7 +144,7 @@ public interface GitLabService {
     @Logged
     @Path("/projects")
     @Produces("application/json")
-    List<Project> getProjectByName(@QueryParam("search") @Encoded String name);
+    List<ProjectSearchResults> getProjectByName(@QueryParam("search") @Encoded String name);
 
     @GET
     @Logged

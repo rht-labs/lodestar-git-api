@@ -25,7 +25,11 @@ public class EngagementService {
     private final String COMMIT_MSG = "\uD83E\uDD84 Created by OMP Git API \uD83D\uDE80 \uD83C\uDFC1";
     private final String DEFAULT_BRANCH = "master";
 
+    @ConfigProperty(name = "residenciesParentRepositoryId")
     Integer engagementParentId;
+
+    @ConfigProperty(name = "stripPathPrefix", defaultValue = "schema/")
+    String stripPathPrefix;
 
     @ConfigProperty(name = "deployKey")
     Integer deployKey;
@@ -42,6 +46,18 @@ public class EngagementService {
     @Inject
     FileService fileService;
 
+    /*
+     * 
+     * 
+     * Start here:  Not all files are being generated
+     * 
+     * looks like they are being read and are in the templatesFiles.  just never make to to the commit
+     * 
+     * 
+     * 
+     */
+    
+    
     // create an engagement
     public Project createEngagement(Engagement engagement) {
 
@@ -58,7 +74,7 @@ public class EngagementService {
         CommitMultiple commit = createCommitMultiple(templateFiles, project.getId(), DEFAULT_BRANCH);
 
         // send commit to gitlab
-        if(!fileService.createFiles(project.getId(), commit)) {
+        if (!fileService.createFiles(project.getId(), commit)) {
             throw new UnexpectedGitLabResponseException("failed to commit files for engagement creation.");
         }
 
@@ -74,18 +90,13 @@ public class EngagementService {
                         .parentId(engagementParentId).build());
 
         // create group for project name
-        Group projectGroup = getOrCreateGroup(engagement.getCustomerName(),
+        Group projectGroup = getOrCreateGroup(engagement.getProjectName(),
                 Group.builder().name(engagement.getProjectName()).path(engagement.getProjectName())
                         .parentId(customerGroup.getId()).build());
 
         // create project under project name group
-        Optional<Project> projectOptional = projectService.createProject(
+        Project project = getOrCreateProject(projectGroup.getId(), ENGAGEMENT_PROJECT_NAME,
                 Project.builder().name(ENGAGEMENT_PROJECT_NAME).namespaceId(projectGroup.getId()).build());
-        if (projectOptional.isEmpty()) {
-            throw new UnexpectedGitLabResponseException("failed to create project.");
-        }
-
-        Project project = projectOptional.get();
 
         // enable deployment key on project
         projectService.enableDeploymentKeyOnProject(project.getId(), deployKey);
@@ -113,6 +124,25 @@ public class EngagementService {
 
     }
 
+    private Project getOrCreateProject(Integer namespaceId, String projectName, Project project) {
+
+        Optional<Project> optional = projectService.getProjectByName(namespaceId, projectName);
+
+        if (optional.isEmpty()) {
+
+            // try to create project
+            optional = projectService.createProject(project);
+
+            if (optional.isEmpty()) {
+                throw new UnexpectedGitLabResponseException("failed to create project");
+            }
+
+        }
+
+        return optional.get();
+
+    }
+
     private CommitMultiple createCommitMultiple(List<File> filesToCommit, Integer projectId, String branch) {
 
         List<Action> actions = new ArrayList<>();
@@ -125,7 +155,15 @@ public class EngagementService {
     }
 
     private Action createAction(File file, FileAction action) {
-        return Action.builder().filePath(file.getFilePath()).content(file.getContent()).encoding("base64").build();
+        return Action.builder().action(action).filePath(stripPrefix(file.getFilePath())).content(file.getContent())
+                .encoding("base64").build();
+    }
+
+    private String stripPrefix(String in) {
+        if (in != null && in.startsWith(stripPathPrefix)) {
+            return in.split(stripPathPrefix)[1];
+        }
+        return in;
     }
 
     // update an engagement

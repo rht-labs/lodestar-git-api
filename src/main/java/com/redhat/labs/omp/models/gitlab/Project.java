@@ -131,4 +131,12 @@ public class Project {
     // TODO: Can expose avatar as well, just need to figure out what type to use.
     // avatar mixed no Image file for avatar of the group. Introduced in GitLab 12.9
 
+    public static Project from(ProjectSearchResults result) {
+
+        Project p =  Project.builder().id(result.getId()).name(result.getName()).path(result.getPath())
+                .namespaceId(result.getNamespace().getId()).build();
+        return p;
+
+    }
+
 }

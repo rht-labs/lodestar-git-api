@@ -43,12 +43,12 @@ public class ProjectResource {
     }
 
     @GET
-    @Path("/names/{name}")
-    public Project getByName(@PathParam("name") String name) {
+    @Path("{id}/names/{name}")
+    public Project getByName(@PathParam("id") Integer projectId, @PathParam("name") String name) {
 
         Optional<Project> optional;
         try {
-            optional = projectService.getProjectByName(name);
+            optional = projectService.getProjectByName(projectId, name);
         } catch (UnexpectedGitLabResponseException e) {
             optional = Optional.empty();
         }

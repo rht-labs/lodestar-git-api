@@ -26,8 +26,9 @@ public class Group {
     private String description;
     @JsonbProperty("membership_lock")
     private Boolean membershipLock;
+    @Builder.Default
     @JsonbProperty("visibility")
-    private String visibility;
+    private String visibility = "private";
     @JsonbProperty("share_with_group_lock")
     private Boolean shareWithGroupLock;
     @JsonbProperty("require_two_factor_authentication")

@@ -38,39 +38,15 @@ public class Action {
 
     public void encodeActionAttributes() throws UnsupportedEncodingException {
 
-        // encode file path
-        if (null != filePath) {
-            String encodedFilePath = EncodingUtils.urlEncode(this.filePath);
-            this.filePath = encodedFilePath;
-        }
-
-        // encode previous path
-        if (null != previousPath) {
-            String encodedFilePath = EncodingUtils.urlEncode(this.previousPath);
-            this.previousPath = encodedFilePath;
-        }
-
         // encode contents
         if (null != content) {
-            byte[] encodedContents = EncodingUtils.base64Encode(this.filePath.getBytes());
+            byte[] encodedContents = EncodingUtils.base64Encode(this.content.getBytes());
             this.content = new String(encodedContents, StandardCharsets.UTF_8);
         }
 
     }
 
     public void decodeActionAttributes() throws UnsupportedEncodingException {
-
-        // decode file path
-        if (null != filePath) {
-            String decodedFilePath = EncodingUtils.urlDecode(this.filePath);
-            this.filePath = decodedFilePath;
-        }
-
-        // decode previous path
-        if (null != previousPath) {
-            String decodedFilePath = EncodingUtils.urlDecode(this.previousPath);
-            this.previousPath = decodedFilePath;
-        }
 
         // decode contents
         if (null != content) {
