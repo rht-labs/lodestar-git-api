@@ -13,8 +13,8 @@ import org.infinispan.client.hotrod.RemoteCacheManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.labs.cache.ResidencyDataStore;
-import com.redhat.labs.cache.ResidencyInformation;
+import com.redhat.labs.cache.EngagementDataStore;
+import com.redhat.labs.cache.EngagementInformation;
 import com.redhat.labs.omp.models.gitlab.File;
 
 import io.quarkus.infinispan.client.Remote;
@@ -26,9 +26,9 @@ import io.quarkus.runtime.StartupEvent;
  * @author faisalmasood, Donal Spring & Fred Permantier ❤️
  */
 @ApplicationScoped
-public class ResidencyDataCache implements ResidencyDataStore {
+public class EngagementDataCache implements EngagementDataStore {
 
-    public static Logger LOGGER = LoggerFactory.getLogger(ResidencyDataCache.class);
+    public static Logger LOGGER = LoggerFactory.getLogger(EngagementDataCache.class);
 
     void onStart(@Observes StartupEvent ev) {
         LOGGER.debug("On start cache check available ==> {}", cache != null);
@@ -48,7 +48,7 @@ public class ResidencyDataCache implements ResidencyDataStore {
     }
 
     @Override
-    public void store(String key, ResidencyInformation residencyInformation) {
+    public void store(String key, EngagementInformation residencyInformation) {
         cache.put(key, residencyInformation);
     }
 

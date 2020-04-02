@@ -9,7 +9,7 @@ import com.redhat.labs.omp.models.gitlab.File;
  *
  * @author faisalmasood
  */
-public interface ResidencyDataStore {
+public interface EngagementDataStore {
 
     /**
      * throws {@link RuntimeException} if the store call is not successfull
@@ -20,7 +20,7 @@ public interface ResidencyDataStore {
      * @param key
      * @param residencyInformation
      */
-    public void store(String key, ResidencyInformation residencyInformation);
+    public void store(String key, EngagementInformation residencyInformation);
 
     public void store(File file);
 

@@ -11,5 +11,5 @@ public interface EventHandler {
 
     public void handleEvent(Message<JsonObject> getAllProjectsMessage);
     public String getChannelName();
-    public void setPersistenceStore(ResidencyDataStore residencyDataStore);
+    public void setPersistenceStore(EngagementDataStore residencyDataStore);
 }

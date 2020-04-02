@@ -9,8 +9,8 @@ import java.util.Objects;
 /**
  * A utility class to hold the residency data
  */
-public class ResidencyInformation implements Serializable {
-	public static Logger logger = LoggerFactory.getLogger(ResidencyInformation.class);
+public class EngagementInformation implements Serializable {
+	public static Logger logger = LoggerFactory.getLogger(EngagementInformation.class);
 
     private final String residencyYaml;
 
@@ -19,7 +19,7 @@ public class ResidencyInformation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public ResidencyInformation(String residencyYaml, Object metadata) {
+    public EngagementInformation(String residencyYaml, Object metadata) {
 
         this.residencyYaml = residencyYaml;
         this.metadata = metadata;
@@ -46,7 +46,7 @@ public class ResidencyInformation implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ResidencyInformation that = (ResidencyInformation) o;
+        EngagementInformation that = (EngagementInformation) o;
         return Objects.equals(residencyYaml, that.residencyYaml) &&
                 Objects.equals(metadata, that.metadata);
     }

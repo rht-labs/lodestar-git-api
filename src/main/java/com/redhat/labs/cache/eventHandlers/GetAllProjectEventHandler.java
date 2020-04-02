@@ -1,6 +1,6 @@
 package com.redhat.labs.cache.eventHandlers;
 
-import com.redhat.labs.cache.ResidencyDataStore;
+import com.redhat.labs.cache.EngagementDataStore;
 import com.redhat.labs.cache.EventHandler;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonObject;
@@ -31,10 +31,10 @@ public class GetAllProjectEventHandler implements EventHandler {
     }
 
     @Override
-    public void setPersistenceStore(ResidencyDataStore residencyDataStore) {
+    public void setPersistenceStore(EngagementDataStore residencyDataStore) {
         this.residencyDataStore = residencyDataStore;
     }
-    private ResidencyDataStore residencyDataStore;
+    private EngagementDataStore residencyDataStore;
 
     private static final String CHANNEL_GET_ALL_PROJECT_EVENTS = "cache.getAllProjects";
 

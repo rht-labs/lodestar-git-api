@@ -13,8 +13,8 @@ import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
-import com.redhat.labs.cache.ResidencyInformation;
-import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
+import com.redhat.labs.cache.EngagementInformation;
+import com.redhat.labs.cache.cacheStore.EngagementDataCache;
 import com.redhat.labs.exception.FileNotFoundException;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.resources.filters.Logged;
@@ -35,13 +35,13 @@ public class CacheResource {
     FileService fileService;
 
     @Inject
-    protected ResidencyDataCache cache;
+    protected EngagementDataCache cache;
 
     public CacheResource() {
-        residencyDataCacheForConfig = new ResidencyDataCache();
+        residencyDataCacheForConfig = new EngagementDataCache();
     }
 
-    private final ResidencyDataCache residencyDataCacheForConfig;
+    private final EngagementDataCache residencyDataCacheForConfig;
 
     private static final String CONFIG_FILE_CACHE_KEY = "configFile";
 
@@ -69,7 +69,7 @@ public class CacheResource {
     // TODO this method here showing ResInfo is not set up for caching
     @GET
     public Response testResCache() {
-        ResidencyInformation ri = new ResidencyInformation("yaml", new Object());
+        EngagementInformation ri = new EngagementInformation("yaml", new Object());
         cache.store("banana2", ri);
         return Response.ok().build();
     }
