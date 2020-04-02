@@ -77,7 +77,7 @@ public class CacheResource {
     private File fetchContentFromGit(String fileName) {
 
         Optional<File> optional = fileService.getFile(templateRepositoryId, fileName);
-        if (optional.isEmpty()) {
+        if (!optional.isPresent()) {
             throw new FileNotFoundException("file not found in gitlab.");
         }
 

@@ -34,7 +34,7 @@ public class LegacyFileResource {
     public Response getFileFromGitByName(@QueryParam("name") String fileName, @QueryParam("repo_id") Integer repoId,
             @QueryParam("branch") String branch) {
         Optional<File> optional = fileService.getFile(repoId, fileName, branch);
-        if (optional.isEmpty()) {
+        if (!optional.isPresent()) {
             return Response.status(HttpStatus.SC_NOT_FOUND).build();
         }
 

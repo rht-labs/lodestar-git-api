@@ -66,7 +66,7 @@ public class TemplateService {
         // get inventory file
         Optional<File> optional = fileService.getFile(templateRepositoryId, inventoryFileName);
 
-        if (optional.isEmpty()) {
+        if (!optional.isPresent()) {
             throw new FileNotFoundException("could not get template inventory file from gitlab.");
         }
 
@@ -86,7 +86,7 @@ public class TemplateService {
             String fileName = metaFileFolder + line.substring(1);
 
             Optional<File> optional = fileService.getFile(templateRepositoryId, fileName);
-            if (optional.isEmpty()) {
+            if (!optional.isPresent()) {
                 throw new FileNotFoundException("could not get template file '" + fileName + "' from gitlab.");
             }
 

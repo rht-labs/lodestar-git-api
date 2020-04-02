@@ -97,12 +97,12 @@ public class EngagementService {
 
         Optional<Group> optional = groupService.getGitLabGroupByName(groupName);
 
-        if (optional.isEmpty()) {
+        if (!optional.isPresent()) {
 
             // try to create group
             optional = groupService.createGitLabGroup(groupToCreate);
 
-            if (optional.isEmpty()) {
+            if (!optional.isPresent()) {
                 throw new UnexpectedGitLabResponseException("failed to create group");
             }
 
@@ -116,12 +116,12 @@ public class EngagementService {
 
         Optional<Project> optional = projectService.getProjectByName(namespaceId, projectName);
 
-        if (optional.isEmpty()) {
+        if (!optional.isPresent()) {
 
             // try to create project
             optional = projectService.createProject(project);
 
-            if (optional.isEmpty()) {
+            if (!optional.isPresent()) {
                 throw new UnexpectedGitLabResponseException("failed to create project");
             }
 
