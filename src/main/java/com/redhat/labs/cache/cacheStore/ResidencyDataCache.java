@@ -10,8 +10,6 @@ import javax.inject.Inject;
 
 import org.infinispan.client.hotrod.RemoteCache;
 import org.infinispan.client.hotrod.RemoteCacheManager;
-import org.infinispan.configuration.cache.Configuration;
-import org.infinispan.configuration.cache.ConfigurationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +79,6 @@ public class ResidencyDataCache implements ResidencyDataStore {
 
     private void createCache() {
         LOGGER.info("Create OMP cache");
-        Configuration config = new ConfigurationBuilder().build();
-        cache = cacheManager.administration().createCache("omp", config);
+        cache = cacheManager.administration().getOrCreateCache("omp", "default");
     }
 }
