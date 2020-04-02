@@ -46,18 +46,6 @@ public class EngagementService {
     @Inject
     FileService fileService;
 
-    /*
-     * 
-     * 
-     * Start here:  Not all files are being generated
-     * 
-     * looks like they are being read and are in the templatesFiles.  just never make to to the commit
-     * 
-     * 
-     * 
-     */
-    
-    
     // create an engagement
     public Project createEngagement(Engagement engagement) {
 

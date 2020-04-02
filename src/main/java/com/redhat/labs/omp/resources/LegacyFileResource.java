@@ -38,11 +38,7 @@ public class LegacyFileResource {
             return Response.status(HttpStatus.SC_NOT_FOUND).build();
         }
 
-        // decode the file
-        File file = optional.get();
-        file.decodeFileAttributes();
-
-        return Response.status(HttpStatus.SC_OK).entity(file).build();
+        return Response.status(HttpStatus.SC_OK).entity(optional.get()).build();
 
     }
 
