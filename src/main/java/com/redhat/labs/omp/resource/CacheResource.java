@@ -1,4 +1,4 @@
-package com.redhat.labs.omp.resources;
+package com.redhat.labs.omp.resource;
 
 import java.util.Optional;
 
@@ -17,7 +17,7 @@ import com.redhat.labs.cache.EngagementInformation;
 import com.redhat.labs.cache.cacheStore.EngagementDataCache;
 import com.redhat.labs.exception.FileNotFoundException;
 import com.redhat.labs.omp.models.gitlab.File;
-import com.redhat.labs.omp.resources.filters.Logged;
+import com.redhat.labs.omp.resources.filter.Logged;
 import com.redhat.labs.omp.service.FileService;
 
 @Path("/api/cache")

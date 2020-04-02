@@ -22,7 +22,7 @@ import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.Group;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
-import com.redhat.labs.omp.resources.filters.Logged;
+import com.redhat.labs.omp.resources.filter.Logged;
 
 @Path("/api/v4")
 @RegisterRestClient(configKey = "gitlab.api")

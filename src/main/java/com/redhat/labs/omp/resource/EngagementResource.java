@@ -1,4 +1,4 @@
-package com.redhat.labs.omp.resources;
+package com.redhat.labs.omp.resource;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -37,7 +37,7 @@ public class EngagementResource {
     public Response createEngagement(Engagement engagement, @Context UriInfo uriInfo) {
 
         Project project = engagementService.createEngagement(engagement);
-        
+
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(Integer.toString(project.getId()));
         return Response.created(builder.build()).build();

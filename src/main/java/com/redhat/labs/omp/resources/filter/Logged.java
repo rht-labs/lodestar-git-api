@@ -1,4 +1,4 @@
-package com.redhat.labs.omp.resources.filters;
+package com.redhat.labs.omp.resources.filter;
 
 import javax.ws.rs.NameBinding;
 import java.lang.annotation.Retention;
