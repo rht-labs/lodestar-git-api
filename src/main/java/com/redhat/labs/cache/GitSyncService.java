@@ -6,8 +6,8 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
-import com.redhat.labs.omp.models.filesmanagement.SingleFileResponse;
+import com.redhat.labs.cache.cacheStore.EngagementDataCache;
+import com.redhat.labs.omp.models.gitlab.File;
 
 import io.quarkus.vertx.ConsumeEvent;
 
@@ -18,11 +18,11 @@ public class GitSyncService {
     public static final String FILE_CACHE_EVENT = "fileCacheEvent";
     
     @Inject
-    ResidencyDataCache cache;
+    EngagementDataCache cache;
     
     @ConsumeEvent(FILE_CACHE_EVENT)
-    public void consumeTemplate(SingleFileResponse message) {
-        LOGGER.warn("Caching repo file event::::  {} ", message.cacheKey);
+    public void consumeTemplate(File message) {
+        LOGGER.warn("Caching repo file event::::  {} ", message.getCacheKey());
         cache.store(message);
     }
 }

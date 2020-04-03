@@ -1,6 +1,6 @@
 package com.redhat.labs.cache;
 
-import com.redhat.labs.cache.cacheStore.ResidencyDataCache;
+import com.redhat.labs.cache.cacheStore.EngagementDataCache;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class GitSyncManager {
 
 
     @Inject
-    ResidencyDataCache dataCache;
+    EngagementDataCache dataCache;
 
     public void addEventHandler(String channelName, EventHandler eventHandler) {
         eventHandler.setPersistenceStore(dataCache);
