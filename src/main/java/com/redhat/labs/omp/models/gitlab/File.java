@@ -62,7 +62,7 @@ public class File {
 
         // encode contents
         if (null != content) {
-            byte[] encodedContents = EncodingUtils.base64Encode(this.filePath.getBytes());
+            byte[] encodedContents = EncodingUtils.base64Encode(this.content.getBytes());
             this.content = new String(encodedContents, StandardCharsets.UTF_8);
         }
 
