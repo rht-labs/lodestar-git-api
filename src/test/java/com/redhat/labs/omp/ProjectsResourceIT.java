@@ -1,13 +1,14 @@
 package com.redhat.labs.omp;
 
-import com.redhat.labs.utils.ResourceLoader;
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
-import io.restassured.response.ValidatableResponse;
-import org.junit.jupiter.api.*;
-
 import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
+
+import com.redhat.labs.utils.ResourceLoader;
+
+import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.http.ContentType;
 
 @QuarkusTest
 public class ProjectsResourceIT {

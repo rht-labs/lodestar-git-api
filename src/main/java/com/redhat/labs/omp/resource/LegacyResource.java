@@ -17,11 +17,12 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.http.HttpStatus;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.metrics.annotation.Counted;
+import org.eclipse.microprofile.metrics.annotation.Timed;
 
 import com.redhat.labs.omp.models.Engagement;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.Project;
-import com.redhat.labs.omp.resources.filter.Logged;
 import com.redhat.labs.omp.service.EngagementService;
 import com.redhat.labs.omp.service.FileService;
 
@@ -49,7 +50,8 @@ public class LegacyResource {
     protected String defaultBranch;
 
     @GET
-    @Logged
+    @Counted(name = "performedGetFile", description = "How many files retrievals have been performed")
+    @Timed(name = "getFileTimer", description = "A measuer of how long it takes to perform file retrieval")
     @Path("/file")
     public Response getFileFromGitByName(@QueryParam("name") String fileName, @QueryParam("repo_id") Integer repoId,
             @QueryParam("branch") String branch) {

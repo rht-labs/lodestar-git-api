@@ -6,6 +6,10 @@ import javax.json.bind.config.PropertyNamingStrategy;
 
 import io.quarkus.jsonb.JsonbConfigCustomizer;
 
+/**
+ * For actions associated with requests and responses
+ *
+ */
 @Singleton
 public class JsonConfig implements JsonbConfigCustomizer {
 

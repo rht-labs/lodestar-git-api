@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbTransient;
 import javax.validation.constraints.NotBlank;
 
 import lombok.AllArgsConstructor;
@@ -127,6 +128,9 @@ public class Project {
     private Integer groupWithProjectTemplatesId;
     @JsonbProperty("packages_enabled")
     private Boolean packagesEnabled;
+
+    @JsonbTransient
+    private boolean first;
 
     // TODO: Can expose avatar as well, just need to figure out what type to use.
     // avatar mixed no Image file for avatar of the group. Introduced in GitLab 12.9

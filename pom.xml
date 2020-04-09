@@ -78,8 +78,8 @@
 		</dependency>
 		<!-- Metrics -->
 		<dependency>
-			<groupId>org.eclipse.microprofile.metrics</groupId>
-			<artifactId>microprofile-metrics-api</artifactId>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-smallrye-metrics</artifactId>
 		</dependency>
 		<!-- Other -->
 		<dependency>
