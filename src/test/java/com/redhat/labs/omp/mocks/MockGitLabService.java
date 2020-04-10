@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -12,10 +13,12 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.Group;
+import com.redhat.labs.omp.models.gitlab.Namespace;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
 import com.redhat.labs.omp.rest.client.GitLabService;
 import com.redhat.labs.omp.utils.EncodingUtils;
+import com.redhat.labs.utils.ResourceLoader;
 
 import io.quarkus.test.Mock;
 
@@ -71,8 +74,15 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public List<ProjectSearchResults> getProjectByName(String name) {
-
+        
         List<ProjectSearchResults> results = new ArrayList<>();
+        
+        if("iac".contentEquals(name)) {
+            ProjectSearchResults project = ProjectSearchResults.builder().id(45).name("iac").description("bla").path("path").namespace(new Namespace()).build();
+            results.add(project);
+        }
+
+        
 
 //        results.add(
 //                ProjectSearchResults.builder()
@@ -98,6 +108,10 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public Project createProject(Project project) {
+        
+        if("invalid".equals(project.getName())) {
+            return null;
+        }
 
         project.setId(45);
 
@@ -125,12 +139,28 @@ public class MockGitLabService implements GitLabService {
             content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
             return File.builder().filePath(filePath).content(content).build();
 
-        } else if ("schema/residency.yml".equalsIgnoreCase(filePath)) {
+        }
+
+        if ("schema/residency.yml".equalsIgnoreCase(filePath)) {
             String content = "---\n" + "\n" + "residency:\n" + "  id: \"{engagement.id}\"\n"
                     + "  customer_name: \"{engagement.customerName}\"\n"
                     + "  project_name: \"{engagement.projectName}\"\n";
             content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
             return File.builder().filePath(filePath).content(content).build();
+        } 
+        
+        if("engagement.json".equals(filePath)) {
+            String content = ResourceLoader.load("engagement.json");
+            content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
+            return File.builder().filePath(filePath).content(content).build();
+        }
+        
+        if("400.error".equals(filePath)) {
+            throw new WebApplicationException(404);
+        }
+        
+        if("500.error".equals(filePath)) {
+            throw new WebApplicationException(500);
         }
 
         return null;
@@ -138,12 +168,20 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public File createFile(Integer projectId, String filePath, File file) {
-        return file;
+        if(filePath.equals("create.file")) {
+            return file;
+        }
+        return null;
     }
 
     @Override
     public File updateFile(Integer projectId, String filePath, File file) {
-        // TODO Auto-generated method stub
+        if("update.file".equals(filePath)) {
+            String content = ResourceLoader.load("engagement.json");
+            content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
+            return File.builder().filePath(filePath).content(content).build();
+        }
+        
         return null;
     }
 
@@ -162,6 +200,26 @@ public class MockGitLabService implements GitLabService {
     @Override
     public Response enableDeployKey(Integer projectId, Integer deployKey) {
         return Response.ok().build();
+    }
+
+    @Override
+    public List<Project> getProjectsbyGroup(Integer groupId) {
+        List<Project> projects = new ArrayList<>();
+        projects.add(Project.builder().id(groupId * 10).name("Project " + (groupId*10)).build());
+        return projects;
+    }
+
+    @Override
+    public List<Group> getSubGroups(Integer groupId) {
+        List<Group> groups = new ArrayList<>();
+        groups.add(Group.builder().id(groupId + 1).name("Group 1").build());
+        return groups;
+    }
+
+    @Override
+    public Response getFileWithResponse(Integer projectId, String filePath, String ref) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

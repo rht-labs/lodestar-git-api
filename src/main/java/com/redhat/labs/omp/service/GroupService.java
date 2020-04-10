@@ -1,12 +1,16 @@
 package com.redhat.labs.omp.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.omp.models.gitlab.Group;
@@ -14,10 +18,14 @@ import com.redhat.labs.omp.rest.client.GitLabService;
 
 @ApplicationScoped
 public class GroupService {
+    public static Logger LOGGER = LoggerFactory.getLogger(ProjectService.class);
 
     @Inject
     @RestClient
     GitLabService gitLabService;
+
+    @ConfigProperty(name = "residenciesParentRepositoryId")
+    Integer engagementGroupId;
 
     // get a group
     public Optional<Group> getGitLabGroupByName(String name) throws UnexpectedGitLabResponseException {
@@ -45,6 +53,21 @@ public class GroupService {
         throw new UnexpectedGitLabResponseException(
                 "No resource found with name equal to path attribute.");
 
+    }
+
+    public  List<Group> getAllGroups() {
+
+        //FIRST LEVEL
+        List<Group> customerGroups = gitLabService.getSubGroups(engagementGroupId);
+
+        List<Group> customerEngagementGroups = new ArrayList<>();
+        customerGroups.stream().forEach(group -> customerEngagementGroups.addAll(gitLabService.getSubGroups(group.getId())));
+
+        if(LOGGER.isDebugEnabled()) {
+            customerEngagementGroups.stream().forEach(group -> LOGGER.debug("Group -> {}", group.getName()));
+        }
+
+        return customerEngagementGroups;
     }
 
     // create a group

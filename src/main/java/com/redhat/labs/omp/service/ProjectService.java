@@ -7,6 +7,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.omp.models.gitlab.Project;
@@ -15,6 +17,7 @@ import com.redhat.labs.omp.rest.client.GitLabService;
 
 @ApplicationScoped
 public class ProjectService {
+    public static Logger LOGGER = LoggerFactory.getLogger(ProjectService.class);
 
     @Inject
     @RestClient
@@ -38,7 +41,6 @@ public class ProjectService {
 
         // found more than one project with name in either 'name' or 'path' attribute
         // should match path
-        // TODO: This is checking parent id here. can this be part of the search?
         for (ProjectSearchResults result : resultList) {
             if (namespaceId.equals(result.getNamespace().getId()) && name.equalsIgnoreCase(result.getPath())) {
                 return Optional.of(Project.from(result));
@@ -47,6 +49,21 @@ public class ProjectService {
 
         return optional;
 
+    }
+
+    public List<ProjectSearchResults> getAllProjectsByNane(String name) {
+        return gitLabService.getProjectByName(name);
+    }
+
+    public List<Project> getProjects(int groupId) {
+        List<Project> projects = gitLabService.getProjectsbyGroup(groupId);
+
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.trace("project count group id({}) {}", groupId, projects.size());
+            projects.stream().forEach(project -> LOGGER.debug("Group {} Project {}", groupId, project.getName()));
+        }
+
+        return projects;
     }
 
     public Optional<Project> getProjectById(Integer projectId) {

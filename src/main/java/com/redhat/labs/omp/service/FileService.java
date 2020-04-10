@@ -4,10 +4,13 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.apache.http.HttpStatus;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.File;
@@ -15,6 +18,7 @@ import com.redhat.labs.omp.rest.client.GitLabService;
 
 @ApplicationScoped
 public class FileService {
+    public static Logger LOGGER = LoggerFactory.getLogger(FileService.class);
 
     @Inject
     @RestClient
@@ -57,12 +61,7 @@ public class FileService {
         commit.decodeActions();
 
         // should get a 201 back if commit created
-        if (HttpStatus.SC_CREATED == response.getStatus()) {
-            return true;
-        }
-
-        return false;
-
+        return HttpStatus.SC_CREATED == response.getStatus();
     }
 
     // update a file
@@ -94,7 +93,7 @@ public class FileService {
 
     public Optional<File> deleteFile(Integer projectId, String filePath, String ref) {
 
-        Optional<File> optional = getFile(projectId, filePath, ref);
+        Optional<File> optional = getFile(projectId, filePath, ref, false);
 
         if (optional.isPresent()) {
 
@@ -113,22 +112,40 @@ public class FileService {
 
     // get a file
     public Optional<File> getFile(Integer projectId, String filePath) {
-        return getFile(projectId, filePath, "master");
+        return getFile(projectId, filePath, "master", false);
     }
 
+    // get a file
+    public Optional<File> getFileAllow404(Integer projectId, String filePath) {
+        return getFile(projectId, filePath, "master", true);
+    }
+
+    // get a file
     public Optional<File> getFile(Integer projectId, String filePath, String ref) {
+        return getFile(projectId, filePath, "master", false);
+    }
+
+    public Optional<File> getFile(Integer projectId, String filePath, String ref, boolean allow404) {
 
         Optional<File> optional = Optional.empty();
 
-        // get file
-        File file = gitLabService.getFile(projectId, filePath, ref);
+        try {
 
-        if (null != file) {
+            // get file
+            File file = gitLabService.getFile(projectId, filePath, ref);
 
-            // decode file
-            file.decodeFileAttributes();
-            optional = Optional.of(file);
-
+            if (null != file) {
+                // decode file
+                file.decodeFileAttributes();
+                optional = Optional.of(file);
+            }
+        } catch(WebApplicationException wae) {
+            if(wae.getResponse().getStatus() != 404) {
+                LOGGER.error("Get file {} for project {} failed with code {}", filePath, projectId, wae.getResponse().getStatus());
+                throw wae;
+            } else if(LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Get file {} for project {} failed with code {}", filePath, projectId, wae.getResponse().getStatus());
+            }
         }
 
         return optional;

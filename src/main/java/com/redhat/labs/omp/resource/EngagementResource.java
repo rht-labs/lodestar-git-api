@@ -1,7 +1,10 @@
 package com.redhat.labs.omp.resource;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -33,7 +36,7 @@ public class EngagementResource {
 
     @POST
     @Counted(name = "engagement", description = "How many engagements request have been requested")
-    @Timed(name = "performedChecks", description = "How much time it takes to create an engagement", unit = MetricUnits.MILLISECONDS)
+    @Timed(name = "performedCreates", description = "How much time it takes to create an engagement", unit = MetricUnits.MILLISECONDS)
     public Response createEngagement(Engagement engagement, @Context UriInfo uriInfo) {
 
         Project project = engagementService.createEngagement(engagement);
@@ -42,6 +45,15 @@ public class EngagementResource {
         builder.path(Integer.toString(project.getId()));
         return Response.created(builder.build()).build();
 
+    }
+
+    @GET
+    @Counted(name = "get-engagement", description = "How many enagement requests have been requested")
+    @Timed(name = "performedEngagementGetAll", description = "Time to get all engagements", unit = MetricUnits.MILLISECONDS)
+    public Response findAllEngagements() {
+        List<Engagement> engagements = engagementService.getAllEngagements();
+
+        return Response.ok().entity(engagements).build();
     }
 
 }
