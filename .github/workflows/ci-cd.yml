@@ -1,9 +1,9 @@
-name: Java CI
+name: Container Build
 
 on:
   push:
     branches:
-      - master
+      - versioning
 
 jobs:
   build:
@@ -18,10 +18,22 @@ jobs:
         java-version: 13.0.1
     - name: Build with Maven & Quarkus
       run: mvn test
+    - name: Find and Replace Commit
+      uses: jacobtomlinson/gha-find-replace@0.1.1
+      with:
+        find: "###GIT_COMMIT###"
+        replace: "${{ github.sha }}"
+        include: ".s2i"
+    - name: Find and Replace Tag
+      uses: jacobtomlinson/gha-find-replace@0.1.1
+      with:
+        find: "###GIT_TAG###"
+        replace: "${{ github.ref }}"
+        include: ".s2i"
     - uses: redhat-cop/github-actions/s2i@v2
       with:
         base: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.8
-        output_image: "quay.io/rht-labs/omp-git-api:${{ github.sha }}"
+        output_image: "quay.io/mcanoy/omp-git-api:${{ github.sha }}"
         image_push_registry: quay.io
         image_push_username: ${{ secrets.QUAY_USERNAME }}
         image_push_password: ${{ secrets.QUAY_PASSWORD }}
