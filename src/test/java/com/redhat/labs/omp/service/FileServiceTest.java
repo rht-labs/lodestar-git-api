@@ -43,7 +43,7 @@ public class FileServiceTest {
     
     @Test
     public void deleteFile() {
-        Optional<File> deletedFile = fileService.deleteFile(7, "/engagement.json");
+        Optional<File> deletedFile = fileService.deleteFile(7, "engagement.json");
         Assert.assertTrue(deletedFile.isPresent());
     }
     
