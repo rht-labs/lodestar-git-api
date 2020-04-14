@@ -1,3 +1,5 @@
+![Container Build](https://github.com/rht-labs/open-management-portal-git-api/workflows/Container%20Build/badge.svg)
+
 # open-management-portal-git-api project
 
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
