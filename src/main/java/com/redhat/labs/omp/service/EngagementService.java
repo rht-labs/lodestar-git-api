@@ -138,7 +138,7 @@ public class EngagementService {
 
         // create project under project name group
         Project project = getOrCreateProject(projectGroup.getId(), ENGAGEMENT_PROJECT_NAME,
-                Project.builder().name(ENGAGEMENT_PROJECT_NAME).namespaceId(projectGroup.getId()).build());
+                Project.builder().name(ENGAGEMENT_PROJECT_NAME).visibility("private").namespaceId(projectGroup.getId()).build());
 
         // enable deployment key on project
         projectService.enableDeploymentKeyOnProject(project.getId(), deployKey);
