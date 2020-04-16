@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Engagement {
 
-    private int id;
+    private int projectId;
     private String customerName;
     private String projectName;
     private String description;
