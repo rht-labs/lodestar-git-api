@@ -62,7 +62,7 @@ public class EngagementService {
 
         // create project structure
         Project project = createProjectStucture(engagement);
-        engagement.setId(project.getId());
+        engagement.setProjectId(project.getId());
 
         // get all template files
         List<File> templateFiles = new ArrayList<>();
