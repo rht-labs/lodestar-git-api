@@ -7,9 +7,6 @@ import java.util.Random;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.config.PropertyNamingStrategy;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
@@ -58,7 +55,7 @@ public class EngagementService {
     JsonMarshaller json;
 
     // create an engagement
-    public Project createEngagement(Engagement engagement) {
+    public Project createEngagement(Engagement engagement, String author, String authorEmail) {
 
         // create project structure
         Project project = createProjectStucture(engagement);
@@ -68,15 +65,15 @@ public class EngagementService {
         List<File> templateFiles = new ArrayList<>();
         templateFiles.add(createEngagmentFile(engagement));
 
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             templateFiles.stream().forEach(file -> LOGGER.debug("File path :: " + file.getFilePath()));
         }
 
         // create actions for multiple commit
-        CommitMultiple commit = createCommitMultiple(templateFiles, project.getId(), DEFAULT_BRANCH,
-                engagement.getEngagementLeadName(), engagement.getEngagementLeadEmail(), project.isFirst());
+        CommitMultiple commit = createCommitMultiple(templateFiles, project.getId(), DEFAULT_BRANCH, author,
+                authorEmail, project.isFirst());
 
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             commit.getActions().stream().forEach(file -> LOGGER.debug("Action File path :: " + file.getFilePath()));
         }
 
@@ -90,14 +87,11 @@ public class EngagementService {
     }
 
     /**
-     * Gets all engagements from the base group
-     * Structure is
-     * BaseGroup
-     *   - customer group
-     *     - engagement group
-     *       - project (repo)
-     *         - engagement file
-     *  This is search for all projects named 'iac' that our bot has access to. Then looking for the config data
+     * Gets all engagements from the base group Structure is BaseGroup - customer
+     * group - engagement group - project (repo) - engagement file This is search
+     * for all projects named 'iac' that our bot has access to. Then looking for the
+     * config data
+     * 
      * @return A list or engagements
      */
     public List<Engagement> getAllEngagements() {
@@ -106,10 +100,10 @@ public class EngagementService {
 
         List<Engagement> engagementFiles = new ArrayList<>();
 
-        for(ProjectSearchResults project : projects) {
+        for (ProjectSearchResults project : projects) {
             LOGGER.debug("project id {}", project.getId());
             Optional<File> engagementFile = fileService.getFileAllow404(project.getId(), "engagement.json");
-            if(engagementFile.isPresent()) {
+            if (engagementFile.isPresent()) {
                 engagementFiles.add(json.fromJson(engagementFile.get().getContent(), Engagement.class));
             }
         }
@@ -137,8 +131,8 @@ public class EngagementService {
                         .parentId(customerGroup.getId()).build());
 
         // create project under project name group
-        Project project = getOrCreateProject(projectGroup.getId(), ENGAGEMENT_PROJECT_NAME,
-                Project.builder().name(ENGAGEMENT_PROJECT_NAME).visibility("private").namespaceId(projectGroup.getId()).build());
+        Project project = getOrCreateProject(projectGroup.getId(), ENGAGEMENT_PROJECT_NAME, Project.builder()
+                .name(ENGAGEMENT_PROJECT_NAME).visibility("private").namespaceId(projectGroup.getId()).build());
 
         // enable deployment key on project
         projectService.enableDeploymentKeyOnProject(project.getId(), deployKey);
@@ -191,7 +185,8 @@ public class EngagementService {
 
         List<Action> actions = new ArrayList<>();
 
-        // convert each file to action - parallelStream was bringing inconsistent results
+        // convert each file to action - parallelStream was bringing inconsistent
+        // results
         filesToCommit.stream().forEach(file -> actions.add(createAction(file, isNew)));
 
         return CommitMultiple.builder().id(projectId).branch(branch).commitMessage(commitMessage()).actions(actions)
@@ -215,7 +210,7 @@ public class EngagementService {
 
     private String commitMessage() {
         String COMMIT_MSG = "%s engagement update by git-api %s ";
-        return String.format(COMMIT_MSG, getEmoji(),getEmoji());
+        return String.format(COMMIT_MSG, getEmoji(), getEmoji());
     }
 
     private String getEmoji() {
@@ -223,7 +218,8 @@ public class EngagementService {
 
         int bearCodePoint = bear.codePointAt(bear.offsetByCodePoints(0, 0));
         int mysteryAnimalCodePoint = bearCodePoint + new Random().nextInt(144);
-        char mysteryEmoji[] = {Character.highSurrogate(mysteryAnimalCodePoint), Character.lowSurrogate(mysteryAnimalCodePoint)};
+        char mysteryEmoji[] = { Character.highSurrogate(mysteryAnimalCodePoint),
+                Character.lowSurrogate(mysteryAnimalCodePoint) };
 
         return String.valueOf(mysteryEmoji);
     }

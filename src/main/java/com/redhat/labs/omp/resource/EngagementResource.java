@@ -3,11 +3,13 @@ package com.redhat.labs.omp.resource;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -37,9 +39,10 @@ public class EngagementResource {
     @POST
     @Counted(name = "engagement", description = "How many engagements request have been requested")
     @Timed(name = "performedCreates", description = "How much time it takes to create an engagement", unit = MetricUnits.MILLISECONDS)
-    public Response createEngagement(Engagement engagement, @Context UriInfo uriInfo) {
+    public Response createEngagement(Engagement engagement, @Context UriInfo uriInfo,
+            @NotBlank @QueryParam("username") String author, @NotBlank @QueryParam("userEmail") String authorEmail) {
 
-        Project project = engagementService.createEngagement(engagement);
+        Project project = engagementService.createEngagement(engagement, author, authorEmail);
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(Integer.toString(project.getId()));

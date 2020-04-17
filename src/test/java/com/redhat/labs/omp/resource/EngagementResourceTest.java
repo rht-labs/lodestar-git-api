@@ -36,6 +36,8 @@ public class EngagementResourceTest {
         given()
             .when()
                 .contentType(ContentType.JSON)
+                .queryParam("username", "jdoe")
+                .queryParam("userEmail", "jdoe@email.com")
                 .body(ResourceLoader.load("engagement.json"))
                 .post("/api/v1/engagements")
             .then()
