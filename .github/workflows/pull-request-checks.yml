@@ -1,13 +1,15 @@
 name: PR check
 
 on:
-- pull_request
+  pull_request:
+    paths-ignore:
+      - deployment/**
+      - development/**
+      - .vscode/**
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK
