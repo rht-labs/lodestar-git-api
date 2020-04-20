@@ -1,5 +1,7 @@
 package com.redhat.labs.omp.models;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,5 +34,6 @@ public class Engagement {
     private String ocpPersistentStorageSize;
     private String ocpClusterSize;
     private Launch launch;
+    private List<EngagementUser> engagementUsers;
 
 }
