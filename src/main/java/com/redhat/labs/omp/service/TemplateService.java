@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import com.redhat.labs.cache.cacheStore.EngagementDataCache;
 import com.redhat.labs.exception.FileNotFoundException;
 import com.redhat.labs.omp.models.Engagement;
 import com.redhat.labs.omp.models.gitlab.File;
@@ -45,8 +44,6 @@ public class TemplateService {
     @Inject
     EventBus bus;
 
-    @Inject
-    EngagementDataCache cache;
 
     public List<File> getAllFilesFromTemplateInventory() {
 

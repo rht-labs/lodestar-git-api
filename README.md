@@ -9,29 +9,6 @@ If you want to learn more about Quarkus, please visit its website: https://quark
 
 Prior to running the app, you need to create a **Personal Access Token** linked to your GitLab account.
 
-### Local Infinispan (if necessary)
-
-Fire 🔥 up a docker instance of Infinispan to work with the app
-
-```
-docker run -it -p 11222:11222 -e USER="omp" -e PASS="omp" infinispan/server:10.1
-```
-
-### Running in dev mode 
-
-You can run your application in dev mode that enables **live coding** using:
-```
-export CACHE_CLIENT_INTELLIGENCE=<For mac dev set to BASIC>
-export CACHE_USE_AUTH=true
-export CONFIG_REPOSITORY_ID =<Git Repo id where the config files are>
-export GITLAB_API_URL=<The base url of your git api. ie https://gitlab.com>
-export GITLAB_PERSONAL_ACCESS_TOKEN=<GitLab Personal Access Token>
-export OMP_LOGGING=DEBUG
-export RESIDENCIES_PARENT_REPOSITORIES_ID=<Parent project id where repos will be saved>
-export TEMPLATE_REPOSITORY_ID=<Repo where template live>
-./mvnw quarkus:dev
-```
-
 You could edit your bash profile and make your Quarkus quacky by adding this neat emoji alias, then all you need to fire up your  app is run 🦆
 ```
 echo "alias 🦆='./mvnw quarkus:dev -Dquarkus.http.port=8080'" >> ~/.zshrc
@@ -44,8 +21,6 @@ source ~/.zshrc
 
 You can run your application using Quarkus profiles using:
 ```
-export CACHE_CLIENT_INTELLIGENCE=<For mac dev set to BASIC>
-export CACHE_USE_AUTH=true
 export CONFIG_REPOSITORY_ID =<Git Repo id where the config files are>
 export GITLAB_API_URL=<The base url of your git api. ie https://gitlab.com>
 export GITLAB_PERSONAL_ACCESS_TOKEN=<GitLab Personal Access Token>
@@ -75,67 +50,6 @@ You can then execute your binary: `./target/open-management-portal-git-api-1.0.0
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/building-native-image-guide .
 
-## Add Infinispan to OCP via the Infinispan Operator
-
-* Cluster admin probably needed for CRD
-
-### Create secret
-
-Create a secret file named `omp-cache-secret.yaml`. This secret will create an `identities.yaml` file on the cache. Take note of the name that must match the app secret By default the user / pass will be omp / omp as defined in `src/main/resources/application.properties` and the secret below.
-
-```
-apiVersion: v1
-stringData:
-  identities.yaml: |+
-    credentials:
-    - username: omp
-      password: omp
-    - username: operator
-      password: operator1
-kind: Secret
-metadata:
-  labels:
-    app: infinispan-secret-identities
-    clusterName: omp-cache
-    infinispan_cr: omp-cache
-  name: omp-cache-secret
-type: Opaque
-```
-
-### Create the Infinispan cluster file
-
-Create a file named infinispan-cluster.yaml
-
-```
-apiVersion: infinispan.org/v1
-kind: Infinispan
-metadata:
-  name: omp-cache
-spec:
-  replicas: 1
-  image: infinispan/server:10.1
-  logging:
-    categories:
-      org.infinispan: info
-      org.jgroups: info
-  security:
-    endpointSecretName: omp-cache-secret
-```
-
-### Create the Infinispan Operator
-
-Login to OpenShift with the `oc` client and run the following commands
-
-```
-# Install Infinispan Operator running these commands
-oc apply -f omp-cache-secret.yaml
-oc apply -f https://raw.githubusercontent.com/infinispan/infinispan-operator/master/deploy/rbac.yaml
-oc apply -f https://raw.githubusercontent.com/infinispan/infinispan-operator/master/deploy/operator.yaml
-oc apply -f https://raw.githubusercontent.com/infinispan/infinispan-operator/master/deploy/crd.yaml
-
-# Create an Infinispan Cluster
-oc apply -f infinispan-cluster.yaml
-```
 
 ## Configuration
 
@@ -149,7 +63,4 @@ Deployment template will read from the above secret and inject following env var
 * `RESIDENCIES_PARENT_REPOSITORIES_ID`
 * `GITLAB_API_URL`
 * `GITLAB_PERSONAL_ACCESS_TOKEN` (should be secret and a service account)
-* `CACHE_SERVICE`
-* `CACHE_USER`
-* `CACHE_PASS` (should be secret and match the Infinispan operator secret)
-* `CACHE_USE_AUTH` set to true
+

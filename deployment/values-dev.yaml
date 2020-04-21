@@ -13,8 +13,6 @@ git:
   uri: https://github.com/rht-labs/open-management-portal-git-api.git
   ref: master
 
-cacheService: false
-cacheUseAuth: false
 configRepositoryId: false
 deployKey: false
 gitLabApiUrl: false
