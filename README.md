@@ -138,10 +138,10 @@ oc apply -f infinispan-cluster.yaml
 ```
 
 ## Configuration
+
 The preferred place to store non-sensitive data is in the application.properties.
 
 Sensitive fields like the gitlab token and cluster credentials should be stored in a OpenShift secret at a minimum. Other environment specific information should be stored in environmental variables such as repository id for residencies and repository id for the config.
-This info is stored in `ocp-s11/labs-test/omp-gitlab-configuration`.
 
 Deployment template will read from the above secret and inject following env variables. These are controlled from application.properties, so if a different env name is needed, change in the application properties file and the deployment template.
 
@@ -153,15 +153,3 @@ Deployment template will read from the above secret and inject following env var
 * `CACHE_USER`
 * `CACHE_PASS` (should be secret and match the Infinispan operator secret)
 * `CACHE_USE_AUTH` set to true
-
-### OpenShift Applier
-
-This section is not guaranteed to be up to date. This project includes an `openshift-applier` inventory. To use it, make sure that you are logged in to the cluster and that you customize the variables in `.applier/inventory/group_vars/all.yml` - namely make sure that `deploy_vars` uses the correct endpoints. Once these are configured, you can deploy the project with:
-
-```bash
-cd .applier/
-ansible-galaxy install -r requirements.yml --roles-path=roles --force
-ansible-playbook apply.yml -i inventory/
-```
-
-

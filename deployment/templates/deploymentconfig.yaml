@@ -51,7 +51,7 @@ spec:
   test: false
   triggers:
   - type: ConfigChange
-  {{- if eq .Values.imageTag "latest" }}
+  {{- if or (.Values.development) (eq .Values.imageTag "latest") }}
   - type: ImageChange
     imageChangeParams:
       automatic: true
