@@ -61,11 +61,6 @@
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-vertx</artifactId>
 		</dependency>
-		<!-- Cache -->
-		<dependency>
-			<groupId>io.quarkus</groupId>
-			<artifactId>quarkus-infinispan-client</artifactId>
-		</dependency>
 		<!-- Health Checks -->
 		<dependency>
 			<groupId>io.quarkus</groupId>

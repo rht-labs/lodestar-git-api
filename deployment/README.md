@@ -31,8 +31,6 @@ helm template . \
   --values values-dev.yaml \
   --set git.uri=https://github.com/rht-labs/open-management-portal-git-api.git \
   --set git.ref=master \
-  --set cacheService=<your-infinispan-service-name> \
-  --set cacheUseAuth=<use-infinispan-auth> \
   --set configRepositoryId=<your-config-repository-id> \
   --set deployKey=<your-gitlab-deploy-key-id> \
   --set gitLabApiUrl=<your-gitlab-base-url> \
@@ -50,8 +48,6 @@ It accepts the following variables
 |---|---|
 | `git.uri`  | The HTTPS reference to the repo (your fork!) to build  |
 | `git.ref`  | The branch name to build  |
-| `cacheService`  | The service name of the Infinispan deployment  |
-| `cacheUseAuth`  | Enable authentication against the cache  |
 | `configRepositoryId`  | The GitLab ID of the config repository  |
 | `deployKey`  | The ID of the GitLab deploy key to enable on newly-created repositories  |
 | `gitLabApiUrl`  | The base URL of the GitLab instance to use  |
