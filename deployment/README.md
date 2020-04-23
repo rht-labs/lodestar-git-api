@@ -31,13 +31,12 @@ helm template . \
   --values values-dev.yaml \
   --set git.uri=https://github.com/rht-labs/open-management-portal-git-api.git \
   --set git.ref=master \
+  --set configFile=<your-config-file> \
   --set configRepositoryId=<your-config-repository-id> \
   --set deployKey=<your-gitlab-deploy-key-id> \
   --set gitLabApiUrl=<your-gitlab-base-url> \
   --set gitLabPersonalAccessToken=<your-gitlab-personal-access-token> \
-  --set jwtVerifyPublicKeyLocation=<your-openid-connect-cert-url> \
-  --set residenciesParentRepositoryId=<your-gitlab-group-id> \
-  --set templateRepositoryId=<your-template-repository-id> \
+  --set engagementsRepositoryId=<your-gitlab-group-id> \
   --set trustedClientKey=<your-trusted-client-key> \
 | oc apply -f -
 ```
@@ -48,13 +47,12 @@ It accepts the following variables
 |---|---|
 | `git.uri`  | The HTTPS reference to the repo (your fork!) to build  |
 | `git.ref`  | The branch name to build  |
+| `configFile` | The path including name of the config file |
 | `configRepositoryId`  | The GitLab ID of the config repository  |
 | `deployKey`  | The ID of the GitLab deploy key to enable on newly-created repositories  |
 | `gitLabApiUrl`  | The base URL of the GitLab instance to use  |
 | `gitLabPersonalAccessToken`  | The access token to use to auth against GitLab  |
-| `jwtVerifyPublicKeyLocation`  | The URL at which your OpenID Connect (SSO) provider exposes its public key  |
-| `residenciesParentRepositoryId`  | The ID of the GitLab group under which to create new projects  |
-| `templateRepositoryId`  | The ID of the GitLab repository which defines a template to use for creating new repos  |
+| `engagementsRepositoryId`  | The ID of the GitLab group under which to create new projects  |
 | `trustedClientKey`  | [Temporary] Used as a placeholder to authenticate client requests, being replaced by validating JWT tokens against the `jwtVerifyPublicKeyLocation` |
 
 This will spin up all of the usual resources that this service needs in production, plus a `BuildConfig` configured to build it from source from the Git repository specified. To trigger this build, use `oc start-build omp-git-api`.
