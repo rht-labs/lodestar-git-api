@@ -7,7 +7,6 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +22,6 @@ public class GroupService {
     @Inject
     @RestClient
     GitLabService gitLabService;
-
-    @ConfigProperty(name = "residenciesParentRepositoryId")
-    Integer engagementGroupId;
 
     // get a group
     public Optional<Group> getGitLabGroupByName(String name) throws UnexpectedGitLabResponseException {
@@ -55,10 +51,10 @@ public class GroupService {
 
     }
 
-    public  List<Group> getAllGroups() {
+    public  List<Group> getAllGroups(Integer engagementRepositoryId) {
 
         //FIRST LEVEL
-        List<Group> customerGroups = gitLabService.getSubGroups(engagementGroupId);
+        List<Group> customerGroups = gitLabService.getSubGroups(engagementRepositoryId);
 
         List<Group> customerEngagementGroups = new ArrayList<>();
         customerGroups.stream().forEach(group -> customerEngagementGroups.addAll(gitLabService.getSubGroups(group.getId())));

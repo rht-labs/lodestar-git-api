@@ -163,6 +163,12 @@ public class MockGitLabService implements GitLabService {
             throw new WebApplicationException(500);
         }
 
+        if("schema/config.yml".equals(filePath)) {
+            String content = ResourceLoader.load("config.yml");
+            content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
+            return File.builder().filePath(filePath).content(content).build();
+        }
+
         return null;
     }
 
