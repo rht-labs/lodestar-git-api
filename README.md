@@ -54,27 +54,27 @@ Deployment template will read from the above secret and inject following env var
 |------|---------------|----------|
 | OMP_LOGGING | DEBUG | False |
 
-# GitLab
+### GitLab
 
 | Name | Example Value | Required |
 |------|---------------|----------|
 | GITLAB_API_URL | https://acmegit.com | True |
 | DEPLOY_KEY | 0 | True |
 
-# Config Resource 
+### Config Resource 
 
 | Name | Example Value | Required |
 |------|---------------|----------|
 | CONFIG_REPOSITORY_ID | 1 | True |
 | CONFIG_FILE | my-config.yml | True |
 
-# Engagements Resource
+### Engagements Resource
 
 | Name | Example Value | Required |
 |------|---------------|----------|
 | ENGAGEMENTS_REPOSITORY_ID | 2 | True |
 
-# Version Resource
+### Version Resource
 
 | Name | Example Value | Required |
 |------|---------------|----------|
