@@ -37,7 +37,6 @@ helm template . \
   --set gitLabApiUrl=<your-gitlab-base-url> \
   --set gitLabPersonalAccessToken=<your-gitlab-personal-access-token> \
   --set engagementsRepositoryId=<your-gitlab-group-id> \
-  --set trustedClientKey=<your-trusted-client-key> \
 | oc apply -f -
 ```
 
@@ -53,6 +52,5 @@ It accepts the following variables
 | `gitLabApiUrl`  | The base URL of the GitLab instance to use  |
 | `gitLabPersonalAccessToken`  | The access token to use to auth against GitLab  |
 | `engagementsRepositoryId`  | The ID of the GitLab group under which to create new projects  |
-| `trustedClientKey`  | [Temporary] Used as a placeholder to authenticate client requests, being replaced by validating JWT tokens against the `jwtVerifyPublicKeyLocation` |
 
 This will spin up all of the usual resources that this service needs in production, plus a `BuildConfig` configured to build it from source from the Git repository specified. To trigger this build, use `oc start-build omp-git-api`.
