@@ -1,9 +1,90 @@
 ![Container Build](https://github.com/rht-labs/open-management-portal-git-api/workflows/Container%20Build/badge.svg)
 
-# open-management-portal-git-api project
+# Open Management Portal - Git API
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+The Git API for the Open Management Portal.
+
+This API uses GitLab as a repository to store OMP resources.
+
+## JSON REST APIs
+
+The JSON REST APIs consist of the following resources:
+
+* Config
+* Engagements
+* Version
+
+### Config Resource
+
+The config resource exposes an API that allows clients to retrieve a configured `Config` file from GitLab.
+
+```
+GET  /api/v1/config
+```
+
+### Engagement Resource
+
+The engagement resource exposes an API that allows clients to create or update and engagement resource in GitLab.
+
+```
+POST /api/v1/engagements
+```
+
+This endpoint will create the expected group/project structure in GitLab.  Then, will update the `engagement.json` file if it already exists or create it if it does not.
+
+### Version Resource
+
+The version resource exposes an API that allows a client to determine which version of the application is deployed.
+
+```
+GET  /api/v1/version
+```
+
+## Configuration
+
+The preferred place to store non-sensitive data is in the application.properties.
+
+Sensitive fields like the gitlab token and cluster credentials should be stored in a OpenShift secret at a minimum. Other environment specific information should be stored in environmental variables such as repository id for engagements and repository id for the config.
+
+Deployment template will read from the above secret and inject following env variables. These are controlled from application.properties, so if a different env name is needed, change in the application properties file and the deployment template.
+
+### Logging
+
+| Name | Example Value | Required |
+|------|---------------|----------|
+| OMP_LOGGING | DEBUG | False |
+
+### GitLab
+
+| Name | Example Value | Required |
+|------|---------------|----------|
+| GITLAB_API_URL | https://acmegit.com | True |
+| DEPLOY_KEY | 0 | True |
+
+### Config Resource 
+
+| Name | Example Value | Required |
+|------|---------------|----------|
+| CONFIG_REPOSITORY_ID | 1 | True |
+| CONFIG_FILE | my-config.yml | True |
+
+### Engagements Resource
+
+| Name | Example Value | Required |
+|------|---------------|----------|
+| ENGAGEMENTS_REPOSITORY_ID | 2 | True |
+
+### Version Resource
+
+| Name | Example Value | Required |
+|------|---------------|----------|
+| GIT_API_GIT_COMMIT | a2adfk | False |
+| GIT_API_GIT_TAG | v1.2 | False |
+
+## Development
+
+See [the deployment README](deployment/README.md) for details on how to spin up a deployment for developing on OpenShift.
+
 
 ## Running the application
 
@@ -17,50 +98,29 @@ source ~/.zshrc
 🦆
 ```
 
-### Running with a profile 
+### Running the Application 
 
-You can run your application using Quarkus profiles using:
+You can run your application using Quarkus using:
+
 ```
-export CONFIG_REPOSITORY_ID =<Git Repo id where the config files are>
+
+# logging
+export OMP_LOGGING=DEBUG
+
+# gitlab
 export GITLAB_API_URL=<The base url of your git api. ie https://gitlab.com>
 export GITLAB_PERSONAL_ACCESS_TOKEN=<GitLab Personal Access Token>
-export OMP_LOGGING=DEBUG
-export RESIDENCIES_PARENT_REPOSITORIES_ID=<Parent project id where repos will be saved>
-export TEMPLATE_REPOSITORY_ID=<Repo where template live>
-export QUARKUS_PROFILE=<Quarkus profile>
+export DEPLOY_KEY=<Deployment Key for Engagements>
+
+# config 
+export CONFIG_REPOSITORY_ID=<Git Repo id where the config files are>
+
+# engagements
+export ENGAGEMENTS_REPOSITORY_ID=<Parent project id where repos will be saved>
+
+# package the application
 ./mvnw clean package
+
+# run the application
 java -jar target/open-management-portal-git-api-*-runner.jar
 ```
-
-## Packaging and running the application
-
-The application is packageable using `./mvnw package`.
-It produces the executable `open-management-portal-git-api-1.0.0-SNAPSHOT-runner.jar` file in `/target` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/lib` directory.
-
-The application is now runnable using `java -jar target/open-management-portal-git-api-1.0.0-SNAPSHOT-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using: `./mvnw package -Pnative`.
-
-Or you can use Podman to build the native executable using: `./mvnw package -Pnative -Dquarkus.native.container-runtime=podman`.
-
-You can then execute your binary: `./target/open-management-portal-git-api-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/building-native-image-guide .
-
-
-## Configuration
-
-The preferred place to store non-sensitive data is in the application.properties.
-
-Sensitive fields like the gitlab token and cluster credentials should be stored in a OpenShift secret at a minimum. Other environment specific information should be stored in environmental variables such as repository id for residencies and repository id for the config.
-
-Deployment template will read from the above secret and inject following env variables. These are controlled from application.properties, so if a different env name is needed, change in the application properties file and the deployment template.
-
-* `TEMPLATE_REPOSITORY_ID`
-* `RESIDENCIES_PARENT_REPOSITORIES_ID`
-* `GITLAB_API_URL`
-* `GITLAB_PERSONAL_ACCESS_TOKEN` (should be secret and a service account)
-

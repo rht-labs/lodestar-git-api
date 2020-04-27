@@ -30,13 +30,13 @@ public class EngagementService {
     private static final String ENGAGEMENT_PROJECT_NAME = "iac";
     private final String DEFAULT_BRANCH = "master";
 
-    @ConfigProperty(name = "residenciesParentRepositoryId")
-    Integer engagementParentId;
+    @ConfigProperty(name = "engagements.repository.id")
+    Integer engagementRepositoryId;
 
     @ConfigProperty(name = "stripPathPrefix", defaultValue = "schema/")
     String stripPathPrefix;
 
-    @ConfigProperty(name = "deployKey")
+    @ConfigProperty(name = "gitlab.deploy.key")
     Integer deployKey;
 
     @Inject
@@ -44,9 +44,6 @@ public class EngagementService {
 
     @Inject
     GroupService groupService;
-
-    @Inject
-    TemplateService templateService;
 
     @Inject
     FileService fileService;
@@ -123,7 +120,7 @@ public class EngagementService {
         // create group for customer name
         Group customerGroup = getOrCreateGroup(engagement.getCustomerName(),
                 Group.builder().name(engagement.getCustomerName()).path(engagement.getCustomerName())
-                        .parentId(engagementParentId).build());
+                        .parentId(engagementRepositoryId).build());
 
         // create group for project name
         Group projectGroup = getOrCreateGroup(engagement.getProjectName(),
@@ -223,11 +220,5 @@ public class EngagementService {
 
         return String.valueOf(mysteryEmoji);
     }
-
-    // update an engagement
-
-    // get an engagement
-
-    // delete an engagement?
 
 }
