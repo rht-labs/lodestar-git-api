@@ -13,4 +13,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Skip build
-      run: echo "This build has been skipped."
+      run: echo "This build has been skipped because the only changes are in non-code directories."
