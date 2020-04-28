@@ -3,11 +3,10 @@ name: PR check without code changes
 on:
   pull_request:
     paths:
+      - "!**"
       - deployment/**
       - development/**
       - .vscode/**
-      - "!src/**"
-      - "!s2i/**"
 
 jobs:
   build:
