@@ -5,6 +5,9 @@ on:
     paths-ignore:
       - deployment/**
       - .vscode/**
+      - README.md
+      - lombok.config
+      - .gitignore
 
 jobs:
   build:
