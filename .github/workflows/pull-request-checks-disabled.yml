@@ -1,4 +1,4 @@
-name: PR check
+name: PR check without code changes
 
 on:
   pull_request:
@@ -6,6 +6,8 @@ on:
       - deployment/**
       - development/**
       - .vscode/**
+      - !src/**
+      - !s2i/**
 
 jobs:
   build:
