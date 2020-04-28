@@ -6,8 +6,8 @@ on:
       - deployment/**
       - development/**
       - .vscode/**
-      - !src/**
-      - !s2i/**
+      - "!src/**"
+      - "!s2i/**"
 
 jobs:
   build:
