@@ -1,0 +1,15 @@
+name: PR check
+
+on:
+  pull_request:
+    paths:
+      - deployment/**
+      - development/**
+      - .vscode/**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Skip build
+      run: echo "This build has been skipped."
