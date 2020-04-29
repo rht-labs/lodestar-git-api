@@ -23,12 +23,6 @@ jobs:
         find: "###GIT_COMMIT###"
         replace: "${{ github.sha }}"
         include: ".s2i"
-    - name: Find and Replace Tag
-      uses: jacobtomlinson/gha-find-replace@0.1.1
-      with:
-        find: "###GIT_TAG###"
-        replace: "${{ github.ref }}"
-        include: ".s2i"
     - uses: redhat-cop/github-actions/s2i@v2
       with:
         base: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.8
