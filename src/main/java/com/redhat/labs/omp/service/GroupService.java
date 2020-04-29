@@ -24,7 +24,8 @@ public class GroupService {
     GitLabService gitLabService;
 
     // get a group
-    public Optional<Group> getGitLabGroupByName(String name) throws UnexpectedGitLabResponseException {
+    public Optional<Group> getGitLabGroupByName(String name, Integer parentId)
+            throws UnexpectedGitLabResponseException {
 
         Optional<Group> optional = Optional.empty();
 
@@ -35,8 +36,8 @@ public class GroupService {
         }
 
         // look for a match between returned name and provided path
-        for(Group group : groupList) {
-            if(name.equals(group.getPath())) {
+        for (Group group : groupList) {
+            if (name.equals(group.getPath()) && parentId.equals(group.getParentId())) {
                 return Optional.of(group);
             }
         }
@@ -45,15 +46,16 @@ public class GroupService {
 
     }
 
-    public  List<Group> getAllGroups(Integer engagementRepositoryId) {
+    public List<Group> getAllGroups(Integer engagementRepositoryId) {
 
-        //FIRST LEVEL
+        // FIRST LEVEL
         List<Group> customerGroups = gitLabService.getSubGroups(engagementRepositoryId);
 
         List<Group> customerEngagementGroups = new ArrayList<>();
-        customerGroups.stream().forEach(group -> customerEngagementGroups.addAll(gitLabService.getSubGroups(group.getId())));
+        customerGroups.stream()
+                .forEach(group -> customerEngagementGroups.addAll(gitLabService.getSubGroups(group.getId())));
 
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             customerEngagementGroups.stream().forEach(group -> LOGGER.debug("Group -> {}", group.getName()));
         }
 
