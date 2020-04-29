@@ -3,7 +3,7 @@ name: Container Build
 on:
   push:
     branches:
-      - master
+      - version-fix
 
 jobs:
   build:
