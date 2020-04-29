@@ -30,6 +30,9 @@ spec:
       - envFrom:
         - secretRef:
             name: omp-gitlab-configuration
+        env:
+        - name: GIT_API_GIT_TAG
+          value: {{ .Values.imageTag }}
         image: {{ .Values.name }}:{{ .Values.imageTag }}
         imagePullPolicy: Always
         name: {{ .Values.name }}
