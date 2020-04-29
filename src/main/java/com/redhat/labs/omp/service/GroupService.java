@@ -34,20 +34,14 @@ public class GroupService {
             return optional;
         }
 
-        if (1 == groupList.size()) {
-            return Optional.of(groupList.get(0));
-        }
-
-        // found more than one group with name in either 'name' or 'path' attribute
-        // should match path
+        // look for a match between returned name and provided path
         for(Group group : groupList) {
-            if(name.equalsIgnoreCase(group.getPath())) {
+            if(name.equals(group.getPath())) {
                 return Optional.of(group);
             }
         }
 
-        throw new UnexpectedGitLabResponseException(
-                "No resource found with name equal to path attribute.");
+        return optional;
 
     }
 
