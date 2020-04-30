@@ -140,7 +140,7 @@ public class EngagementService {
 
     private Group getOrCreateGroup(String groupName, Group groupToCreate) {
 
-        Optional<Group> optional = groupService.getGitLabGroupByName(groupName);
+        Optional<Group> optional = groupService.getGitLabGroupByName(groupName, groupToCreate.getParentId());
 
         if (!optional.isPresent()) {
 

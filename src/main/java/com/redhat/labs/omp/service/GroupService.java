@@ -24,7 +24,8 @@ public class GroupService {
     GitLabService gitLabService;
 
     // get a group
-    public Optional<Group> getGitLabGroupByName(String name) throws UnexpectedGitLabResponseException {
+    public Optional<Group> getGitLabGroupByName(String name, Integer parentId)
+            throws UnexpectedGitLabResponseException {
 
         Optional<Group> optional = Optional.empty();
 
@@ -34,32 +35,27 @@ public class GroupService {
             return optional;
         }
 
-        if (1 == groupList.size()) {
-            return Optional.of(groupList.get(0));
-        }
-
-        // found more than one group with name in either 'name' or 'path' attribute
-        // should match path
-        for(Group group : groupList) {
-            if(name.equalsIgnoreCase(group.getPath())) {
+        // look for a match between returned name and provided path
+        for (Group group : groupList) {
+            if (name.equals(group.getPath()) && parentId.equals(group.getParentId())) {
                 return Optional.of(group);
             }
         }
 
-        throw new UnexpectedGitLabResponseException(
-                "No resource found with name equal to path attribute.");
+        return optional;
 
     }
 
-    public  List<Group> getAllGroups(Integer engagementRepositoryId) {
+    public List<Group> getAllGroups(Integer engagementRepositoryId) {
 
-        //FIRST LEVEL
+        // FIRST LEVEL
         List<Group> customerGroups = gitLabService.getSubGroups(engagementRepositoryId);
 
         List<Group> customerEngagementGroups = new ArrayList<>();
-        customerGroups.stream().forEach(group -> customerEngagementGroups.addAll(gitLabService.getSubGroups(group.getId())));
+        customerGroups.stream()
+                .forEach(group -> customerEngagementGroups.addAll(gitLabService.getSubGroups(group.getId())));
 
-        if(LOGGER.isDebugEnabled()) {
+        if (LOGGER.isDebugEnabled()) {
             customerEngagementGroups.stream().forEach(group -> LOGGER.debug("Group -> {}", group.getName()));
         }
 

@@ -35,14 +35,9 @@ public class ProjectService {
             return optional;
         }
 
-        if (1 == resultList.size()) {
-            return Optional.of(Project.from(resultList.get(0)));
-        }
-
-        // found more than one project with name in either 'name' or 'path' attribute
-        // should match path
+        // look for a project with name that matches the namespace id and the path
         for (ProjectSearchResults result : resultList) {
-            if (namespaceId.equals(result.getNamespace().getId()) && name.equalsIgnoreCase(result.getPath())) {
+            if (namespaceId.equals(result.getNamespace().getId()) && name.equals(result.getPath())) {
                 return Optional.of(Project.from(result));
             }
         }
