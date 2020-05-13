@@ -41,7 +41,7 @@ public class EngagementResource {
     @Timed(name = "performedCreates", description = "How much time it takes to create an engagement", unit = MetricUnits.MILLISECONDS)
     public Response createEngagement(Engagement engagement, @Context UriInfo uriInfo,
             @NotBlank @QueryParam("username") String author, @NotBlank @QueryParam("userEmail") String authorEmail) {
-
+LOGGER.debug("engagement from resource {}", engagement);
         Project project = engagementService.createEngagement(engagement, author, authorEmail);
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
