@@ -50,16 +50,16 @@ public class FileService {
     public boolean createFiles(Integer projectId, CommitMultiple commit) {
 
         Response response = null;
-LOGGER.debug("commit before encoding {}", commit);
+
         // encode actions in commit
         commit.encodeActions();
-LOGGER.debug("commit after encoding {}", commit);
+
         // call gitlab api to commit
         response = gitLabService.commitMultipleFiles(projectId, commit);
-LOGGER.debug("commit before decoding {}", commit);
+
         // decode actions in commit
         commit.decodeActions();
-LOGGER.debug("commit before decoding {}", commit);
+
         // should get a 201 back if commit created
         return HttpStatus.SC_CREATED == response.getStatus();
     }

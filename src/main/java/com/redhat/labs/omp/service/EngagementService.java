@@ -54,11 +54,11 @@ public class EngagementService {
 
     // create an engagement
     public Project createEngagement(Engagement engagement, String author, String authorEmail) {
-LOGGER.debug("creating engagement in gitlab with {}", engagement);
+
         // create project structure
         Project project = createProjectStucture(engagement);
         engagement.setProjectId(project.getId());
-LOGGER.debug("engagement after project structure created {}", engagement);
+
         // get all template files
         List<File> templateFiles = new ArrayList<>();
         templateFiles.add(createEngagmentFile(engagement));
@@ -110,23 +110,21 @@ LOGGER.debug("engagement after project structure created {}", engagement);
     }
 
     private File createEngagmentFile(Engagement engagement) {
-LOGGER.debug("creating engagement file from engagement {}", engagement);
+
         String fileContent = json.toJson(engagement);
-LOGGER.debug("file content generated from engagement {}", fileContent);
         File file = File.builder().content(fileContent).filePath("engagement.json").build();
-LOGGER.debug("created file {}", file);
+
         return file;
     }
 
     private Project createProjectStucture(Engagement engagement) {
-LOGGER.debug("creating project structure with {}", engagement);
+
         // create group for customer name
         Group customerGroup = getOrCreateGroup(engagement.getCustomerName(),
                 Group.builder().name(engagement.getCustomerName())
                         .path(GitLabPathUtils.generateValidPath(engagement.getCustomerName()))
                         .parentId(engagementRepositoryId).build());
-LOGGER.debug("engagement after customer group {}", engagement);
-LOGGER.debug("customer group {}", customerGroup);
+
         // create group for project name
         Group projectGroup = getOrCreateGroup(engagement.getProjectName(),
                 Group.builder().name(engagement.getProjectName())
