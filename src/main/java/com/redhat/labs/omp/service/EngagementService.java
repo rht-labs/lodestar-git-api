@@ -58,7 +58,7 @@ public class EngagementService {
         // create project structure
         Project project = createProjectStucture(engagement);
         engagement.setProjectId(project.getId());
-
+LOGGER.debug("engagement after project structure created {}", engagement);
         // get all template files
         List<File> templateFiles = new ArrayList<>();
         templateFiles.add(createEngagmentFile(engagement));
@@ -110,9 +110,11 @@ public class EngagementService {
     }
 
     private File createEngagmentFile(Engagement engagement) {
+LOGGER.debug("creating engagement file from engagement {}", engagement);
         String fileContent = json.toJson(engagement);
+LOGGER.debug("file content generated from engagement {}", fileContent);
         File file = File.builder().content(fileContent).filePath("engagement.json").build();
-
+LOGGER.debug("created file {}", file);
         return file;
     }
 
