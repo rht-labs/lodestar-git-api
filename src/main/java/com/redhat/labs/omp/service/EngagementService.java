@@ -54,7 +54,7 @@ public class EngagementService {
 
     // create an engagement
     public Project createEngagement(Engagement engagement, String author, String authorEmail) {
-
+LOGGER.debug("creating engagement in gitlab with {}", engagement);
         // create project structure
         Project project = createProjectStucture(engagement);
         engagement.setProjectId(project.getId());
@@ -119,13 +119,14 @@ LOGGER.debug("created file {}", file);
     }
 
     private Project createProjectStucture(Engagement engagement) {
-
+LOGGER.debug("creating project structure with {}", engagement);
         // create group for customer name
         Group customerGroup = getOrCreateGroup(engagement.getCustomerName(),
                 Group.builder().name(engagement.getCustomerName())
                         .path(GitLabPathUtils.generateValidPath(engagement.getCustomerName()))
                         .parentId(engagementRepositoryId).build());
-
+LOGGER.debug("engagement after customer group {}", engagement);
+LOGGER.debug("customer group {}", customerGroup);
         // create group for project name
         Group projectGroup = getOrCreateGroup(engagement.getProjectName(),
                 Group.builder().name(engagement.getProjectName())
