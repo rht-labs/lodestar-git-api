@@ -43,5 +43,18 @@ public class EngagementResourceTest {
             .then()
                 .statusCode(201);
     }
-    
+
+    @Test
+    public void testUpdateEngagementSuccess() {
+        given()
+            .when()
+                .contentType(ContentType.JSON)
+                .queryParam("username", "jdoe")
+                .queryParam("userEmail", "jdoe@email.com")
+                .body(ResourceLoader.load("engagement-update.json"))
+                .post("/api/v1/engagements")
+            .then()
+                .statusCode(201);
+    }
+
 }

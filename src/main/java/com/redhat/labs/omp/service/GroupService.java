@@ -37,7 +37,7 @@ public class GroupService {
 
         // look for a match between returned name and provided path
         for (Group group : groupList) {
-            if (name.equals(group.getPath()) && parentId.equals(group.getParentId())) {
+            if (name.equals(group.getName()) && parentId.equals(group.getParentId())) {
                 return Optional.of(group);
             }
         }
