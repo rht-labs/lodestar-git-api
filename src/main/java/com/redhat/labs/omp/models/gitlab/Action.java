@@ -40,7 +40,8 @@ public class Action {
 
         // encode contents
         if (null != content) {
-            byte[] encodedContents = EncodingUtils.base64Encode(this.content.getBytes());
+            byte[] encodedContents = EncodingUtils
+                    .base64Encode(this.content.getBytes(StandardCharsets.UTF_8.toString()));
             this.content = new String(encodedContents, StandardCharsets.UTF_8);
         }
 

@@ -22,6 +22,7 @@ import com.redhat.labs.omp.models.gitlab.FileAction;
 import com.redhat.labs.omp.models.gitlab.Group;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
+import com.redhat.labs.omp.utils.GitLabPathUtils;
 
 @ApplicationScoped
 public class EngagementService {
@@ -109,6 +110,7 @@ public class EngagementService {
     }
 
     private File createEngagmentFile(Engagement engagement) {
+
         String fileContent = json.toJson(engagement);
         File file = File.builder().content(fileContent).filePath("engagement.json").build();
 
@@ -119,12 +121,14 @@ public class EngagementService {
 
         // create group for customer name
         Group customerGroup = getOrCreateGroup(engagement.getCustomerName(),
-                Group.builder().name(engagement.getCustomerName()).path(engagement.getCustomerName())
+                Group.builder().name(engagement.getCustomerName())
+                        .path(GitLabPathUtils.generateValidPath(engagement.getCustomerName()))
                         .parentId(engagementRepositoryId).build());
 
         // create group for project name
         Group projectGroup = getOrCreateGroup(engagement.getProjectName(),
-                Group.builder().name(engagement.getProjectName()).path(engagement.getProjectName())
+                Group.builder().name(engagement.getProjectName())
+                        .path(GitLabPathUtils.generateValidPath(engagement.getProjectName()))
                         .parentId(customerGroup.getId()).build());
 
         // create project under project name group
