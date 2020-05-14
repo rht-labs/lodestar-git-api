@@ -94,7 +94,6 @@ public class EngagementService {
      */
     public List<Engagement> getAllEngagements() {
 
-//        List<ProjectSearchResults> projects = projectService.getAllProjectsByNane("iac");
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
 
         List<Engagement> engagementFiles = new ArrayList<>();
