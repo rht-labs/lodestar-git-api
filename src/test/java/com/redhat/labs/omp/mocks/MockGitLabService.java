@@ -212,7 +212,7 @@ public class MockGitLabService implements GitLabService {
     }
 
     @Override
-    public List<Project> getProjectsbyGroup(Integer groupId) {
+    public List<Project> getProjectsbyGroup(Integer groupId, Boolean includeSubgroups) {
         List<Project> projects = new ArrayList<>();
         projects.add(Project.builder().id(groupId * 10).name("Project " + (groupId*10)).build());
         return projects;

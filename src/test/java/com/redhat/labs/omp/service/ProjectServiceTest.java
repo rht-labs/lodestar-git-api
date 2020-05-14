@@ -38,7 +38,7 @@ public class ProjectServiceTest {
     
     @Test 
     public void getProjectsByGroup() {
-        List<Project> projects = projectService.getProjects(10);
+        List<Project> projects = projectService.getProjectsByGroup(10, true);
         
         Assertions.assertEquals(1, projects.size());
     }
