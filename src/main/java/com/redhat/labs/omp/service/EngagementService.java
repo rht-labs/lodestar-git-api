@@ -94,11 +94,11 @@ public class EngagementService {
      */
     public List<Engagement> getAllEngagements() {
 
-        List<ProjectSearchResults> projects = projectService.getAllProjectsByNane("iac");
+        List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
 
         List<Engagement> engagementFiles = new ArrayList<>();
 
-        for (ProjectSearchResults project : projects) {
+        for (Project project : projects) {
             LOGGER.debug("project id {}", project.getId());
             Optional<File> engagementFile = fileService.getFileAllow404(project.getId(), "engagement.json");
             if (engagementFile.isPresent()) {

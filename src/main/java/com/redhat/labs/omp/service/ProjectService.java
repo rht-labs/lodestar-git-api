@@ -50,8 +50,8 @@ public class ProjectService {
         return gitLabService.getProjectByName(name);
     }
 
-    public List<Project> getProjects(int groupId) {
-        List<Project> projects = gitLabService.getProjectsbyGroup(groupId);
+    public List<Project> getProjectsByGroup(int groupId, Boolean includeSubgroups) {
+        List<Project> projects = gitLabService.getProjectsbyGroup(groupId, includeSubgroups);
 
         if(LOGGER.isDebugEnabled()) {
             LOGGER.trace("project count group id({}) {}", groupId, projects.size());
