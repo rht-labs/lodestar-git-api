@@ -59,10 +59,10 @@ public class MockGitLabService implements GitLabService {
 
         if ("customer3".equalsIgnoreCase(name)) {
             groupList.add(Group.builder().id(3).name("customer1").path("customer1").build());
-        } else if ("project4".equalsIgnoreCase(name)) {
-            groupList.add(Group.builder().id(4).name("project1").path("project1").build());
-        } else if ("customer".equalsIgnoreCase(name)) {
-            groupList.add(Group.builder().id(11).name("customerA").path("customerA").parentId(10).build());
+        } else if ("project1".equalsIgnoreCase(name)) {
+            groupList.add(Group.builder().id(4).name("project1").path("project1").parentId(11).build());
+        } else if ("customer".equalsIgnoreCase(name) || "customer A".equalsIgnoreCase(name)) {
+            groupList.add(Group.builder().id(11).name("customer A").path("customer-a").parentId(2).build());
             groupList.add(Group.builder().id(12).name("customer").path("customer").parentId(10).build());
         }
 
