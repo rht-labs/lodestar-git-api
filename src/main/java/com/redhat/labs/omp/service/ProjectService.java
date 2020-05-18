@@ -57,7 +57,7 @@ public class ProjectService {
     public List<Project> getProjectsByGroup(int groupId, Boolean includeSubgroups) {
         List<Project> projects = gitLabService.getProjectsbyGroup(groupId, includeSubgroups);
 
-        if(LOGGER.isTraceEnabled()) {
+        if(LOGGER.isDebugEnabled()) {
             LOGGER.trace("project count group id({}) {}", groupId, projects.size());
             projects.stream().forEach(project -> LOGGER.debug("Group {} Project {}", groupId, project.getName()));
         }
