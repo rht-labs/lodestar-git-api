@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,9 @@ public class ProjectService {
     @Inject
     @RestClient
     GitLabService gitLabService;
+
+    @ConfigProperty(name = "engagements.do.not.delete")
+    boolean doNotDelete;
 
     // get a project
     public Optional<Project> getProjectByName(Integer namespaceId, String name)
@@ -53,7 +57,7 @@ public class ProjectService {
     public List<Project> getProjectsByGroup(int groupId, Boolean includeSubgroups) {
         List<Project> projects = gitLabService.getProjectsbyGroup(groupId, includeSubgroups);
 
-        if(LOGGER.isDebugEnabled()) {
+        if(LOGGER.isTraceEnabled()) {
             LOGGER.trace("project count group id({}) {}", groupId, projects.size());
             projects.stream().forEach(project -> LOGGER.debug("Group {} Project {}", groupId, project.getName()));
         }
@@ -79,6 +83,12 @@ public class ProjectService {
     public Optional<Project> createProject(Project project) {
 
         Optional<Project> optional = Optional.empty();
+
+        if(doNotDelete) {
+            project.preserve();
+        }
+
+        LOGGER.debug("create project  " + project);
 
         // try to create project
         Project createdProject = gitLabService.createProject(project);
