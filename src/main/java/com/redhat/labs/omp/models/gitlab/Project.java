@@ -1,5 +1,6 @@
 package com.redhat.labs.omp.models.gitlab;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Project {
+
+    private static final String DO_NOT_DELETE = "DO_NOT_DELETE";
 
     @JsonbProperty("id")
     private Integer id;
@@ -141,6 +144,16 @@ public class Project {
                 .namespaceId(result.getNamespace().getId()).build();
         return p;
 
+    }
+
+    public void preserve() {
+        if(tagList == null) {
+            tagList = new ArrayList<String>();
+        }
+
+        if(!tagList.contains(DO_NOT_DELETE)) {
+            tagList.add(DO_NOT_DELETE);
+        }
     }
 
 }
