@@ -7,12 +7,14 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.Group;
+import com.redhat.labs.omp.models.gitlab.Hook;
 import com.redhat.labs.omp.models.gitlab.Namespace;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
@@ -104,8 +106,19 @@ public class MockGitLabService implements GitLabService {
     }
 
     @Override
-    public Project getProjectById(Integer projectId) {
-        // TODO Auto-generated method stub
+    public Project getProjectById(String projectId) {
+        System.out.println("p "+ projectId);
+        if(projectId == "66") {
+            return Project.builder().id(66).build();
+        }
+        
+        if("top/dog/jello/lemon/iac".equals(projectId)) {
+            return Project.builder().id(99).build();
+        }
+        
+        if("top/dog/jello/tutti-frutti/iac".equals(projectId)) {
+            return Project.builder().id(66).build();
+        }
         return null;
     }
 
@@ -171,6 +184,12 @@ public class MockGitLabService implements GitLabService {
             content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
             return File.builder().filePath(filePath).content(content).build();
         }
+        
+        if("schema/webhooks.json".equals(filePath)) {
+            String content = ResourceLoader.load("webhooks.json");
+            content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
+            return File.builder().filePath(filePath).content(content).build();
+        }
 
         return null;
     }
@@ -228,6 +247,43 @@ public class MockGitLabService implements GitLabService {
     @Override
     public Response getFileWithResponse(Integer projectId, String filePath, String ref) {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Response createProjectHook(Integer projectId, Hook hook) {
+        if(projectId == 66) {
+            return Response.status(Status.CREATED).build();
+        }
+        
+        return null;
+    }
+
+    @Override
+    public Response updateProjectHook(Integer projectId, Integer hookId, Hook hook) {
+        if(projectId == 99) {
+            return Response.ok().build();
+        } 
+        return null;
+    }
+
+    @Override
+    public List<Hook> getProjectHooks(Integer projectId) {
+        List<Hook> hookList = new ArrayList<>();
+        
+        if(projectId == 99) {
+            Hook hook = Hook.builder().id(13).url("http://webhook.edu/hook").token("token").projectId(99)
+                    .pushEvents(true).pushEventsBranchFilter("master").build();
+            hookList.add(hook);
+        }
+        return hookList;
+    }
+
+    @Override
+    public Group getGroupByIdOrPath(String idOrPath) {
+        if("2".equals(idOrPath)) {
+            return Group.builder().fullPath("top/dog").build();
+        }
         return null;
     }
 

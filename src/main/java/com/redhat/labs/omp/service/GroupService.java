@@ -1,6 +1,5 @@
 package com.redhat.labs.omp.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,50 +44,33 @@ public class GroupService {
         return optional;
 
     }
-
-    public List<Group> getAllGroups(Integer engagementRepositoryId) {
-
-        // FIRST LEVEL
-        List<Group> customerGroups = gitLabService.getSubGroups(engagementRepositoryId);
-
-        List<Group> customerEngagementGroups = new ArrayList<>();
-        customerGroups.stream()
-                .forEach(group -> customerEngagementGroups.addAll(gitLabService.getSubGroups(group.getId())));
-
-        if (LOGGER.isDebugEnabled()) {
-            customerEngagementGroups.stream().forEach(group -> LOGGER.debug("Group -> {}", group.getName()));
-        }
-
-        return customerEngagementGroups;
+    
+    public Optional<Group> getGitLabGroupByById(int id) {
+        return getGitLabGroupByByIdOrPath(String.valueOf(id));
     }
+    
+    public Optional<Group> getGitLabGroupByByIdOrPath(String idOrPath) {
+        
+        Group group = gitLabService.getGroupByIdOrPath(idOrPath);
+        return Optional.ofNullable(group);
+    }
+
 
     // create a group
     public Optional<Group> createGitLabGroup(Group group) {
 
-        Optional<Group> optional = Optional.empty();
-
         // try to create the group
         Group createdGroup = gitLabService.createGroup(group);
-        if (null != createdGroup) {
-            optional = Optional.of(createdGroup);
-        }
-
-        return optional;
+        return Optional.ofNullable(createdGroup);
 
     }
 
     // update a group
     public Optional<Group> updateGitLabGroup(Integer groupId, Group group) {
 
-        Optional<Group> optional = Optional.empty();
-
         // try to update the group
         Group updatedGroup = gitLabService.updateGroup(groupId, group);
-        if (null != updatedGroup) {
-            optional = Optional.of(updatedGroup);
-        }
-
-        return optional;
+        return Optional.ofNullable(updatedGroup);
 
     }
 

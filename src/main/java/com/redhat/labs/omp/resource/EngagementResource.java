@@ -19,10 +19,12 @@ import javax.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Counted;
 import org.eclipse.microprofile.metrics.annotation.Timed;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.omp.models.Engagement;
+import com.redhat.labs.omp.models.gitlab.Hook;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.service.EngagementService;
 
@@ -51,10 +53,40 @@ public class EngagementResource {
     }
 
     @GET
-    @Counted(name = "get-engagement", description = "How many enagement requests have been requested")
+    @Counted(name = "get-all-engagement", description = "Count of get all engagements")
     @Timed(name = "performedEngagementGetAll", description = "Time to get all engagements", unit = MetricUnits.MILLISECONDS)
     public Response findAllEngagements() {
         List<Engagement> engagements = engagementService.getAllEngagements();
+
+        return Response.ok().entity(engagements).build();
+    }
+    
+    @GET
+    @Path("/customer/{customer}/{engagement}")
+    @Counted(name = "get-engagement", description = "Count of get engagement")
+    @Timed(name = "performedEngagementGet", description = "Time to get an engagement", unit = MetricUnits.MILLISECONDS)
+    public Response getEngagment(@PathParam("customer") String customer, @PathParam("engagement") String engagement) {
+        Engagement response = engagementService.getEngagement(customer, engagement);
+
+        return Response.ok().entity(response).build();
+    }
+    
+    @POST
+    @Path("customer/{customer}/{engagement}/hooks")
+    @Counted(name = "create-engagement-hook", description = "Count of create-hook requestst")
+    @Timed(name = "performedHookCreate", description = "Time to create hook", unit = MetricUnits.MILLISECONDS)
+    public Response createProjectHook(Hook hook, @PathParam("customer") String customer, @PathParam("engagement") String engagement) {
+        
+        Response response = engagementService.createHook(customer, engagement, hook);
+        return response;
+    }
+    
+    @GET
+    @Path("customer/{customer}/{engagement}/hooks")
+    @Counted(name = "get-hook", description = "Count of get-hook requests")
+    @Timed(name = "performedHookGetAll", description = "Time to get all hooks", unit = MetricUnits.MILLISECONDS)
+    public Response findAllProjectHooks(@PathParam("customer") String customer, @PathParam("engagement") String engagement) {
+        List<Hook> engagements = engagementService.getHooks(customer, engagement);
 
         return Response.ok().entity(engagements).build();
     }

@@ -20,6 +20,7 @@ import org.jboss.resteasy.annotations.jaxrs.PathParam;
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.Group;
+import com.redhat.labs.omp.models.gitlab.Hook;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
 import com.redhat.labs.omp.resources.filter.Logged;
@@ -61,6 +62,12 @@ public interface GitLabService {
     @Path("/groups")
     @Produces("application/json")
     List<Group> getGroupByName(@QueryParam("search") @Encoded String name);
+    
+    @GET
+    @Logged
+    @Path("/groups/{idOrPath}")
+    @Produces("application/json")
+    Group getGroupByIdOrPath(@PathParam("idOrPath") @Encoded String idOrPath);
 
     @DELETE
     @Logged
@@ -86,7 +93,7 @@ public interface GitLabService {
     @Logged
     @Path("/projects/{id}")
     @Produces("application/json")
-    Project getProjectById(@PathParam("id") @Encoded Integer projectId);
+    Project getProjectById(@PathParam("id") @Encoded String projectId);
 
     @POST
     @Logged
@@ -105,6 +112,25 @@ public interface GitLabService {
     @Logged
     @Path("/projects/{id}")
     void deleteProjectById(@PathParam("id") @Encoded Integer projectId);
+    
+    @POST
+    @Logged
+    @Path("/projects/{id}/hooks")
+    @Produces("application/json")
+    Response createProjectHook(@PathParam("id") @Encoded Integer projectId, Hook hook);
+    
+    @PUT
+    @Logged
+    @Path("/projects/{id}/hooks/{hookId}")
+    @Produces("application/json")
+    Response updateProjectHook(@PathParam("id") @Encoded Integer projectId, @PathParam("hookId") @Encoded Integer hookId, Hook hook);
+    
+    @GET
+    @Logged
+    @Path("/projects/{id}/hooks")
+    @Produces("application/json")
+    @Consumes("application/json")
+    List<Hook> getProjectHooks(@PathParam("id") @Encoded Integer projectId);
 
     // FILES
 

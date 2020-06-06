@@ -23,6 +23,9 @@ public class FileService {
     @Inject
     @RestClient
     GitLabService gitLabService;
+    
+    private static final String DEFAULT_REF = "master";
+    
 
     // create a file
     public Optional<File> createFile(Integer projectId, String filePath, File file) {
@@ -88,7 +91,7 @@ public class FileService {
 
     // delete a file
     public Optional<File> deleteFile(Integer projectId, String filePath) {
-        return deleteFile(projectId, filePath, "master");
+        return deleteFile(projectId, filePath, DEFAULT_REF);
     }
 
     public Optional<File> deleteFile(Integer projectId, String filePath, String ref) {
@@ -112,17 +115,17 @@ public class FileService {
 
     // get a file
     public Optional<File> getFile(Integer projectId, String filePath) {
-        return getFile(projectId, filePath, "master", false);
+        return getFile(projectId, filePath, DEFAULT_REF, false);
     }
 
     // get a file
     public Optional<File> getFileAllow404(Integer projectId, String filePath) {
-        return getFile(projectId, filePath, "master", true);
+        return getFile(projectId, filePath, DEFAULT_REF, true);
     }
 
     // get a file
     public Optional<File> getFile(Integer projectId, String filePath, String ref) {
-        return getFile(projectId, filePath, "master", false);
+        return getFile(projectId, filePath, ref, false);
     }
 
     public Optional<File> getFile(Integer projectId, String filePath, String ref, boolean allow404) {

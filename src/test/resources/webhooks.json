@@ -1,0 +1,16 @@
+[
+    {
+        "name": "labs",
+        "baseUrl": "https://labs.com/webhooks/",
+        "pushEvent": true,
+        "pushEventsBranchFilter": "master",
+        "token": "abc"
+    },
+    {
+        "name": "rht",
+        "baseUrl": "https://rht.com/hooks/",
+        "pushEvent": true,
+        "pushEventsBranchFilter": "master",
+        "token": "def"
+    }
+]
