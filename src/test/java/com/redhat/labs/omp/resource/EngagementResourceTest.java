@@ -62,7 +62,7 @@ public class EngagementResourceTest {
         given()
             .when()
                 .contentType(ContentType.JSON)
-                .get("/api/v1/engagements/jello/lemon/hooks")
+                .get("/api/v1/engagements/customer/jello/lemon/hooks")
             .then()
                 .statusCode(200)
                 .body(is("[{\"id\":13,\"project_id\":99,\"push_events\":true,\"push_events_branch_filter\""
@@ -75,7 +75,7 @@ public class EngagementResourceTest {
             .when()
                 .contentType(ContentType.JSON)
                 .body("{\"push_events\": true, \"url\": \"https://lodestar/webhooks/blah\"}")
-                .post("/api/v1/engagements/jello/tutti-frutti/hooks")
+                .post("/api/v1/engagements/customer/jello/tutti-frutti/hooks")
             .then()
                 .statusCode(201);
     }

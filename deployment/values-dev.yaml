@@ -19,3 +19,16 @@ deployKey: false
 gitLabApiUrl: false
 gitLabPersonalAccessToken: false
 engagementsRepositoryId: false
+
+config:
+  hookFile:
+    path: /schema
+    name: webhooks.yaml
+  hooks:
+    - name: hook1
+      baseUrl: http://localhost/hook1
+      token: ibaka
+    - name: hook2
+      baseUrl: http://localhost/hook2
+      token: anunoby
+      

@@ -1,0 +1,13 @@
+apiVersion: v1
+data:
+  webhooks.yaml: |
+{{- range $hook := .Values.config.hooks }}
+    - name: {{ $hook.name }}
+      baseUrl: {{ $hook.baseUrl }}
+      token: {{ $hook.token }}
+      pushEvent: {{ $hook.pushEvent | default true }}
+      pushEventsBranchFilter: {{ $hook.pushEventsBranchFilter | default "master" }}
+{{- end }}
+kind: ConfigMap
+metadata:
+  name: hook-cm
