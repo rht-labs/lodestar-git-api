@@ -1,5 +1,7 @@
 package com.redhat.labs.omp.resource;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -15,6 +17,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.redhat.labs.omp.models.gitlab.File;
+import com.redhat.labs.omp.models.gitlab.HookConfig;
 import com.redhat.labs.omp.service.ConfigService;
 
 @Path("/api")
@@ -29,6 +32,7 @@ public class ConfigResource {
     @GET
     @Path("/v1/config")
     public File get() {
+        LOGGER.info("V1 or undefined is deprecated");
         return configService.getConfigFile();
     }
 
@@ -38,12 +42,20 @@ public class ConfigResource {
         File configFile = configService.getConfigFile();
         ObjectMapper om = new ObjectMapper(new YAMLFactory());
         try {
-            LOGGER.debug(configFile.getContent());
+            LOGGER.trace(configFile.getContent());
             Object content =  om.readValue(configFile.getContent(), Object.class);
             return Response.ok(content).build();
         } catch (JsonProcessingException e) {
             LOGGER.error(String.format("Error processing config file %s", configFile.getFilePath()), e);
             return Response.serverError().build();
         }
+    }
+    
+    @GET
+    @Path("/v2/config/webhooks")
+    public Response getWebhooks() {
+        List<HookConfig> hooks = configService.getHookConfig();
+        
+        return Response.ok(hooks).build();
     }
 }

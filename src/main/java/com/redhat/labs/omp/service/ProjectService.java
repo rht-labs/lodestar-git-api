@@ -66,19 +66,14 @@ public class ProjectService {
     }
 
     public Optional<Project> getProjectById(Integer projectId) {
-
-        Optional<Project> optional = Optional.empty();
-
-        Project project = gitLabService.getProjectById(projectId);
-
-        if (null != project) {
-            optional = Optional.of(project);
-        }
-
-        return optional;
-
+        return getProjectByIdOrPath(String.valueOf(projectId));
     }
-
+        
+    public Optional<Project> getProjectByIdOrPath(String idOrPath) {
+        Project project = gitLabService.getProjectById(idOrPath);
+        return Optional.ofNullable(project);
+    }
+    
     // create a project
     public Optional<Project> createProject(Project project) {
 

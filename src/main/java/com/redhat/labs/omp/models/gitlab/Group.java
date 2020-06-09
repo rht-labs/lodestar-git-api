@@ -3,6 +3,8 @@ package com.redhat.labs.omp.models.gitlab;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.validation.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +24,8 @@ public class Group {
     @NotBlank
     @JsonbProperty("path")
     private String path;
+    @JsonProperty("full_path")
+    private String fullPath;
     @JsonbProperty("description")
     private String description;
     @JsonbProperty("membership_lock")

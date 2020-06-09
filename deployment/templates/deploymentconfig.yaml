@@ -42,11 +42,18 @@ spec:
         resources: {}
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
+        volumeMounts:
+        - name: hook-cm-volume
+          mountPath: {{ .Values.config.hookFile.path }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
+      volumes:
+      - name: hook-cm-volume
+        configMap:
+          name: hook-cm
   test: false
   triggers:
   - type: ConfigChange

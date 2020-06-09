@@ -1,10 +1,10 @@
 ![Container Build](https://github.com/rht-labs/open-management-portal-git-api/workflows/Container%20Build/badge.svg)
 
-# Open Management Portal - Git API
+# LodeStar - Git API
 
-The Git API for the Open Management Portal.
+The Git API for LodeStar.
 
-This API uses GitLab as a repository to store OMP resources.
+This API uses GitLab as a repository to store LodeStar resources.
 
 ## JSON REST APIs
 
@@ -67,12 +67,15 @@ Deployment template will read from the above secret and inject following env var
 |------|---------------|----------|
 | CONFIG_REPOSITORY_ID | 1 | True |
 | CONFIG_FILE | my-config.yml | True |
+| CONFIG_GITLAB_REF | master | False |
+| WEBHOOK_FILE | webhooks.yml | False |
 
 ### Engagements Resource
 
 | Name | Example Value | Required |
 |------|---------------|----------|
 | ENGAGEMENTS_REPOSITORY_ID | 2 | True |
+| WEBHOOK_DEFAULT_TOKEN | tolkien | False | 
 
 ### Version Resource
 

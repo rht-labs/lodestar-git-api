@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
@@ -20,6 +23,8 @@ import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.FileAction;
 import com.redhat.labs.omp.models.gitlab.Group;
+import com.redhat.labs.omp.models.gitlab.Hook;
+import com.redhat.labs.omp.models.gitlab.HookConfig;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.utils.GitLabPathUtils;
 
@@ -29,6 +34,8 @@ public class EngagementService {
 
     private static final String ENGAGEMENT_PROJECT_NAME = "iac";
     private final String DEFAULT_BRANCH = "master";
+    
+    private String engagementPathPrefix;
 
     @ConfigProperty(name = "engagements.repository.id")
     Integer engagementRepositoryId;
@@ -47,9 +54,27 @@ public class EngagementService {
 
     @Inject
     FileService fileService;
+    
+    @Inject
+    HookService hookService;
 
     @Inject
     JsonMarshaller json;
+    
+    @Inject
+    ConfigService configService;
+    
+    @PostConstruct
+    public void setPathPrefix() {
+        Optional<Group> groupOption = groupService.getGitLabGroupByById(engagementRepositoryId);
+ 
+        if(groupOption.isPresent()) {
+            engagementPathPrefix = groupOption.get().getFullPath();
+            LOGGER.info("Engagement repo set- to {}", engagementPathPrefix);
+        } else {
+            LOGGER.warn("Could not find the path for repo {}", engagementRepositoryId);
+        }
+    }
 
     // create an engagement
     public Project createEngagement(Engagement engagement, String author, String authorEmail) {
@@ -59,15 +84,11 @@ public class EngagementService {
         engagement.setProjectId(project.getId());
 
         // get all template files
-        List<File> templateFiles = new ArrayList<>();
-        templateFiles.add(createEngagmentFile(engagement));
-
-        if (LOGGER.isDebugEnabled()) {
-            templateFiles.stream().forEach(file -> LOGGER.debug("File path :: " + file.getFilePath()));
-        }
+        List<File> repoFiles = new ArrayList<>();
+        repoFiles.add(createEngagmentFile(engagement));
 
         // create actions for multiple commit
-        CommitMultiple commit = createCommitMultiple(templateFiles, project.getId(), DEFAULT_BRANCH, author,
+        CommitMultiple commit = createCommitMultiple(repoFiles, project.getId(), DEFAULT_BRANCH, author,
                 authorEmail, project.isFirst());
 
         if (LOGGER.isDebugEnabled()) {
@@ -78,10 +99,60 @@ public class EngagementService {
         if (!fileService.createFiles(project.getId(), commit)) {
             throw new UnexpectedGitLabResponseException("failed to commit files for engagement creation.");
         }
+        
+        List<HookConfig> hookConfigs = configService.getHookConfig();
+        hookConfigs.stream().forEach(hookC -> {
+            Hook hook = Hook.builder().projectId(engagement.getProjectId()).pushEvents(true)
+                    .url(hookC.getBaseUrl() + engagement.getCustomerName() + "-" + engagement.getProjectName())
+                    .token(hookC.getToken()).build();
+            if(project.isFirst()) { //No need to check for existing hooks first time
+                hookService.createProjectHook(engagement.getProjectId(), hook);
+            } else {
+                hookService.createOrUpdateProjectHook(engagement.getProjectId(), hook);
+            }
+        });
 
         return project;
 
     }
+    
+    public List<Hook> getHooks(String customer, String engagment) {
+        Optional<Project> project = getProject(customer, engagment);
+        
+        if(project.isPresent()) {
+            return hookService.getProjectHooks(project.get().getId());
+        }
+        
+        return new ArrayList<Hook>();
+    }
+    
+    public Response createHook(String customerName, String engagementName, Hook hook) {
+        Response created = Response.status(Status.BAD_REQUEST).entity("project doesn't exist").build();
+        Optional<Project> optional = getProject(customerName, engagementName);
+        
+        if(optional.isPresent()) {
+            List<Hook> hooks = hookService.getProjectHooks(optional.get().getId());
+            boolean hookExists = hooks.stream().anyMatch(h -> h.getUrl().equals(hook.getUrl()));
+            if(!hookExists) {
+                created = hookService.createProjectHook(optional.get().getId(), hook);
+            }
+        }
+        
+        return created;
+    }
+    
+    public Optional<Project> getProject(String customerName, String engagementName) {
+        String fullPath = new StringBuilder(engagementPathPrefix)
+                .append("/")
+                .append(customerName)
+                .append("/")
+                .append(engagementName)
+                .append("/iac").toString();
+        
+        LOGGER.debug("Full path {}", fullPath.toString());
+        return projectService.getProjectByIdOrPath(fullPath);
+    }
+    
 
     /**
      * Gets all engagements from the base group Structure is BaseGroup - customer
@@ -95,17 +166,40 @@ public class EngagementService {
 
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
 
-        List<Engagement> engagementFiles = new ArrayList<>();
+        List<Engagement> engagementList = new ArrayList<>();
 
         for (Project project : projects) {
             LOGGER.debug("project id {}", project.getId());
-            Optional<File> engagementFile = fileService.getFileAllow404(project.getId(), "engagement.json");
-            if (engagementFile.isPresent()) {
-                engagementFiles.add(json.fromJson(engagementFile.get().getContent(), Engagement.class));
+            Optional<Engagement> engagement = getEngagement(project);
+            if(engagement.isPresent() ) {
+                engagementList.add(engagement.get());
             }
         }
 
-        return engagementFiles;
+        return engagementList;
+    }
+    
+    public Engagement getEngagement(String customerName, String engagementName) {
+        Engagement engagement = null;
+        
+        Optional<Project> project = getProject(customerName, engagementName);
+        
+        if(project.isPresent()) {
+            engagement = getEngagement(project.get()).orElse(null);
+        }
+        
+        return engagement;
+    }
+    
+    private Optional<Engagement> getEngagement(Project project) {
+        Engagement engagement = null;
+        
+        Optional<File> engagementFile = fileService.getFileAllow404(project.getId(), "engagement.json");
+        if (engagementFile.isPresent()) {
+            engagement = json.fromJson(engagementFile.get().getContent(), Engagement.class);
+        }
+        
+        return Optional.ofNullable(engagement);
     }
 
     private File createEngagmentFile(Engagement engagement) {
