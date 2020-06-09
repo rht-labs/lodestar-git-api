@@ -18,7 +18,7 @@ public class HookConfig {
     @JsonbProperty("baseUrl")
     private String baseUrl;
     
-    @JsonbProperty("pushDvent")
+    @JsonbProperty("pushEvent")
     private boolean pushEvent;
     
     @JsonbProperty("pushEventsBranchFilter")
