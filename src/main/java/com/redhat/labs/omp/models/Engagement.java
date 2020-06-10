@@ -35,5 +35,7 @@ public class Engagement {
     private String ocpClusterSize;
     private Launch launch;
     private List<EngagementUser> engagementUsers;
+    
+    private Status status;
 
 }
