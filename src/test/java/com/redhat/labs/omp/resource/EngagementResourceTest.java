@@ -23,11 +23,12 @@ public class EngagementResourceTest {
                 .get("/api/v1/engagements")
             .then()
                 .statusCode(200)
-                .body(is("[{\"archive_date\":\"20210125\",\"customer_contact_email\":\"reg@chiefs.com\",\"customer_contact_name\":\"Reg Dunlop\",\"customer_name\":\"customer1\","
-                        + "\"description\":\"Charleston\",\"end_date\":\"20201225\",\"engagement_lead_email\":\"doug93@leafs.com\",\"engagement_lead_name\":\"Doug Gilmour\","
-                        + "\"location\":\"Raleigh, NC\",\"ocp_cloud_provider_name\":\"GCP\",\"ocp_cloud_provider_region\":\"West\",\"ocp_cluster_size\":\"medium\","
-                        + "\"ocp_persistent_storage_size\":\"50GB\",\"ocp_sub_domain\":\"jello\",\"ocp_version\":\"v4.2\",\"project_id\":0,\"project_name\":\"project1\",\"start_date\":\"20200202\","
-                        + "\"technical_lead_email\":\"wendel17@leafs.com\",\"technical_lead_name\":\"Wendel Clark\"}]"));
+                .body(is("[{\"archive_date\":\"20210125\",\"customer_contact_email\":\"reg@chiefs.com\",\"customer_contact_name\":\"Reg Dunlop\","
+                        + "\"customer_name\":\"customer1\",\"description\":\"Charleston\",\"end_date\":\"20201225\",\"engagement_lead_email\":\"doug93@leafs.com\","
+                        + "\"engagement_lead_name\":\"Doug Gilmour\",\"location\":\"Raleigh, NC\",\"ocp_cloud_provider_name\":\"GCP\",\"ocp_cloud_provider_region\":\"West\","
+                        + "\"ocp_cluster_size\":\"medium\",\"ocp_persistent_storage_size\":\"50GB\",\"ocp_sub_domain\":\"jello\",\"ocp_version\":\"v4.2\",\"project_id\":0,\"project_name\":\"project1\","
+                        + "\"start_date\":\"20200202\",\"status\":{\"messages\":[\"This is message 1\",\"This is message 2\",\"This is message 3\"],\"openshift_api\":\"https://console.s11.core.rht-labs.com/\","
+                        + "\"openshift_web_console\":\"https://console.s11.core.rht-labs.com/\",\"overall_status\":\"green\"},\"technical_lead_email\":\"wendel17@leafs.com\",\"technical_lead_name\":\"Wendel Clark\"}]"));
 
     }
     
@@ -79,5 +80,34 @@ public class EngagementResourceTest {
             .then()
                 .statusCode(201);
     }
-
+    
+    @Test
+    public void testGetStatusSuccess() {
+        given()
+            .when()
+                .contentType(ContentType.JSON)
+                .get("/api/v1/engagements/customer/jello/lemon/status")
+            .then()
+                .statusCode(200)
+                .body(is("{\"messages\":[\"This is message 1\",\"This is message 2\",\"This is message 3\"],\"openshift_api\":\"https://console.s11.core.rht-labs.com/\",\"openshift_web_console\":\"https://console.s11.core.rht-labs.com/\","
+                        + "\"overall_status\":\"green\"}"));
+    }
+    
+    @Test
+    public void testGetProjectSuccess() {
+        given()
+            .when()
+                .contentType(ContentType.JSON)
+                .queryParam("includeStatus", true)
+                .get("/api/v1/engagements/customer/jello/lemon")
+            .then()
+                .statusCode(200)
+                .body(is("{\"archive_date\":\"20210125\",\"customer_contact_email\":\"reg@chiefs.com\",\"customer_contact_name\":\"Reg Dunlop\",\"customer_name\":\"customer1\",\"description\":\"Charleston\",\"end_date\":\"20201225\","
+                        + "\"engagement_lead_email\":\"doug93@leafs.com\",\"engagement_lead_name\":\"Doug Gilmour\",\"location\":\"Raleigh, NC\",\"ocp_cloud_provider_name\":\"GCP\",\"ocp_cloud_provider_region\":\"West\",\"ocp_cluster_size\":\"medium\","
+                        + "\"ocp_persistent_storage_size\":\"50GB\",\"ocp_sub_domain\":\"jello\",\"ocp_version\":\"v4.2\",\"project_id\":0,\"project_name\":\"project1\",\"start_date\":\"20200202\","
+                        + "\"status\":{\"messages\":[\"This is message 1\",\"This is message 2\",\"This is message 3\"],\"openshift_api\":\"https://console.s11.core.rht-labs.com/\",\"openshift_web_console\":\"https://console.s11.core.rht-labs.com/\","
+                        + "\"overall_status\":\"green\"},\"technical_lead_email\":\"wendel17@leafs.com\",\"technical_lead_name\":\"Wendel Clark\"}"));
+    }
+     
+    
 }

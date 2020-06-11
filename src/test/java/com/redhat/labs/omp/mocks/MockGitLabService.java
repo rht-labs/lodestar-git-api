@@ -147,7 +147,7 @@ public class MockGitLabService implements GitLabService {
     }
 
     @Override
-    public File getFile(Integer projectId, String filePath, String ref) {
+    public File getFile(String projectId, String filePath, String ref) {
 
         if ("schema/meta.dat".equalsIgnoreCase(filePath)) {
 
@@ -187,6 +187,12 @@ public class MockGitLabService implements GitLabService {
         
         if("schema/webhooks.json".equals(filePath)) {
             String content = ResourceLoader.load("webhooks.json");
+            content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
+            return File.builder().filePath(filePath).content(content).build();
+        }
+        
+        if("status.json".equals(filePath)) {
+            String content = ResourceLoader.load("status.json");
             content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
             return File.builder().filePath(filePath).content(content).build();
         }

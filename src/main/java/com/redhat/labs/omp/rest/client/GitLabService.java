@@ -138,7 +138,7 @@ public interface GitLabService {
     @Logged
     @Path("/projects/{id}/repository/files/{file_path}")
     @Produces("application/json")
-    File getFile(@PathParam("id") @Encoded Integer projectId, @PathParam("file_path") @Encoded String filePath,
+    File getFile(@PathParam("id") @Encoded String projectId, @PathParam("file_path") @Encoded String filePath,
             @QueryParam("ref") @Encoded String ref);
 
     @GET

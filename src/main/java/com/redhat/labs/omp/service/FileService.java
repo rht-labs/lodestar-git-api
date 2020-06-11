@@ -96,7 +96,7 @@ public class FileService {
 
     public Optional<File> deleteFile(Integer projectId, String filePath, String ref) {
 
-        Optional<File> optional = getFile(projectId, filePath, ref, false);
+        Optional<File> optional = getFile(String.valueOf(projectId), filePath, ref, false);
 
         if (optional.isPresent()) {
 
@@ -112,30 +112,34 @@ public class FileService {
 
         return optional;
     }
+    
+    public Optional<File> getFile(String projectPath, String filePath) {
+        return getFile(projectPath, filePath, DEFAULT_REF, false);
+    }
 
     // get a file
     public Optional<File> getFile(Integer projectId, String filePath) {
-        return getFile(projectId, filePath, DEFAULT_REF, false);
+        return getFile(String.valueOf(projectId), filePath);
     }
 
     // get a file
     public Optional<File> getFileAllow404(Integer projectId, String filePath) {
-        return getFile(projectId, filePath, DEFAULT_REF, true);
+        return getFile(String.valueOf(projectId), filePath, DEFAULT_REF, true);
     }
 
     // get a file
-    public Optional<File> getFile(Integer projectId, String filePath, String ref) {
-        return getFile(projectId, filePath, ref, false);
+    public Optional<File> getFile(String projectIdOrPAth, String filePath, String ref) {
+        return getFile(projectIdOrPAth, filePath, ref, false);
     }
 
-    public Optional<File> getFile(Integer projectId, String filePath, String ref, boolean allow404) {
+    public Optional<File> getFile(String projectIdOrPath, String filePath, String ref, boolean allow404) {
 
         Optional<File> optional = Optional.empty();
 
         try {
 
             // get file
-            File file = gitLabService.getFile(projectId, filePath, ref);
+            File file = gitLabService.getFile(projectIdOrPath, filePath, ref);
 
             if (null != file) {
                 // decode file
@@ -144,10 +148,10 @@ public class FileService {
             }
         } catch(WebApplicationException wae) {
             if(wae.getResponse().getStatus() != 404) {
-                LOGGER.error("Get file {} for project {} failed with code {}", filePath, projectId, wae.getResponse().getStatus());
+                LOGGER.error("Get file {} for project {} failed with code {}", filePath, projectIdOrPath, wae.getResponse().getStatus());
                 throw wae;
             } else if(LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Get file {} for project {} failed with code {}", filePath, projectId, wae.getResponse().getStatus());
+                LOGGER.debug("Get file {} for project {} failed with code {}", filePath, projectIdOrPath, wae.getResponse().getStatus());
             }
         }
 

@@ -50,7 +50,7 @@ public class ConfigService {
 
     public File getConfigFile() {
 
-        Optional<File> optional = fileService.getFile(Integer.valueOf(configRepositoryId), configFile, gitRef);
+        Optional<File> optional = fileService.getFile(configRepositoryId, configFile, gitRef);
 
         if (!optional.isPresent()) {
             throw new FileNotFoundException("the configured file was not found in the gitlab repository.");
@@ -66,7 +66,7 @@ public class ConfigService {
         }
         
         String gitLabHookFile = webHooksFile.charAt(0) == '/' ? webHooksFile.substring(1) : webHooksFile;
-        Optional<File> optional = fileService.getFile(Integer.valueOf(configRepositoryId), gitLabHookFile, gitRef);
+        Optional<File> optional = fileService.getFile(configRepositoryId, gitLabHookFile, gitRef);
 
         if (!optional.isPresent()) {
             LOGGER.error("No webhook file could be found. This is abnormal but not a deal breaker");

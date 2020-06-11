@@ -9,7 +9,6 @@ import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
@@ -18,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.redhat.labs.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.omp.config.JsonMarshaller;
 import com.redhat.labs.omp.models.Engagement;
+import com.redhat.labs.omp.models.Status;
 import com.redhat.labs.omp.models.gitlab.Action;
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.File;
@@ -33,7 +33,9 @@ public class EngagementService {
     public static Logger LOGGER = LoggerFactory.getLogger(EngagementService.class);
 
     private static final String ENGAGEMENT_PROJECT_NAME = "iac";
-    private final String DEFAULT_BRANCH = "master";
+    private static final String DEFAULT_BRANCH = "master";
+    private static final String ENGAGEMENT_FILE = "engagement.json";
+    private static final String STATUS_FILE = "status.json";
     
     private String engagementPathPrefix;
 
@@ -127,7 +129,7 @@ public class EngagementService {
     }
     
     public Response createHook(String customerName, String engagementName, Hook hook) {
-        Response created = Response.status(Status.BAD_REQUEST).entity("project doesn't exist").build();
+        Response created = Response.status(javax.ws.rs.core.Response.Status.BAD_REQUEST).entity("project doesn't exist").build();
         Optional<Project> optional = getProject(customerName, engagementName);
         
         if(optional.isPresent()) {
@@ -141,13 +143,18 @@ public class EngagementService {
         return created;
     }
     
+    public Status getProjectStatus(String customerName, String engagementName) {
+        Status status = null;
+        Optional<File> file = fileService.getFile(this.getPath(customerName, engagementName), "status.json");
+        if(file.isPresent()) {
+            status = json.fromJson(file.get().getContent(), Status.class);
+        }
+        
+        return status;
+    }
+    
     public Optional<Project> getProject(String customerName, String engagementName) {
-        String fullPath = new StringBuilder(engagementPathPrefix)
-                .append("/")
-                .append(customerName)
-                .append("/")
-                .append(engagementName)
-                .append("/iac").toString();
+        String fullPath = this.getPath(customerName, engagementName);
         
         LOGGER.debug("Full path {}", fullPath.toString());
         return projectService.getProjectByIdOrPath(fullPath);
@@ -170,7 +177,7 @@ public class EngagementService {
 
         for (Project project : projects) {
             LOGGER.debug("project id {}", project.getId());
-            Optional<Engagement> engagement = getEngagement(project);
+            Optional<Engagement> engagement = getEngagement(project, true);
             if(engagement.isPresent() ) {
                 engagementList.add(engagement.get());
             }
@@ -179,24 +186,31 @@ public class EngagementService {
         return engagementList;
     }
     
-    public Engagement getEngagement(String customerName, String engagementName) {
+    public Engagement getEngagement(String customerName, String engagementName, boolean includeStatus) {
         Engagement engagement = null;
         
         Optional<Project> project = getProject(customerName, engagementName);
         
         if(project.isPresent()) {
-            engagement = getEngagement(project.get()).orElse(null);
+            engagement = getEngagement(project.get(), includeStatus).orElse(null);
         }
         
         return engagement;
     }
     
-    private Optional<Engagement> getEngagement(Project project) {
+    private Optional<Engagement> getEngagement(Project project, boolean includeStatus) {
         Engagement engagement = null;
         
-        Optional<File> engagementFile = fileService.getFileAllow404(project.getId(), "engagement.json");
+        Optional<File> engagementFile = fileService.getFileAllow404(project.getId(), ENGAGEMENT_FILE);
         if (engagementFile.isPresent()) {
             engagement = json.fromJson(engagementFile.get().getContent(), Engagement.class);
+        }
+        
+        if(includeStatus && engagement != null) {
+            Optional<File> statusFile = fileService.getFileAllow404(project.getId(), STATUS_FILE);
+            if(statusFile.isPresent()) {
+                engagement.setStatus(json.fromJson(statusFile.get().getContent(), Status.class));
+            }
         }
         
         return Optional.ofNullable(engagement);
@@ -205,7 +219,7 @@ public class EngagementService {
     private File createEngagmentFile(Engagement engagement) {
 
         String fileContent = json.toJson(engagement);
-        File file = File.builder().content(fileContent).filePath("engagement.json").build();
+        File file = File.builder().content(fileContent).filePath(ENGAGEMENT_FILE).build();
 
         return file;
     }
@@ -316,6 +330,15 @@ public class EngagementService {
                 Character.lowSurrogate(mysteryAnimalCodePoint) };
 
         return String.valueOf(mysteryEmoji);
+    }
+    
+    private String getPath(String customerName, String engagementName) {
+        return new StringBuilder(engagementPathPrefix)
+                .append("/")
+                .append(customerName)
+                .append("/")
+                .append(engagementName)
+                .append("/iac").toString();
     }
 
 }
