@@ -33,5 +33,19 @@ public class ConfigResourceTest {
                 + "{\"label\":\"Admin\",\"value\":\"admin\"}]}}}"));
 
     }
+    
+    @Test
+    public void testGetHookFileSuccess() {
+
+        given()
+        .when()
+            .contentType(ContentType.JSON)
+            .get("/api/v2/config/webhooks")
+        .then()
+            .statusCode(200)
+            .body(is("[{\"baseUrl\":\"https://labs.com/webhooks/\",\"name\":\"labs\",\"pushEvent\":true,\"pushEventsBranchFilter\":\"master\",\"token\":\"abc\"},"
+                    + "{\"baseUrl\":\"https://rht.com/hooks/\",\"name\":\"rht\",\"pushEvent\":true,\"pushEventsBranchFilter\":\"master\",\"token\":\"def\"}]"));
+
+    }
 
 }

@@ -16,7 +16,7 @@ import com.redhat.labs.omp.rest.client.GitLabService;
 
 @ApplicationScoped
 public class GroupService {
-    public static Logger LOGGER = LoggerFactory.getLogger(ProjectService.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(GroupService.class);
 
     @Inject
     @RestClient
