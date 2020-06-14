@@ -18,7 +18,7 @@ import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
-public class ProjectServiceTest {
+class ProjectServiceTest {
 
     @Inject
     ProjectService projectService;

@@ -222,7 +222,9 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public Response commitMultipleFiles(Integer projectId, CommitMultiple commit) {
-        // TODO: need to be able to have negative scenarios
+        if("fail@commitmultiplefiles.com".equals(commit.getAuthorEmail())) {
+            return Response.ok().build();
+        }
         return Response.status(201).build();
     }
 

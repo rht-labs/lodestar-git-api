@@ -11,11 +11,11 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 
 @QuarkusTest
-public class EngagementResourceTest {
+class EngagementResourceTest {
 
     
     @Test
-    public void testGetAllEngagementsSuccess() {
+    void testGetAllEngagementsSuccess() {
         
         given()
             .when()
@@ -33,7 +33,7 @@ public class EngagementResourceTest {
     }
     
     @Test
-    public void testCreateEngagementSuccess() {
+    void testCreateEngagementSuccess() {
         given()
             .when()
                 .contentType(ContentType.JSON)
@@ -46,7 +46,7 @@ public class EngagementResourceTest {
     }
 
     @Test
-    public void testUpdateEngagementSuccess() {
+    void testUpdateEngagementSuccess() {
         given()
             .when()
                 .contentType(ContentType.JSON)
@@ -59,7 +59,7 @@ public class EngagementResourceTest {
     }
     
     @Test
-    public void testGetWebhooksSuccess() {
+    void testGetWebhooksSuccess() {
         given()
             .when()
                 .contentType(ContentType.JSON)
@@ -71,7 +71,7 @@ public class EngagementResourceTest {
     }
     
     @Test
-    public void testCreateProjectHookSuccess() {
+    void testCreateProjectHookSuccess() {
         given()
             .when()
                 .contentType(ContentType.JSON)
@@ -82,7 +82,29 @@ public class EngagementResourceTest {
     }
     
     @Test
-    public void testGetStatusSuccess() {
+    void testCreateProjectHookFailAlreadyExists() {
+        given()
+            .when()
+                .contentType(ContentType.JSON)
+                .body("{\"push_events\": true, \"url\": \"http://webhook.edu/hook\"}")
+                .post("/api/v1/engagements/customer/jello/lemon/hooks")
+            .then()
+                .statusCode(400);
+    }
+    
+    @Test
+    void testCreateProjectHookFailNoProject() {
+        given()
+            .when()
+                .contentType(ContentType.JSON)
+                .body("{\"push_events\": true, \"url\": \"https://lodestar/webhooks/blah\"}")
+                .post("/api/v1/engagements/customer/nope/tutti-frutti/hooks")
+            .then()
+                .statusCode(400);
+    }
+    
+    @Test
+    void testGetStatusSuccess() {
         given()
             .when()
                 .contentType(ContentType.JSON)
@@ -94,7 +116,7 @@ public class EngagementResourceTest {
     }
     
     @Test
-    public void testGetProjectSuccess() {
+    void testGetProjectSuccess() {
         given()
             .when()
                 .contentType(ContentType.JSON)
