@@ -1,3 +1,4 @@
+{{- if .Values.development }}
 apiVersion: v1
 data:
   webhooks.yaml: |
@@ -11,3 +12,4 @@ data:
 kind: ConfigMap
 metadata:
   name: hook-cm
+{{- end }}
