@@ -21,7 +21,7 @@ import io.quarkus.runtime.StartupEvent;
 
 @ApplicationScoped
 public class ConfigService {
-    public static Logger LOGGER = LoggerFactory.getLogger(ConfigService.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(ConfigService.class);
 
     @ConfigProperty(name = "config.file")
     String configFile;
@@ -70,7 +70,7 @@ public class ConfigService {
 
         if (!optional.isPresent()) {
             LOGGER.error("No webhook file could be found. This is abnormal but not a deal breaker");
-            return new ArrayList<HookConfig>();
+            return new ArrayList<>();
         }
         
         File file = optional.get();

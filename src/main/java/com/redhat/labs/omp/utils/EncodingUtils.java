@@ -7,18 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class EncodingUtils {
-
-    public static boolean isDecodable(String val) {
-
-        try {
-            Base64.getDecoder().decode(val.getBytes());
-        } catch (IllegalArgumentException iae) {
-            return false;
-        }
-
-        return true;
-
-    }
+    
+    private EncodingUtils() {}
 
     public static byte[] base64Encode(byte[] src) {
         return Base64.getEncoder().encode(src);

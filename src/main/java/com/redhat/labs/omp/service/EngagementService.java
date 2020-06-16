@@ -30,7 +30,7 @@ import com.redhat.labs.omp.utils.GitLabPathUtils;
 
 @ApplicationScoped
 public class EngagementService {
-    public static Logger LOGGER = LoggerFactory.getLogger(EngagementService.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(EngagementService.class);
 
     private static final String ENGAGEMENT_PROJECT_NAME = "iac";
     private static final String DEFAULT_BRANCH = "master";
@@ -94,7 +94,7 @@ public class EngagementService {
                 authorEmail, project.isFirst());
 
         if (LOGGER.isDebugEnabled()) {
-            commit.getActions().stream().forEach(file -> LOGGER.debug("Action File path :: " + file.getFilePath()));
+            commit.getActions().stream().forEach(file -> LOGGER.debug("Action File path :: {}", file.getFilePath()));
         }
 
         // send commit to gitlab
@@ -125,7 +125,7 @@ public class EngagementService {
             return hookService.getProjectHooks(project.get().getId());
         }
         
-        return new ArrayList<Hook>();
+        return new ArrayList<>();
     }
     
     public Response createHook(String customerName, String engagementName, Hook hook) {
@@ -145,7 +145,7 @@ public class EngagementService {
     
     public Status getProjectStatus(String customerName, String engagementName) {
         Status status = null;
-        Optional<File> file = fileService.getFile(this.getPath(customerName, engagementName), "status.json");
+        Optional<File> file = fileService.getFile(this.getPath(customerName, engagementName), STATUS_FILE);
         if(file.isPresent()) {
             status = json.fromJson(file.get().getContent(), Status.class);
         }
