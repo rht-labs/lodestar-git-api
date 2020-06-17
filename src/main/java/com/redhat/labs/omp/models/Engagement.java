@@ -2,6 +2,8 @@ package com.redhat.labs.omp.models;
 
 import java.util.List;
 
+import com.redhat.labs.omp.models.gitlab.Commit;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,5 +39,6 @@ public class Engagement {
     private List<EngagementUser> engagementUsers;
     
     private Status status;
+    private List<Commit> commits;
 
 }

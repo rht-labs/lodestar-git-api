@@ -1,5 +1,7 @@
 package com.redhat.labs.omp.mocks;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,9 @@ import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.redhat.labs.omp.config.JsonMarshaller;
+import com.redhat.labs.omp.models.gitlab.Commit;
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.DeployKey;
 import com.redhat.labs.omp.models.gitlab.File;
@@ -32,7 +37,6 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public Response getProjects() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -293,6 +297,16 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public Response updateDeployKey(Integer projectId, Integer deployKeyId, DeployKey deployKey) {
+        return null;
+    }
+
+    @Override
+    public List<Commit> getCommitLog(String projectId) {
+        if("top/dog/jello/lemon/iac".equals(projectId)) {
+            String content = ResourceLoader.load("commits.yaml");
+            List<Commit> commitList = new JsonMarshaller().fromYaml(content, Commit.class);
+            return commitList;
+        }
         return null;
     }
 

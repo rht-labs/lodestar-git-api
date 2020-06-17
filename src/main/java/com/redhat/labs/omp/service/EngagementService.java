@@ -19,6 +19,7 @@ import com.redhat.labs.omp.config.JsonMarshaller;
 import com.redhat.labs.omp.models.Engagement;
 import com.redhat.labs.omp.models.Status;
 import com.redhat.labs.omp.models.gitlab.Action;
+import com.redhat.labs.omp.models.gitlab.Commit;
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.FileAction;
@@ -118,6 +119,11 @@ public class EngagementService {
 
     }
     
+    public List<Commit> getCommitLog(String customerName, String engagementName) {
+        String projectPath = getPath(customerName, engagementName);
+        return projectService.getCommitLog(projectPath);
+    }
+    
     public List<Hook> getHooks(String customer, String engagment) {
         Optional<Project> project = getProject(customer, engagment);
         
@@ -204,6 +210,9 @@ public class EngagementService {
         Optional<File> engagementFile = fileService.getFileAllow404(project.getId(), ENGAGEMENT_FILE);
         if (engagementFile.isPresent()) {
             engagement = json.fromJson(engagementFile.get().getContent(), Engagement.class);
+            
+            List<Commit> commits = projectService.getCommitLog(String.valueOf(engagement.getProjectId()));
+            engagement.setCommits(commits);
         }
         
         if(includeStatus && engagement != null) {

@@ -11,6 +11,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.redhat.labs.omp.models.gitlab.Commit;
 import com.redhat.labs.omp.models.gitlab.DeployKey;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
@@ -120,6 +121,10 @@ public class ProjectService {
         
         gitLabService.enableDeployKey(projectId, deployKey);
         gitLabService.updateDeployKey(projectId, deployKey, DeployKey.builder().title("LodeStar DK").canPush(true).build());
+    }
+    
+    public List<Commit> getCommitLog(String projectId) {
+        return gitLabService.getCommitLog(projectId);
     }
 
 }

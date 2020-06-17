@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.omp.models.Engagement;
 import com.redhat.labs.omp.models.Status;
+import com.redhat.labs.omp.models.gitlab.Commit;
 import com.redhat.labs.omp.models.gitlab.Hook;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.service.EngagementService;
@@ -80,6 +81,16 @@ public class EngagementResource {
         
         Response response = engagementService.createHook(customer, engagement, hook);
         return response;
+    }
+    
+    @GET
+    @Path("/customer/{customer}/{engagement}/commits")
+    @Counted(name = "get-engagement-commits", description = "Count of get engagement commits")
+    @Timed(name = "performedEngagementCommitsGet", description = "Time to get engagement commits", unit = MetricUnits.MILLISECONDS)
+    public Response getEngagementCommits(@PathParam("customer") String customer, @PathParam("engagement") String engagement) {
+        
+        List<Commit> commitList = engagementService.getCommitLog(customer, engagement);
+        return Response.ok().entity(commitList).build();
     }
     
     @GET
