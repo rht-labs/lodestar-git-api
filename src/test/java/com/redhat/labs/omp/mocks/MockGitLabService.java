@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response.Status;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
+import com.redhat.labs.omp.models.gitlab.DeployKey;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.Group;
 import com.redhat.labs.omp.models.gitlab.Hook;
@@ -287,6 +288,11 @@ public class MockGitLabService implements GitLabService {
         if("2".equals(idOrPath)) {
             return Group.builder().fullPath("top/dog").build();
         }
+        return null;
+    }
+
+    @Override
+    public Response updateDeployKey(Integer projectId, Integer deployKeyId, DeployKey deployKey) {
         return null;
     }
 

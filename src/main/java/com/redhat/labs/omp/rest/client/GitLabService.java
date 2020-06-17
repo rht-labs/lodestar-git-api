@@ -18,6 +18,7 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
+import com.redhat.labs.omp.models.gitlab.DeployKey;
 import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.Group;
 import com.redhat.labs.omp.models.gitlab.Hook;
@@ -183,7 +184,12 @@ public interface GitLabService {
     @Logged
     @Path("/projects/{id}/deploy_keys/{deploy_key}/enable")
     @Produces("application/json")
-    Response enableDeployKey(@PathParam("id") @Encoded Integer projectId,
-            @PathParam("deploy_key") @Encoded Integer deployKey);
+    Response enableDeployKey(@PathParam("id") @Encoded Integer projectId, @PathParam("deploy_key") @Encoded Integer deployKey);
+    
+    @PUT
+    @Logged
+    @Path("/projects/{id}/deploy_keys/{deploy_key_id}")
+    @Produces("application/json")
+    Response updateDeployKey(@PathParam("id") @Encoded Integer projectId, @PathParam("deploy_key_id") @Encoded Integer deployKeyId, DeployKey deployKey);
 
 }
