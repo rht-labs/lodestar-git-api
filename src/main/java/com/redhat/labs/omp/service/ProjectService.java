@@ -11,6 +11,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.redhat.labs.omp.models.gitlab.DeployKey;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
 import com.redhat.labs.omp.rest.client.GitLabService;
@@ -114,9 +115,11 @@ public class ProjectService {
         gitLabService.deleteProjectById(projectId);
     }
 
-    // enable deployment key
+    // enable deployment key - by default it's ready only but we need to write so let's 2-step
     public void enableDeploymentKeyOnProject(Integer projectId, Integer deployKey) {
+        
         gitLabService.enableDeployKey(projectId, deployKey);
+        gitLabService.updateDeployKey(projectId, deployKey, DeployKey.builder().title("LodeStar DK").canPush(true).build());
     }
 
 }
