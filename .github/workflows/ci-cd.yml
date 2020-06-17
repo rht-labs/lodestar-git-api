@@ -16,7 +16,7 @@ jobs:
       with:
         java-version: 13.0.1
     - name: Build with Maven & Quarkus
-      run: mvn test -q
+      run: mvn verify sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }} -q
     - name: Find and Replace Commit
       uses: jacobtomlinson/gha-find-replace@0.1.1
       with:
