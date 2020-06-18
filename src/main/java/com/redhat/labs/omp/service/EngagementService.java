@@ -105,8 +105,7 @@ public class EngagementService {
         List<HookConfig> hookConfigs = configService.getHookConfig();
         hookConfigs.stream().forEach(hookC -> {
             Hook hook = Hook.builder().projectId(engagement.getProjectId()).pushEvents(true)
-                    .url(hookC.getBaseUrl() + engagement.getCustomerName() + "-" + engagement.getProjectName())
-                    .token(hookC.getToken()).build();
+                    .url(hookC.getBaseUrl()).token(hookC.getToken()).build();
             if(project.isFirst()) { //No need to check for existing hooks first time
                 hookService.createProjectHook(engagement.getProjectId(), hook);
             } else {
