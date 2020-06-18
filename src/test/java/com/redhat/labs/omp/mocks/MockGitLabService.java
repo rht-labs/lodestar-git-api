@@ -1,7 +1,5 @@
 package com.redhat.labs.omp.mocks;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +11,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.redhat.labs.omp.config.JsonMarshaller;
 import com.redhat.labs.omp.models.gitlab.Commit;
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
