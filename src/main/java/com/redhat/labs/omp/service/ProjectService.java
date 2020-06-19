@@ -1,10 +1,13 @@
 package com.redhat.labs.omp.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
@@ -27,6 +30,9 @@ public class ProjectService {
 
     @ConfigProperty(name = "engagements.do.not.delete")
     boolean doNotDelete;
+    
+    @ConfigProperty(name = "commit.page.size")
+    int commitPageSize;
 
     // get a project
     public Optional<Project> getProjectByName(Integer namespaceId, String name) {
@@ -124,7 +130,27 @@ public class ProjectService {
     }
     
     public List<Commit> getCommitLog(String projectId) {
-        return gitLabService.getCommitLog(projectId);
+        List<Commit> totalCommits = new ArrayList<>();
+        int totalPages = 1;
+        int page = 0;
+        
+        while(totalPages > page++) {
+            LOGGER.trace("page {}", page);
+            Response response = gitLabService.getCommitLog(projectId, commitPageSize, page);
+            
+            totalCommits.addAll(response.readEntity(new GenericType<List<Commit>>() {}));
+            
+            if(page == 1) {
+                String totalPageString = response.getHeaderString("X-Total-Pages");
+                totalPages = Integer.valueOf(totalPageString);
+                LOGGER.trace("TOTAL PAGES {}", totalPages);
+            }
+            
+        }
+        
+        LOGGER.debug("total commits for project {} {}", projectId, totalCommits.size());
+          
+        return totalCommits;
     }
 
 }

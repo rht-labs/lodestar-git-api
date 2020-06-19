@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 import com.redhat.labs.omp.mocks.MockGitLabService;
+import com.redhat.labs.omp.models.gitlab.Commit;
 import com.redhat.labs.omp.models.gitlab.Project;
 import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
 
@@ -101,5 +102,13 @@ class ProjectServiceTest {
     
     @Test void deleteProjectWorks() {
         projectService.deleteProject(45);
+        assertNotNull(projectService);
+    }
+    
+    @Test void getCommitsMultiPage() {
+        List<Commit> commits = projectService.getCommitLog("multi/page/iac");
+        assertNotNull(commits);
+        assertEquals(8, commits.size());
+        
     }
 }

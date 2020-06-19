@@ -17,7 +17,6 @@ import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
-import com.redhat.labs.omp.models.gitlab.Commit;
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.DeployKey;
 import com.redhat.labs.omp.models.gitlab.File;
@@ -181,7 +180,7 @@ public interface GitLabService {
     @Logged
     @Path("/projects/{id}/repository/commits")
     @Produces("application/json")
-    List<Commit> getCommitLog(@PathParam("id") @Encoded String projectId);
+    Response getCommitLog(@PathParam("id") @Encoded String projectId, @QueryParam("per_page") int perPage, @QueryParam("page") int page);
 
     // Deploy Keys
 
