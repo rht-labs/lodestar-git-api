@@ -175,6 +175,12 @@ public interface GitLabService {
     @Path("/projects/{id}/repository/commits")
     @Produces("application/json")
     Response commitMultipleFiles(@PathParam("id") @Encoded Integer projectId, CommitMultiple commit);
+    
+    @GET
+    @Logged
+    @Path("/projects/{id}/repository/commits")
+    @Produces("application/json")
+    Response getCommitLog(@PathParam("id") @Encoded String projectId, @QueryParam("per_page") int perPage, @QueryParam("page") int page);
 
     // Deploy Keys
 

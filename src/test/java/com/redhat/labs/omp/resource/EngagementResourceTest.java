@@ -23,7 +23,7 @@ class EngagementResourceTest {
                 .get("/api/v1/engagements")
             .then()
                 .statusCode(200)
-                .body(is("[{\"archive_date\":\"20210125\",\"customer_contact_email\":\"reg@chiefs.com\",\"customer_contact_name\":\"Reg Dunlop\","
+                .body(is("[{\"archive_date\":\"20210125\",\"commits\":[],\"customer_contact_email\":\"reg@chiefs.com\",\"customer_contact_name\":\"Reg Dunlop\","
                         + "\"customer_name\":\"customer1\",\"description\":\"Charleston\",\"end_date\":\"20201225\",\"engagement_lead_email\":\"doug93@leafs.com\","
                         + "\"engagement_lead_name\":\"Doug Gilmour\",\"location\":\"Raleigh, NC\",\"ocp_cloud_provider_name\":\"GCP\",\"ocp_cloud_provider_region\":\"West\","
                         + "\"ocp_cluster_size\":\"medium\",\"ocp_persistent_storage_size\":\"50GB\",\"ocp_sub_domain\":\"jello\",\"ocp_version\":\"v4.2\",\"project_id\":0,\"project_name\":\"project1\","
@@ -124,11 +124,30 @@ class EngagementResourceTest {
                 .get("/api/v1/engagements/customer/jello/lemon")
             .then()
                 .statusCode(200)
-                .body(is("{\"archive_date\":\"20210125\",\"customer_contact_email\":\"reg@chiefs.com\",\"customer_contact_name\":\"Reg Dunlop\",\"customer_name\":\"customer1\",\"description\":\"Charleston\",\"end_date\":\"20201225\","
+                .body(is("{\"archive_date\":\"20210125\",\"commits\":[],\"customer_contact_email\":\"reg@chiefs.com\",\"customer_contact_name\":\"Reg Dunlop\",\"customer_name\":\"customer1\",\"description\":\"Charleston\",\"end_date\":\"20201225\","
                         + "\"engagement_lead_email\":\"doug93@leafs.com\",\"engagement_lead_name\":\"Doug Gilmour\",\"location\":\"Raleigh, NC\",\"ocp_cloud_provider_name\":\"GCP\",\"ocp_cloud_provider_region\":\"West\",\"ocp_cluster_size\":\"medium\","
                         + "\"ocp_persistent_storage_size\":\"50GB\",\"ocp_sub_domain\":\"jello\",\"ocp_version\":\"v4.2\",\"project_id\":0,\"project_name\":\"project1\",\"start_date\":\"20200202\","
                         + "\"status\":{\"messages\":[\"This is message 1\",\"This is message 2\",\"This is message 3\"],\"openshift_api\":\"https://console.s11.core.rht-labs.com/\",\"openshift_web_console\":\"https://console.s11.core.rht-labs.com/\","
                         + "\"overall_status\":\"green\"},\"technical_lead_email\":\"wendel17@leafs.com\",\"technical_lead_name\":\"Wendel Clark\"}"));
+    }
+    
+    @Test
+    void testGetCommitsSuccess() {
+        given()
+            .when()
+                .contentType(ContentType.JSON)
+                .get("/api/v1/engagements/customer/jello/lemon/commits")
+            .then()
+                .statusCode(200)
+                .body(is("[{\"author_email\":\"bot@bot.com\",\"author_name\":\"bot\",\"authored_date\":\"2020-06-16T00:12:27.000+00:00\",\"committed_date\":\"2020-06-16T00:12:27.000+00:00\",\"id\":\"551eefc6e367aa2ad3c56bdd7229c7bc525d4f0c\","
+                        + "\"message\":\"Auto-update generated files\",\"short_id\":\"551eefc6\",\"title\":\"Auto-update generated files\",\"web_url\":\"https://gitlab.example.com/store/jello/lemon/iac/-/commit/551eefc6e367aa2ad3c56bdd7229c7bc525d4f0c\"},"
+                        + "{\"author_email\":\"mmarner@example.com\",\"author_name\":\"Mitch Marner\",\"authored_date\":\"2020-06-16T00:12:18.000+00:00\",\"committed_date\":\"2020-06-16T00:12:18.000+00:00\","
+                        + "\"id\":\"5178ffab3566ac591af95c3383d1c5916de4a3a9\",\"message\":\"Update engagement.json\",\"short_id\":\"5178ffab\",\"title\":\"Update engagement.json\","
+                        + "\"web_url\":\"https://gitlab.example.com/store/jello/lemon/iac/-/commit/5178ffab3566ac591af95c3383d1c5916de4a3a9\"},{\"author_email\":\"jtavares@example.com\",\"author_name\":\"John Tavares\","
+                        + "\"authored_date\":\"2020-06-11T16:46:19.000+00:00\",\"committed_date\":\"2020-06-11T16:46:19.000+00:00\",\"id\":\"7865570dc63b1463d9fb4d02bd09ff46d244e694\",\"message\":\"Update status.json\","
+                        + "\"short_id\":\"7865570d\",\"title\":\"Update status.json\",\"web_url\":\"https://gitlab.example.com/store/jello/lemon/iac/-/commit/7865570dc63b1463d9fb4d02bd09ff46d244e694\"},{\"author_email\":\"mmarner@example.com\","
+                        + "\"author_name\":\"Mitch Marner\",\"authored_date\":\"2020-06-04T22:34:10.000+00:00\",\"committed_date\":\"2020-06-04T22:34:10.000+00:00\",\"id\":\"dd0cc0fa7868210e2eb5a030f07cc0221dd6bc9f\","
+                        + "\"message\":\"Bump OCP version (jacob test)\",\"short_id\":\"dd0cc0fa\",\"title\":\"Bump OCP version (test)\",\"web_url\":\"https://gitlab.example.com/store/jello/lemon/iac/-/commit/dd0cc0fa7868210e2eb5a030f07cc0221dd6bc9f\"}]"));
     }
      
     

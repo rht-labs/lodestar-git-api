@@ -11,6 +11,8 @@ import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 
+import com.redhat.labs.omp.config.JsonMarshaller;
+import com.redhat.labs.omp.models.gitlab.Commit;
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.DeployKey;
 import com.redhat.labs.omp.models.gitlab.File;
@@ -32,7 +34,6 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public Response getProjects() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -95,7 +96,7 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public Project getProjectById(String projectId) {
-        System.out.println("p "+ projectId);
+
         if(projectId == "66") {
             return Project.builder().id(66).build();
         }
@@ -294,6 +295,22 @@ public class MockGitLabService implements GitLabService {
     @Override
     public Response updateDeployKey(Integer projectId, Integer deployKeyId, DeployKey deployKey) {
         return null;
+    }
+
+    @Override
+    public Response getCommitLog(String projectId, int perPage, int pageNumber) {
+        String content = ResourceLoader.load("commits.yaml");
+        List<Commit> commitList = new JsonMarshaller().fromYaml(content, Commit.class);
+        
+        if("top/dog/jello/lemon/iac".equals(projectId)) {
+            return Response.ok(commitList).header("X-Total-Pages", 1).build();
+        }
+        
+        if("multi/page/iac".equals(projectId)) {
+            return Response.ok(commitList).header("X-Total-Pages", 2).build();
+        }
+        
+        return Response.ok(new ArrayList<Commit>()).header("X-Total-Pages", 0).build();
     }
 
 }
