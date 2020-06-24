@@ -40,5 +40,6 @@ public class Engagement {
     
     private Status status;
     private List<Commit> commits;
+    private CreationDetails creationDetails;
 
 }
