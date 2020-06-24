@@ -1,7 +1,5 @@
 package com.redhat.labs.omp.models;
 
-import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Launch {
 
-    private LocalDateTime launchedDateTime;
+    private String launchedDateTime;
     private String launchedBy;
 
 }
