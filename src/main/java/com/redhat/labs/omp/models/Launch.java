@@ -13,5 +13,6 @@ public class Launch {
 
     private String launchedDateTime;
     private String launchedBy;
+    private String launchedByEmail;
 
 }
