@@ -68,7 +68,7 @@ public class EngagementResource {
     @Counted(name = "get-engagement-namespace", description = "Count of get by id or namespace")
     @Timed(name = "performedEngagementGetByNamespace", description = "Time to get an engagement by namespace", unit = MetricUnits.MILLISECONDS)
     public Response getEngagement(@PathParam("namespace") String namespace, @QueryParam("includeStatus") boolean includeStatus) {
-        System.out.println(namespace);
+
         Engagement response = engagementService.getEngagement(namespace, includeStatus);
         return Response.ok().entity(response).build();
     }
