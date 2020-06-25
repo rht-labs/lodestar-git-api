@@ -226,18 +226,10 @@ public class EngagementService {
 
     private File createEngagmentFile(Engagement engagement) {
 
-        // remove any commits or status before creating json  file
-        removeCommitsAndStatus(engagement);
-
         String fileContent = json.toJson(engagement);
         File file = File.builder().content(fileContent).filePath(ENGAGEMENT_FILE).build();
 
         return file;
-    }
-
-    private void removeCommitsAndStatus(Engagement engagement) {
-        engagement.setCommits(null);
-        engagement.setStatus(null);
     }
 
     private Project createProjectStucture(Engagement engagement) {
