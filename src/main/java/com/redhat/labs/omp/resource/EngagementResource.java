@@ -64,6 +64,16 @@ public class EngagementResource {
     }
     
     @GET
+    @Path("/namespace/{namespace}")
+    @Counted(name = "get-engagement-namespace", description = "Count of get by id or namespace")
+    @Timed(name = "performedEngagementGetByNamespace", description = "Time to get an engagement by namespace", unit = MetricUnits.MILLISECONDS)
+    public Response getEngagement(@PathParam("namespace") String namespace, @QueryParam("includeStatus") boolean includeStatus) {
+
+        Engagement response = engagementService.getEngagement(namespace, includeStatus);
+        return Response.ok().entity(response).build();
+    }
+    
+    @GET
     @Path("/customer/{customer}/{engagement}")
     @Counted(name = "get-engagement", description = "Count of get engagement")
     @Timed(name = "performedEngagementGet", description = "Time to get an engagement", unit = MetricUnits.MILLISECONDS)
