@@ -237,7 +237,7 @@ public class EngagementService {
     }
 
     private File createEngagmentFile(Engagement engagement) {
-        //Git api is ready only here.
+        //Git api is read only here.
         engagement.setCommits(null);
         engagement.setStatus(null);
 
