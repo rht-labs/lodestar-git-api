@@ -2,6 +2,7 @@ package com.redhat.labs.omp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
@@ -30,6 +31,13 @@ class EngagementServiceTest {
         });
         
         assertEquals("failed to create group", exception.getMessage());
+    }
+    
+    @Test void testGetEngagementByNamesapaceNotFound() {
+        
+        Engagement engagement = engagementService.getEngagement("blah", false);
+        
+        assertNull(engagement);
     }
     
     @Test void testCreateEngagementCommitFileFail() {

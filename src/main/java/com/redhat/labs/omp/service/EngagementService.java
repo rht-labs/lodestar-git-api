@@ -1,9 +1,9 @@
 package com.redhat.labs.omp.service;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -191,6 +191,18 @@ public class EngagementService {
         return engagementList;
     }
     
+    public Engagement getEngagement(String namespaceOrId, boolean includeStatus) {
+        Engagement engagement = null;
+
+        Optional<Project> project = projectService.getProjectByIdOrPath(namespaceOrId);
+
+        if(project.isPresent()) {
+            engagement = getEngagement(project.get(), includeStatus).orElse(null);
+        }
+
+        return engagement;
+    }
+    
     public Engagement getEngagement(String customerName, String engagementName, boolean includeStatus) {
         Engagement engagement = null;
         
@@ -225,6 +237,9 @@ public class EngagementService {
     }
 
     private File createEngagmentFile(Engagement engagement) {
+        //Git api is ready only here.
+        engagement.setCommits(null);
+        engagement.setStatus(null);
 
         String fileContent = json.toJson(engagement);
         File file = File.builder().content(fileContent).filePath(ENGAGEMENT_FILE).build();
@@ -333,7 +348,7 @@ public class EngagementService {
         String bear = "\ud83d\udc3b";
 
         int bearCodePoint = bear.codePointAt(bear.offsetByCodePoints(0, 0));
-        int mysteryAnimalCodePoint = bearCodePoint + new Random().nextInt(144);
+        int mysteryAnimalCodePoint = bearCodePoint + new SecureRandom().nextInt(144);
         char mysteryEmoji[] = { Character.highSurrogate(mysteryAnimalCodePoint),
                 Character.lowSurrogate(mysteryAnimalCodePoint) };
 
