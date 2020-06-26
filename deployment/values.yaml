@@ -4,3 +4,5 @@ servicePort: 8080
 
 imageName: "quay.io/rht-labs/omp-git-api"
 imageTag: "latest" # This is intended to be overridden by the parent Helm chart.
+
+gitlabRef: "master"
