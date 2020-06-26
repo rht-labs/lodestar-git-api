@@ -1,10 +1,53 @@
 {
-    "messages": [
-      "This is message 1",
-      "This is message 2",
-      "This is message 3"
-    ],
-    "openshift_api": "https://console.s11.core.rht-labs.com/",
-    "openshift_web_console": "https://console.s11.core.rht-labs.com/",
-    "overall_status": "green"
+  "overall_status": "yellow",
+  "messages": [
+    {
+      "severity": "INFO",
+      "message": "This is message 1",
+      "updated": "2020-06-23T21:25:31Z"
+    },
+    {
+      "severity": "CRITICAL",
+      "message": "This is message 2",
+      "updated": "2020-06-22T11:15:11Z"
+    },
+    {
+      "severity": "SUCCESS",
+      "message": "This is message 3",
+      "updated": "2020-06-22T10:25:31Z"
+    }
+  ],
+  "subsystems": [
+    {
+      "name": "openshift",
+      "status": "yellow",
+      "state": "provisioning",
+      "info": "Deployment In Progress",
+      "updated": "2020-06-23T09:25:31Z",
+      "web_console": "https://console......",
+      "api": "https://api.....:6443",
+      "messages": [
+        {
+          "severity": "INFO",
+          "message": "This is message 1",
+          "updated": "2020-06-23T21:25:31Z"
+        }
+      ]
+    },
+    {
+      "name": "atlassian",
+      "status": "green",
+      "state": "operational",
+      "info": null,
+      "updated": "2020-06-22T20:15:37Z",
+      "url": "https://mycompany.atlassian.net",
+      "messages": [
+        {
+          "severity": "INFO",
+          "message": "This is message 1",
+          "updated": "2020-06-23T21:25:31Z"
+        }
+      ]
+    }
+  ]
 }
