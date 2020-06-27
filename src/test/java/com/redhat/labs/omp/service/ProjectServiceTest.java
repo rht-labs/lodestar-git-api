@@ -81,7 +81,7 @@ class ProjectServiceTest {
     @Test void getProjectAllByName() {
         List<ProjectSearchResults> found = projectService.getAllProjectsByName("iac");
         assertNotNull(found);
-        assertEquals(1, found.size());
+        assertEquals(2, found.size());
         
     }
     

@@ -131,6 +131,9 @@ public class Project {
     private Integer groupWithProjectTemplatesId;
     @JsonbProperty("packages_enabled")
     private Boolean packagesEnabled;
+    @JsonbProperty("path_with_namespace")
+    private String pathWithNamespace;
+    
 
     @JsonbTransient
     private boolean first;
