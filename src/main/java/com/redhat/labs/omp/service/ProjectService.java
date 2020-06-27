@@ -1,6 +1,5 @@
 package com.redhat.labs.omp.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +13,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.redhat.labs.omp.models.PagedResults;
 import com.redhat.labs.omp.models.gitlab.Commit;
 import com.redhat.labs.omp.models.gitlab.DeployKey;
 import com.redhat.labs.omp.models.gitlab.Project;
@@ -60,16 +60,21 @@ public class ProjectService {
     public List<ProjectSearchResults> getAllProjectsByName(String name) {
         return gitLabService.getProjectByName(name);
     }
-
+    
     public List<Project> getProjectsByGroup(int groupId, Boolean includeSubgroups) {
-        List<Project> projects = gitLabService.getProjectsbyGroup(groupId, includeSubgroups);
-
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.trace("project count group id({}) {}", groupId, projects.size());
-            projects.stream().forEach(project -> LOGGER.debug("Group {} Project {}", groupId, project.getName()));
+        
+        PagedResults<Project> page = new PagedResults<>();
+        while(page.hasMore()) {
+            Response response = gitLabService.getProjectsbyGroup(groupId, includeSubgroups, commitPageSize, page.getNumber());
+            page.update(response, new GenericType<List<Project>>() {});
         }
-
-        return projects;
+        
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("project count group id ({}) {}", groupId, page.size());
+            page.getResults().stream().forEach(project -> LOGGER.debug("Project {}", project.getPathWithNamespace()));
+        }
+        
+        return page.getResults();
     }
 
     public Optional<Project> getProjectById(Integer projectId) {
@@ -130,27 +135,16 @@ public class ProjectService {
     }
     
     public List<Commit> getCommitLog(String projectId) {
-        List<Commit> totalCommits = new ArrayList<>();
-        int totalPages = 1;
-        int page = 0;
+        PagedResults<Commit> page = new PagedResults<>();
         
-        while(totalPages > page++) {
-            LOGGER.trace("page {}", page);
-            Response response = gitLabService.getCommitLog(projectId, commitPageSize, page);
-            
-            totalCommits.addAll(response.readEntity(new GenericType<List<Commit>>() {}));
-            
-            if(page == 1) {
-                String totalPageString = response.getHeaderString("X-Total-Pages");
-                totalPages = Integer.valueOf(totalPageString);
-                LOGGER.trace("TOTAL PAGES {}", totalPages);
-            }
-            
+        while(page.hasMore()) {
+            Response response = gitLabService.getCommitLog(projectId, commitPageSize, page.getNumber());
+            page.update(response, new GenericType<List<Commit>>() {});
         }
         
-        LOGGER.debug("total commits for project {} {}", projectId, totalCommits.size());
+        LOGGER.debug("total commits for project {} {}", projectId, page.size());
           
-        return totalCommits;
+        return page.getResults();
     }
 
 }

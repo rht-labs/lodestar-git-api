@@ -1,4 +1,4 @@
-![Container Build](https://github.com/rht-labs/open-management-portal-git-api/workflows/Container%20Build/badge.svg)
+![Container Build](https://github.com/rht-labs/open-management-portal-git-api/workflows/Container%20Build/badge.svg) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.redhat.labs%3Alodestar-git-api&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.redhat.labs%3Alodestar-git-api) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.redhat.labs%3Alodestar-git-api&metric=coverage)](https://sonarcloud.io/dashboard?id=com.redhat.labs%3Alodestar-git-api)
 
 # LodeStar - Git API
 

@@ -161,7 +161,7 @@ public class EngagementService {
     public Optional<Project> getProject(String customerName, String engagementName) {
         String fullPath = this.getPath(customerName, engagementName);
         
-        LOGGER.debug("Full path {}", fullPath.toString());
+        LOGGER.debug("Full path {}", fullPath);
         return projectService.getProjectByIdOrPath(fullPath);
     }
     
@@ -242,9 +242,7 @@ public class EngagementService {
         engagement.setStatus(null);
 
         String fileContent = json.toJson(engagement);
-        File file = File.builder().content(fileContent).filePath(ENGAGEMENT_FILE).build();
-
-        return file;
+        return File.builder().content(fileContent).filePath(ENGAGEMENT_FILE).build();
     }
 
     private Project createProjectStucture(Engagement engagement) {
@@ -319,8 +317,10 @@ public class EngagementService {
         // convert each file to action - parallelStream was bringing inconsistent
         // results
         filesToCommit.stream().forEach(file -> actions.add(createAction(file, isNew)));
+        
+        String commitMessage = isNew ? commitMessage("Engagement created") : commitMessage("Engagement updated");
 
-        return CommitMultiple.builder().id(projectId).branch(branch).commitMessage(commitMessage()).actions(actions)
+        return CommitMultiple.builder().id(projectId).branch(branch).commitMessage(commitMessage).actions(actions)
                 .authorName(authorName).authorEmail(authorEmail).build();
 
     }
@@ -338,10 +338,9 @@ public class EngagementService {
         }
         return in;
     }
-
-    private String commitMessage() {
-        String COMMIT_MSG = "%s engagement update by git-api %s ";
-        return String.format(COMMIT_MSG, getEmoji(), getEmoji());
+    
+    private String commitMessage(String message) {
+        return String.format("%s %s %s", message, getEmoji(), getEmoji());
     }
 
     private String getEmoji() {

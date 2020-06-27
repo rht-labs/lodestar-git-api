@@ -36,7 +36,7 @@ public interface GitLabService {
     // reference: https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects
     @GET
     @Path("/groups/{id}/projects")
-    List<Project> getProjectsbyGroup(@PathParam("id") @Encoded Integer groupId, @QueryParam("include_subgroups") @Encoded Boolean includeSubgroups);
+    Response getProjectsbyGroup(@PathParam("id") @Encoded Integer groupId, @QueryParam("include_subgroups") @Encoded Boolean includeSubgroups, @QueryParam("per_page") int perPage, @QueryParam("page") int page);
 
     //reference: https://docs.gitlab.com/ee/api/groups.html#list-a-groups-subgroups
     @GET

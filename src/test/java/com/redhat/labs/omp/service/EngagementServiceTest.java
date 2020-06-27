@@ -1,9 +1,11 @@
 package com.redhat.labs.omp.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -13,7 +15,9 @@ import org.junit.jupiter.api.Test;
 
 import com.redhat.labs.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.omp.models.Engagement;
+import com.redhat.labs.omp.models.Status;
 import com.redhat.labs.omp.models.gitlab.Hook;
+import com.redhat.labs.omp.models.gitlab.Project;
 
 import io.quarkus.test.junit.QuarkusTest;
 
@@ -22,6 +26,14 @@ class EngagementServiceTest {
 
     @Inject
     EngagementService engagementService;
+    
+    @Test void testCreateEngagementUpdateProject() {
+        
+        Engagement e = Engagement.builder().customerName("updated").projectName("updated2").build();
+        Project project = engagementService.createEngagement(e, "Test Banana", "test@test.com");
+        assertFalse(project.isFirst());
+            
+    }
     
     @Test void testCreateEngagementGroupFail() {
         
@@ -55,5 +67,10 @@ class EngagementServiceTest {
         assertNotNull(hooks);
         assertEquals(0, hooks.size());
         
+    }
+    
+    @Test void tesetNoStatus() {
+        Status status = engagementService.getProjectStatus("nope", "nada");
+        assertNull(status);
     }
 }

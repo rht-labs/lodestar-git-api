@@ -68,6 +68,10 @@ public class MockGitLabService implements GitLabService {
         } else if ("customer".equalsIgnoreCase(name) || "customer A".equalsIgnoreCase(name)) {
             groupList.add(Group.builder().id(11).name("customer A").path("customer-a").parentId(2).build());
             groupList.add(Group.builder().id(12).name("customer").path("customer").parentId(10).build());
+        } else if ("updated".equals(name)) {
+            groupList.add(Group.builder().id(3).name("updated").path("updated").parentId(2).build());
+        } else if ("updated2".equals(name)) {
+            groupList.add(Group.builder().id(5).name("updated2").path("updated").parentId(3).build());
         }
 
         return groupList;
@@ -87,6 +91,9 @@ public class MockGitLabService implements GitLabService {
         if("iac".contentEquals(name)) {
             ProjectSearchResults project = ProjectSearchResults.builder().id(45).name("iac").description("bla").path("iac")
                     .namespace(Namespace.builder().id(45).build()).build();
+            results.add(project);
+            project = ProjectSearchResults.builder().id(5).name("iac").description("bla5").path("iac")
+                    .namespace(Namespace.builder().id(5).build()).build();
             results.add(project);
         }
 
@@ -188,7 +195,7 @@ public class MockGitLabService implements GitLabService {
             return File.builder().filePath(filePath).content(content).build();
         }
         
-        if("status.json".equals(filePath)) {
+        if("status.json".equals(filePath) && ! projectId.equals("top/dog/nope/nada/iac")) {
             String content = ResourceLoader.load("status.json");
             content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
             return File.builder().filePath(filePath).content(content).build();
@@ -236,10 +243,10 @@ public class MockGitLabService implements GitLabService {
     }
 
     @Override
-    public List<Project> getProjectsbyGroup(Integer groupId, Boolean includeSubgroups) {
+    public Response getProjectsbyGroup(Integer groupId, Boolean includeSubgroups, int page, int pageSize) {
         List<Project> projects = new ArrayList<>();
         projects.add(Project.builder().id(groupId * 10).name("Project " + (groupId*10)).build());
-        return projects;
+        return Response.ok(projects).header("X-Total-Pages", 1).build();
     }
 
     @Override
