@@ -28,10 +28,11 @@ public class HookService {
         List<Hook> hooks = getProjectHooks(projectId);
         
         List<Hook> existingHook = hooks.stream().filter(h -> h.getUrl().equals(hook.getUrl())).collect(Collectors.toList());
+        
         if(existingHook.isEmpty()) {
             response = createProjectHook(projectId, hook);
         } else {
-            Hook exHook = hooks.get(0);
+            Hook exHook = existingHook.get(0);
             exHook.setToken(hook.getToken());
             exHook.setPushEvents(hook.getPushEvents());
             exHook.setPushEventsBranchFilter(hook.getPushEventsBranchFilter());
