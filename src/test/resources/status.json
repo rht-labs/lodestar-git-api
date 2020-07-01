@@ -24,8 +24,14 @@
       "state": "provisioning",
       "info": "Deployment In Progress",
       "updated": "2020-06-23T09:25:31Z",
-      "web_console": "https://console......",
-      "api": "https://api.....:6443",
+      "access_urls": [
+        {
+          "Web Console": "https://console......"
+        },
+        {
+          "API": "https://api.....:6443"
+        }
+      ],
       "messages": [
         {
           "severity": "INFO",
@@ -40,7 +46,11 @@
       "state": "operational",
       "info": null,
       "updated": "2020-06-22T20:15:37Z",
-      "url": "https://mycompany.atlassian.net",
+      "access_urls": [
+        {
+          "atlassian": "https://mycompany.atlassian.net"
+        }
+      ],
       "messages": [
         {
           "severity": "INFO",
