@@ -3,8 +3,6 @@ package com.redhat.labs.omp.models;
 import java.util.List;
 import java.util.Map;
 
-import javax.json.bind.annotation.JsonbProperty;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +20,6 @@ public class Subsystem {
     private String info;
     private String updated;
     private List<Message> messages;
-    @JsonbProperty("access_urls")
     private List<Map<String, Object>> accessUrls;
 
 }
