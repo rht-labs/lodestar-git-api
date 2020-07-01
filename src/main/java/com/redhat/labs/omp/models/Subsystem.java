@@ -1,6 +1,7 @@
 package com.redhat.labs.omp.models;
 
 import java.util.List;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,8 +19,7 @@ public class Subsystem {
     private String state;
     private String info;
     private String updated;
-    private String webConsole;
-    private String api;
     private List<Message> messages;
+    private List<Map<String, Object>> accessUrls;
 
 }
