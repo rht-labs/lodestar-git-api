@@ -35,6 +35,7 @@ public class Engagement {
     private String ocpSubDomain;
     private String ocpPersistentStorageSize;
     private String ocpClusterSize;
+    private String additionalDetails;
     private Launch launch;
     private List<EngagementUser> engagementUsers;
     
