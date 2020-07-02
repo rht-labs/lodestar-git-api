@@ -5,12 +5,16 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.Response;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.exception.UnexpectedGitLabResponseException;
+import com.redhat.labs.omp.models.PagedResults;
 import com.redhat.labs.omp.models.gitlab.Group;
 import com.redhat.labs.omp.rest.client.GitLabService;
 
@@ -21,21 +25,25 @@ public class GroupService {
     @Inject
     @RestClient
     GitLabService gitLabService;
+    
+    @ConfigProperty(name = "commit.page.size")
+    int commitPageSize;
 
     // get a group
     public Optional<Group> getGitLabGroupByName(String name, Integer parentId)
             throws UnexpectedGitLabResponseException {
 
         Optional<Group> optional = Optional.empty();
-
-        List<Group> groupList = gitLabService.getGroupByName(name);
-
-        if (null == groupList || groupList.isEmpty()) {
-            return optional;
+        
+        PagedResults<Group> page = new PagedResults<>();
+                
+        while(page.hasMore()) {
+            Response response = gitLabService.getGroupByName(name, commitPageSize, page.getNumber());
+            page.update(response, new GenericType<List<Group>>() {});
         }
 
         // look for a match between returned name and provided path
-        for (Group group : groupList) {
+        for (Group group : page.getResults()) {
             if (name.equals(group.getName()) && parentId.equals(group.getParentId())) {
                 return Optional.of(group);
             }

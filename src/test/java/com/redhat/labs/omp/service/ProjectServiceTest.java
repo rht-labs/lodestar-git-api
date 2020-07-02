@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import com.redhat.labs.omp.mocks.MockGitLabService;
 import com.redhat.labs.omp.models.gitlab.Commit;
 import com.redhat.labs.omp.models.gitlab.Project;
-import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
 
 import io.quarkus.test.junit.QuarkusTest;
 
@@ -76,13 +75,6 @@ class ProjectServiceTest {
         Optional<Project> notFound = projectService.getProjectByName(77, "Banana");
         
         assertEquals(Optional.empty(), notFound);
-    }
-    
-    @Test void getProjectAllByName() {
-        List<ProjectSearchResults> found = projectService.getAllProjectsByName("iac");
-        assertNotNull(found);
-        assertEquals(2, found.size());
-        
     }
     
     @Test void getProjectByPath() {

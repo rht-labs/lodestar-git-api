@@ -57,9 +57,10 @@ public class MockGitLabService implements GitLabService {
     }
 
     @Override
-    public List<Group> getGroupByName(String name) {
+    public Response getGroupByName(String name, int pageSize, int page) {
 
         List<Group> groupList = new ArrayList<>();
+        int pages = 0;
 
         if ("customer3".equalsIgnoreCase(name)) {
             groupList.add(Group.builder().id(3).name("customer1").path("customer1").build());
@@ -74,7 +75,7 @@ public class MockGitLabService implements GitLabService {
             groupList.add(Group.builder().id(5).name("updated2").path("updated").parentId(3).build());
         }
 
-        return groupList;
+        return Response.ok(groupList).header("X-Total-Pages", pages).build();
     }
 
     @Override
@@ -84,9 +85,10 @@ public class MockGitLabService implements GitLabService {
     }
 
     @Override
-    public List<ProjectSearchResults> getProjectByName(String name) {
+    public Response getProjectByName(String name, int pageSize, int page) {
         
         List<ProjectSearchResults> results = new ArrayList<>();
+        int pages = 0;
         
         if("iac".contentEquals(name)) {
             ProjectSearchResults project = ProjectSearchResults.builder().id(45).name("iac").description("bla").path("iac")
@@ -95,9 +97,10 @@ public class MockGitLabService implements GitLabService {
             project = ProjectSearchResults.builder().id(5).name("iac").description("bla5").path("iac")
                     .namespace(Namespace.builder().id(5).build()).build();
             results.add(project);
+            pages++;
         }
 
-        return results;
+        return Response.ok(results).header("X-Total-Pages", pages).build();
 
     }
 

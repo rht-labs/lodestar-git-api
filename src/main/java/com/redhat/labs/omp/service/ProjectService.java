@@ -34,19 +34,22 @@ public class ProjectService {
     @ConfigProperty(name = "commit.page.size")
     int commitPageSize;
 
-    // get a project
+    // get a project - this could be a replaced by a direct call to the project via the path
+    // but must consider changes to the path for special characters
     public Optional<Project> getProjectByName(Integer namespaceId, String name) {
 
         Optional<Project> optional = Optional.empty();
-
-        List<ProjectSearchResults> resultList = gitLabService.getProjectByName(name);
-
-        if (null == resultList || resultList.isEmpty()) {
-            return optional;
+        
+        PagedResults<ProjectSearchResults> page = new PagedResults<>();
+        
+        while(page.hasMore()) {
+            Response response = gitLabService.getProjectByName(name, commitPageSize, page.getNumber());
+            page.update(response, new GenericType<List<ProjectSearchResults>>() {});
         }
 
         // look for a project with name that matches the namespace id and the path
-        for (ProjectSearchResults result : resultList) {
+        for (ProjectSearchResults result : page.getResults()) {
+            LOGGER.debug("PSR {} = {} {}  =  {}", namespaceId, result.getNamespace().getId(), name, result.getPath());
             if (namespaceId.equals(result.getNamespace().getId()) && name.equals(result.getPath())) {
                 return Optional.of(Project.from(result));
             }
@@ -54,11 +57,6 @@ public class ProjectService {
 
         return optional;
 
-    }
-
-    //Needed anymore?
-    public List<ProjectSearchResults> getAllProjectsByName(String name) {
-        return gitLabService.getProjectByName(name);
     }
     
     public List<Project> getProjectsByGroup(int groupId, Boolean includeSubgroups) {
