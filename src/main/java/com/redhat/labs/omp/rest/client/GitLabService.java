@@ -23,7 +23,6 @@ import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.Group;
 import com.redhat.labs.omp.models.gitlab.Hook;
 import com.redhat.labs.omp.models.gitlab.Project;
-import com.redhat.labs.omp.models.gitlab.ProjectSearchResults;
 import com.redhat.labs.omp.resources.filter.Logged;
 
 @Path("/api/v4")
@@ -62,7 +61,7 @@ public interface GitLabService {
     @Logged
     @Path("/groups")
     @Produces("application/json")
-    List<Group> getGroupByName(@QueryParam("search") @Encoded String name);
+    Response getGroupByName(@QueryParam("search") @Encoded String name, @QueryParam("per_page") int perPage, @QueryParam("page") int page);
     
     @GET
     @Logged
@@ -88,7 +87,7 @@ public interface GitLabService {
     @Logged
     @Path("/projects")
     @Produces("application/json")
-    List<ProjectSearchResults> getProjectByName(@QueryParam("search") @Encoded String name);
+    Response getProjectByName(@QueryParam("search") @Encoded String name, @QueryParam("per_page") int perPage, @QueryParam("page") int page);
 
     @GET
     @Logged
