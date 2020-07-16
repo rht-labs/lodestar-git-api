@@ -31,4 +31,7 @@ config:
     - name: hook2
       baseUrl: http://localhost/hook2
       token: anunoby
-      
+  configFile:
+    path: /schema
+    name: config.yml
+
