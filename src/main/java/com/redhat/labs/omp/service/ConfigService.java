@@ -55,6 +55,7 @@ public class ConfigService {
         if (null != content) {
             configuration = File.builder().filePath(configFile).content(content).build();
         }
+        LOGGER.debug("Config File {}", configuration);
     }
 
     public File getConfigFile() {
@@ -63,7 +64,8 @@ public class ConfigService {
             return configuration;
         }
 
-        Optional<File> optional = fileService.getFile(configRepositoryId, configFile, gitRef);
+        String gitLabConfigFile = configFile.charAt(0) == '/' ? configFile.substring(1) : configFile;
+        Optional<File> optional = fileService.getFile(configRepositoryId, gitLabConfigFile, gitRef);
 
         if (!optional.isPresent()) {
             throw new FileNotFoundException("the configured file was not found in the gitlab repository.");
