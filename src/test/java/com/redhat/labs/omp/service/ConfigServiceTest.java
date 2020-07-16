@@ -11,12 +11,48 @@ import org.junit.jupiter.api.Test;
 import com.redhat.labs.exception.FileNotFoundException;
 import com.redhat.labs.omp.config.JsonMarshaller;
 import com.redhat.labs.omp.mocks.MockGitLabService;
+import com.redhat.labs.omp.models.gitlab.File;
 import com.redhat.labs.omp.models.gitlab.HookConfig;
+import com.redhat.labs.utils.ResourceLoader;
 
 import io.quarkus.runtime.StartupEvent;
 
 class ConfigServiceTest {
-    
+
+    @Test void testGetConfigFilePreLoaded() {
+        ConfigService service = new ConfigService();
+        service.configFile = "src/test/resources/config.yml";
+        service.webHooksFile = "src/test/resources/webhooks.yaml";
+        service.marshaller = new JsonMarshaller();
+        
+        service.onStart(new StartupEvent());
+        File config = service.getConfigFile();
+
+        assertNotNull(config);
+        assertEquals("src/test/resources/config.yml", config.getFilePath());
+        assertEquals(ResourceLoader.load("config.yml"), config.getContent());
+
+    }
+
+    @Test void testGetConfigFileFromGitLab() {
+        ConfigService service = new ConfigService();
+        service.configFile = "schema/config.yml";
+        service.webHooksFile = "src/test/resources/webhooks.yaml";
+        service.marshaller = new JsonMarshaller();
+
+        FileService fileService = new FileService();
+        fileService.gitLabService = new MockGitLabService();
+        service.fileService = fileService;
+
+        service.onStart(new StartupEvent());
+        File config = service.getConfigFile();
+
+        assertNotNull(config);
+        assertEquals("schema/config.yml", config.getFilePath());
+        assertEquals(ResourceLoader.load("config.yml"), config.getContent());
+
+    }
+
     @Test void testGetConfigFileNotFound() {
         ConfigService service = new ConfigService();
         service.configFile = "schema/notfound.yaml";
@@ -34,6 +70,7 @@ class ConfigServiceTest {
     
     @Test void testGetHookConfigPreLoaded() {
         ConfigService service = new ConfigService();
+        service.configFile = "src/test/resources/config.yml";
         service.webHooksFile = "src/test/resources/webhooks.yaml";
         service.marshaller = new JsonMarshaller();
         
@@ -48,6 +85,7 @@ class ConfigServiceTest {
     
     @Test void testGetHookConfigLabNotEmpty() {
         ConfigService service = new ConfigService();
+        service.configFile = "src/test/resources/config.yml";
         service.webHooksFile = "/schema/webhooks.yaml";
         service.marshaller = new JsonMarshaller();
         
@@ -65,6 +103,7 @@ class ConfigServiceTest {
     
     @Test void testGetHookConfigLabsEmpty() {
         ConfigService service = new ConfigService();
+        service.configFile = "src/test/resources/config.yml";
         service.webHooksFile = "schema/notfound.yaml";
         service.marshaller = new JsonMarshaller();
         
