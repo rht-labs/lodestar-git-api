@@ -21,7 +21,7 @@ class ConfigServiceTest {
 
     @Test void testGetConfigFilePreLoaded() {
         ConfigService service = new ConfigService();
-        service.configFile = "src/test/resources/config.yml";
+        service.configFile = "src/test/resources/lodestar-runtime-config.yaml";
         service.webHooksFile = "src/test/resources/webhooks.yaml";
         service.marshaller = new JsonMarshaller();
         
@@ -29,14 +29,14 @@ class ConfigServiceTest {
         File config = service.getConfigFile();
 
         assertNotNull(config);
-        assertEquals("src/test/resources/config.yml", config.getFilePath());
-        assertEquals(ResourceLoader.load("config.yml"), config.getContent());
+        assertEquals("src/test/resources/lodestar-runtime-config.yaml", config.getFilePath());
+        assertEquals(ResourceLoader.load("lodestar-runtime-config.yaml"), config.getContent());
 
     }
 
     @Test void testGetConfigFileFromGitLab() {
         ConfigService service = new ConfigService();
-        service.configFile = "schema/config.yml";
+        service.configFile = "runtime/lodestar-runtime-config.yaml";
         service.webHooksFile = "src/test/resources/webhooks.yaml";
         service.marshaller = new JsonMarshaller();
 
@@ -48,8 +48,8 @@ class ConfigServiceTest {
         File config = service.getConfigFile();
 
         assertNotNull(config);
-        assertEquals("schema/config.yml", config.getFilePath());
-        assertEquals(ResourceLoader.load("config.yml"), config.getContent());
+        assertEquals("runtime/lodestar-runtime-config.yaml", config.getFilePath());
+        assertEquals(ResourceLoader.load("lodestar-runtime-config.yaml"), config.getContent());
 
     }
 
@@ -86,7 +86,7 @@ class ConfigServiceTest {
     @Test void testGetHookConfigLabNotEmpty() {
         ConfigService service = new ConfigService();
         service.configFile = "src/test/resources/config.yml";
-        service.webHooksFile = "/schema/webhooks.yaml";
+        service.webHooksFile = "/runtime/webhooks.yaml";
         service.marshaller = new JsonMarshaller();
         
         FileService fileService = new FileService();

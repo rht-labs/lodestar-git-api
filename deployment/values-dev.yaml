@@ -13,7 +13,6 @@ git:
   uri: https://github.com/rht-labs/open-management-portal-git-api.git
   ref: master
 
-configFile: false
 configRepositoryId: false
 deployKey: false
 gitLabApiUrl: false
@@ -22,7 +21,7 @@ engagementsRepositoryId: false
 
 config:
   hookFile:
-    path: /schema
+    path: /runtime
     name: webhooks.yaml
   hooks:
     - name: hook1
@@ -31,7 +30,7 @@ config:
     - name: hook2
       baseUrl: http://localhost/hook2
       token: anunoby
-  configFile:
-    path: /schema
-    name: config.yml
+  runtimeConfigFile:
+    path: /runtime
+    name: lodestar-runtime-config.yaml
 

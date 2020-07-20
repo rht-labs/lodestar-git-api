@@ -46,9 +46,9 @@ spec:
         - name: hook-cm-volume
           mountPath: {{ .Values.config.hookFile.path }}/{{ .Values.config.hookFile.name }}
           subPath: {{ .Values.config.hookFile.name }}
-        - name: config-cm-volume
-          mountPath: {{ .Values.config.configFile.path }}/{{ .Values.config.configFile.name }}
-          subPath: {{ .Values.config.configFile.name }}
+        - name: lodestar-runtime-cm-volume
+          mountPath: {{ .Values.config.runtimeConfigFile.path }}/{{ .Values.config.runtimeConfigFile.name }}
+          subPath: {{ .Values.config.runtimeConfigFile.name }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -58,9 +58,9 @@ spec:
       - name: hook-cm-volume
         configMap:
           name: hook-cm
-      - name: config-cm-volume
+      - name: lodestar-runtime-cm-volume
         configMap:
-          name: config-cm
+          name: lodestar-runtime-cm
   test: false
   triggers:
   - type: ConfigChange

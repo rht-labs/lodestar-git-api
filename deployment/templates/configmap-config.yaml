@@ -1,7 +1,7 @@
 {{- if .Values.development }}
 apiVersion: v1
 data:
-  config.yml: |
+  lodestar-runtime-config.yaml: |
    ---
    basic_information:
      project_name:
@@ -74,5 +74,5 @@ data:
      env_grace_period_max: 180
 kind: ConfigMap
 metadata:
-  name: config-cm
+  name: lodestar-runtime-cm
 {{- end }}

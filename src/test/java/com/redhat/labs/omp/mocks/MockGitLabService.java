@@ -157,7 +157,7 @@ public class MockGitLabService implements GitLabService {
 
         }
         
-        if ("schema/webhooks.yaml".equalsIgnoreCase(filePath)) {
+        if ("runtime/webhooks.yaml".equalsIgnoreCase(filePath)) {
             String content = ResourceLoader.load("webhooks.yaml");
             content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
             return File.builder().filePath(filePath).content(content).build();
@@ -186,8 +186,8 @@ public class MockGitLabService implements GitLabService {
             throw new WebApplicationException(500);
         }
 
-        if("schema/config.yml".equals(filePath)) {
-            String content = ResourceLoader.load("config.yml");
+        if("runtime/lodestar-runtime-config.yaml".equals(filePath)) {
+            String content = ResourceLoader.load("lodestar-runtime-config.yaml");
             content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
             return File.builder().filePath(filePath).content(content).build();
         }
