@@ -54,7 +54,7 @@ public class ConfigService {
         String content = readFile(configFile);
         if (null != content) {
             configuration = File.builder().filePath(configFile).content(content).build();
-            LOGGER.debug("Loaded Runtine Config from File, {}", configFile);
+            LOGGER.debug("Loaded Runtime Config from File, {}", configFile);
         }
        
     }
