@@ -70,7 +70,7 @@ class ConfigServiceTest {
     
     @Test void testGetHookConfigPreLoaded() {
         ConfigService service = new ConfigService();
-        service.configFile = "src/test/resources/config.yml";
+        service.configFile = "src/test/resources/lodestar-runtime-config.yaml";
         service.webHooksFile = "src/test/resources/webhooks.yaml";
         service.marshaller = new JsonMarshaller();
         
@@ -85,7 +85,7 @@ class ConfigServiceTest {
     
     @Test void testGetHookConfigLabNotEmpty() {
         ConfigService service = new ConfigService();
-        service.configFile = "src/test/resources/config.yml";
+        service.configFile = "src/test/resources/lodestar-runtime-config.yaml";
         service.webHooksFile = "/runtime/webhooks.yaml";
         service.marshaller = new JsonMarshaller();
         
@@ -103,7 +103,7 @@ class ConfigServiceTest {
     
     @Test void testGetHookConfigLabsEmpty() {
         ConfigService service = new ConfigService();
-        service.configFile = "src/test/resources/config.yml";
+        service.configFile = "src/test/resources/lodestar-runtime-config.yaml";
         service.webHooksFile = "schema/notfound.yaml";
         service.marshaller = new JsonMarshaller();
         
