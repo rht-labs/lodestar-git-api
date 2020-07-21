@@ -47,8 +47,8 @@ spec:
           mountPath: {{ .Values.config.hookFile.path }}/{{ .Values.config.hookFile.name }}
           subPath: {{ .Values.config.hookFile.name }}
         - name: lodestar-runtime-cm-volume
-          mountPath: {{ .Values.config.runtimeConfigFile.path }}/{{ .Values.config.runtimeConfigFile.name }}
-          subPath: {{ .Values.config.runtimeConfigFile.name }}
+          mountPath: {{ .Values.config.configFile.path }}/{{ .Values.config.configFile.name }}
+          subPath: {{ .Values.config.configFile.name }}
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
