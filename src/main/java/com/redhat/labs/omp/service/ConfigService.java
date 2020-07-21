@@ -1,5 +1,9 @@
 package com.redhat.labs.omp.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,32 +29,44 @@ public class ConfigService {
 
     @ConfigProperty(name = "config.file")
     String configFile;
-    
+
     @ConfigProperty(name = "webhook.file")
     String webHooksFile;
 
     @ConfigProperty(name = "config.repository.id", defaultValue = "9407")
     String configRepositoryId;
-    
+
     @ConfigProperty(name = "config.gitlab.ref", defaultValue = "master")
     String gitRef;
-    
+
     List<HookConfig> hookConfigList;
+    File configuration;
 
     @Inject
     FileService fileService;
-    
+
     @Inject
     JsonMarshaller marshaller;
-    
+
     void onStart(@Observes StartupEvent event) {
         hookConfigList = marshaller.fromYamlFile(webHooksFile, HookConfig.class);
         LOGGER.debug("Hook Config List {}", hookConfigList);
+        String content = readFile(configFile);
+        if (null != content) {
+            configuration = File.builder().filePath(configFile).content(content).build();
+            LOGGER.debug("Loaded Runtime Config from File, {}", configFile);
+        }
+       
     }
 
     public File getConfigFile() {
 
-        Optional<File> optional = fileService.getFile(configRepositoryId, configFile, gitRef);
+        if (null != configuration) {
+            return configuration;
+        }
+
+        String gitLabConfigFile = configFile.charAt(0) == '/' ? configFile.substring(1) : configFile;
+        Optional<File> optional = fileService.getFile(configRepositoryId, gitLabConfigFile, gitRef);
 
         if (!optional.isPresent()) {
             throw new FileNotFoundException("the configured file was not found in the gitlab repository.");
@@ -58,13 +74,13 @@ public class ConfigService {
 
         return optional.get();
     }
-    
+
     public List<HookConfig> getHookConfig() {
 
-        if(hookConfigList != null) {
+        if (hookConfigList != null) {
             return hookConfigList;
         }
-        
+
         String gitLabHookFile = webHooksFile.charAt(0) == '/' ? webHooksFile.substring(1) : webHooksFile;
         Optional<File> optional = fileService.getFile(configRepositoryId, gitLabHookFile, gitRef);
 
@@ -72,11 +88,28 @@ public class ConfigService {
             LOGGER.error("No webhook file could be found. This is abnormal but not a deal breaker");
             return new ArrayList<>();
         }
-        
+
         File file = optional.get();
-       
+
         return marshaller.fromYaml(file.getContent(), HookConfig.class);
-        
+
+    }
+
+    private String readFile(String file) {
+
+        Path path = Paths.get(file);
+
+        if (Files.isReadable(path)) {
+            LOGGER.debug("Loading config file {}", file);
+            try {
+                return new String(Files.readAllBytes(path));
+            } catch (IOException e) {
+                LOGGER.error(String.format("Found but unable to read file %s", file), e);
+            }
+        }
+
+        return null;
+
     }
 
 }

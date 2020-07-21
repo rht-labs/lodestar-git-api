@@ -31,7 +31,6 @@ helm template . \
   --values values-dev.yaml \
   --set git.uri=https://github.com/rht-labs/open-management-portal-git-api.git \
   --set git.ref=master \
-  --set configFile=<your-config-file> \
   --set configRepositoryId=<your-config-repository-id> \
   --set deployKey=<your-gitlab-deploy-key-id> \
   --set gitLabApiUrl=<your-gitlab-base-url> \
@@ -46,7 +45,6 @@ It accepts the following variables
 |---|---|
 | `git.uri`  | The HTTPS reference to the repo (your fork!) to build  |
 | `git.ref`  | The branch name to build  |
-| `configFile` | The path including name of the config file |
 | `configRepositoryId`  | The GitLab ID of the config repository  |
 | `deployKey`  | The ID of the GitLab deploy key to enable on newly-created repositories  |
 | `gitLabApiUrl`  | The base URL of the GitLab instance to use  |
@@ -54,3 +52,9 @@ It accepts the following variables
 | `engagementsRepositoryId`  | The ID of the GitLab group under which to create new projects  |
 
 This will spin up all of the usual resources that this service needs in production, plus a `BuildConfig` configured to build it from source from the Git repository specified. To trigger this build, use `oc start-build omp-git-api`.
+
+## Config Map Configurations
+
+Please note that there is a configuration for both, webhooks and the runtime configuration.  These are provided as samples or subsets and will not be kept current with the values configured in the test/integration/production environments.
+
+These ConfigMaps have already been configured and provided when deployed into the official OpenShift environments.  
