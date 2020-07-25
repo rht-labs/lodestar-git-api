@@ -1,9 +1,14 @@
 package com.redhat.labs.omp.service;
 
 import java.security.SecureRandom;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -17,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import com.redhat.labs.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.omp.config.JsonMarshaller;
 import com.redhat.labs.omp.models.Engagement;
+import com.redhat.labs.omp.models.FileDetail;
 import com.redhat.labs.omp.models.Status;
 import com.redhat.labs.omp.models.gitlab.Action;
 import com.redhat.labs.omp.models.gitlab.Commit;
@@ -37,6 +43,9 @@ public class EngagementService {
     private static final String DEFAULT_BRANCH = "master";
     private static final String ENGAGEMENT_FILE = "engagement.json";
     private static final String STATUS_FILE = "status.json";
+    private static final String ENGAGEMENT_KEY = "engagement";
+    private static final String STATUS_KEY = "status";
+    private static final String COMMITS_KEY = "commits";
     
     private String engagementPathPrefix;
 
@@ -176,21 +185,112 @@ public class EngagementService {
      */
     public List<Engagement> getAllEngagements() {
 
+        Instant start = Instant.now();
+
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
 
-        List<Engagement> engagementList = new ArrayList<>();
+        Map<Integer, Map<String, Object>> projectMap = getProjectMap(projects);
+        List<Engagement> engagementList = convertProjectMapToEngagementList(projectMap);
+//        List<Engagement> engagementList = new ArrayList<>();
 
-        for (Project project : projects) {
-            LOGGER.debug("project id {}", project.getId());
-            Optional<Engagement> engagement = getEngagement(project, true);
-            if(engagement.isPresent() ) {
-                engagementList.add(engagement.get());
-            }
-        }
+        
+
+//        for (Project project : projects) {
+//            LOGGER.debug("project id {}", project.getId());
+//            Optional<Engagement> engagement = getEngagement(project, true);
+//            if(engagement.isPresent() ) {
+//                engagementList.add(engagement.get());
+//            }
+//        }
+
+        Instant end = Instant.now();
+        long elapsedInSeconds = Duration.between(start, end).getSeconds();
+        LOGGER.info("found {} engagements in {} seconds.", engagementList.size(), elapsedInSeconds);
 
         return engagementList;
     }
-    
+
+    private Map<Integer, Map<String, Object>> getProjectMap(List<Project> projects) {
+
+        Map<Integer, Map<String, Object>> projectMap = new ConcurrentHashMap<>();
+
+        // Per project
+        projects.parallelStream().forEach(project -> {
+
+            Integer projectId = project.getId();
+            projectMap.put(projectId, new ConcurrentHashMap<String, Object>());
+
+            // get project commits
+            List<Commit> commits = projectService.getCommitLog(String.valueOf(projectId));
+            projectMap.get(projectId).put(COMMITS_KEY, commits);
+
+            // determine if project has engagement.json or status.json
+            List<FileDetail> files = projectService.getProjectTree(projectId).parallelStream()
+                    .filter(file -> file.getPath().equals(ENGAGEMENT_FILE) || file.getPath().equals(STATUS_FILE))
+                    .collect(Collectors.toList());
+
+            // get each file in parallel
+            files.parallelStream().forEach(f -> {
+
+                String path = f.getPath();
+                Optional<File> optional = fileService.getFile(projectId, path);
+
+                if(optional.isPresent()) {
+
+                    File gitLabFile = optional.get();
+                    String key = ENGAGEMENT_KEY;
+                    if (STATUS_FILE.equals(gitLabFile.getFilePath())) {
+                        key = STATUS_KEY;
+                    }
+
+                    // add file content to map for corresponding key
+                    projectMap.get(projectId).put(key, gitLabFile.getContent());
+
+                }
+
+            });
+
+        });
+
+        return projectMap;
+
+    }
+
+    private List<Engagement> convertProjectMapToEngagementList(Map<Integer, Map<String, Object>> map) {
+
+        List<Engagement> engagementList = new ArrayList<>();
+
+        map.keySet().parallelStream().forEach(projectId -> {
+
+            // create engagement)
+            Map<String, Object> projectMap = map.get(projectId);
+
+            if (projectMap.containsKey(ENGAGEMENT_KEY)) {
+
+                Engagement engagement = json.fromJson(projectMap.get(ENGAGEMENT_KEY).toString(), Engagement.class);
+
+                // create status
+                if (projectMap.containsKey(STATUS_KEY)) {
+                    Status status = json.fromJson(projectMap.get(STATUS_KEY).toString(), Status.class);
+                    engagement.setStatus(status);
+                }
+
+                if(projectMap.containsKey(COMMITS_KEY)) {
+                    @SuppressWarnings("unchecked")
+                    List<Commit> commits = (List<Commit>) projectMap.get(COMMITS_KEY);
+                    engagement.setCommits(commits);
+                }
+
+                engagementList.add(engagement);
+
+            }
+
+        });
+
+        return engagementList;
+
+    }
+
     public Engagement getEngagement(String namespaceOrId, boolean includeStatus) {
         Engagement engagement = null;
 

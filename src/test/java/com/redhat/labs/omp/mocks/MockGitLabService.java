@@ -5,13 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
 import com.redhat.labs.omp.config.JsonMarshaller;
+import com.redhat.labs.omp.models.FileDetail;
 import com.redhat.labs.omp.models.gitlab.Commit;
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.DeployKey;
@@ -321,6 +324,11 @@ public class MockGitLabService implements GitLabService {
         }
         
         return Response.ok(new ArrayList<Commit>()).header("X-Total-Pages", 0).build();
+    }
+
+    @Override
+    public List<FileDetail> getProjectTree(@PathParam("id") @Encoded Integer projectId) {
+        return null;
     }
 
 }

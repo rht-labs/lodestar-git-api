@@ -13,6 +13,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.redhat.labs.omp.models.FileDetail;
 import com.redhat.labs.omp.models.PagedResults;
 import com.redhat.labs.omp.models.gitlab.Commit;
 import com.redhat.labs.omp.models.gitlab.DeployKey;
@@ -145,4 +146,8 @@ public class ProjectService {
         return page.getResults();
     }
 
+    public List<FileDetail> getProjectTree(Integer projectId) {
+        return gitLabService.getProjectTree(projectId);
+    }
+ 
 }

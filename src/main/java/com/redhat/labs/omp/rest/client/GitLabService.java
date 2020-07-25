@@ -17,6 +17,7 @@ import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
+import com.redhat.labs.omp.models.FileDetail;
 import com.redhat.labs.omp.models.gitlab.CommitMultiple;
 import com.redhat.labs.omp.models.gitlab.DeployKey;
 import com.redhat.labs.omp.models.gitlab.File;
@@ -94,6 +95,12 @@ public interface GitLabService {
     @Path("/projects/{id}")
     @Produces("application/json")
     Project getProjectById(@PathParam("id") @Encoded String projectId);
+
+    @GET
+    @Logged
+    @Path("/projects/{id}/repository/tree")
+    @Produces("application/json")
+    List<FileDetail> getProjectTree(@PathParam("id") @Encoded Integer projectId);
 
     @POST
     @Logged
