@@ -1,8 +1,6 @@
 package com.redhat.labs.omp.service;
 
 import java.security.SecureRandom;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -185,29 +183,11 @@ public class EngagementService {
      */
     public List<Engagement> getAllEngagements() {
 
-        Instant start = Instant.now();
-
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
 
-//        Map<Integer, Map<String, Object>> projectMap = getProjectMap(projects);
-//        List<Engagement> engagementList = convertProjectMapToEngagementList(projectMap);
-        List<Engagement> engagementList = new ArrayList<>();
+        Map<Integer, Map<String, Object>> projectMap = getProjectMap(projects);
+        return  convertProjectMapToEngagementList(projectMap);
 
-        
-
-        for (Project project : projects) {
-            LOGGER.debug("project id {}", project.getId());
-            Optional<Engagement> engagement = getEngagement(project, true);
-            if(engagement.isPresent() ) {
-                engagementList.add(engagement.get());
-            }
-        }
-
-        Instant end = Instant.now();
-        long elapsedInSeconds = Duration.between(start, end).getSeconds();
-        LOGGER.info("found {} engagements in {} seconds.", engagementList.size(), elapsedInSeconds);
-
-        return engagementList;
     }
 
     private Map<Integer, Map<String, Object>> getProjectMap(List<Project> projects) {
