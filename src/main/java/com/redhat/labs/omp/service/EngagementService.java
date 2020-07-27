@@ -189,19 +189,19 @@ public class EngagementService {
 
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
 
-        Map<Integer, Map<String, Object>> projectMap = getProjectMap(projects);
-        List<Engagement> engagementList = convertProjectMapToEngagementList(projectMap);
-//        List<Engagement> engagementList = new ArrayList<>();
+//        Map<Integer, Map<String, Object>> projectMap = getProjectMap(projects);
+//        List<Engagement> engagementList = convertProjectMapToEngagementList(projectMap);
+        List<Engagement> engagementList = new ArrayList<>();
 
         
 
-//        for (Project project : projects) {
-//            LOGGER.debug("project id {}", project.getId());
-//            Optional<Engagement> engagement = getEngagement(project, true);
-//            if(engagement.isPresent() ) {
-//                engagementList.add(engagement.get());
-//            }
-//        }
+        for (Project project : projects) {
+            LOGGER.debug("project id {}", project.getId());
+            Optional<Engagement> engagement = getEngagement(project, true);
+            if(engagement.isPresent() ) {
+                engagementList.add(engagement.get());
+            }
+        }
 
         Instant end = Instant.now();
         long elapsedInSeconds = Duration.between(start, end).getSeconds();
