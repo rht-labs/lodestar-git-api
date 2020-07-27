@@ -2,6 +2,7 @@ package com.redhat.labs.omp.mocks;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -328,7 +329,15 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public List<FileDetail> getProjectTree(@PathParam("id") @Encoded Integer projectId) {
-        return null;
+
+        String engagementPath = "engagement.json";
+        String statusPath = "status.json";
+
+        FileDetail engagement = FileDetail.builder().name(engagementPath).path(engagementPath).build();
+        FileDetail status = FileDetail.builder().name(statusPath).path(statusPath).build();
+
+        return Arrays.asList(engagement, status);
+
     }
 
 }
