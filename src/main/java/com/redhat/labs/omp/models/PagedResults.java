@@ -27,18 +27,18 @@ import lombok.NoArgsConstructor;
 public class PagedResults<T> {
     public static final Logger LOGGER = LoggerFactory.getLogger(PagedResults.class);
             
-    @Builder.Default private int number = 0;
+    @Builder.Default private int number = 1;
     @Builder.Default private int total = 1;
     @Builder.Default private List<T> results = new ArrayList<>();
     
     
     public boolean hasMore() {
-        return total > number;
+        return total >= number;
     }
     
     public void update(Response response, GenericType<List<T>> type) {
         
-        if(number == 0) {
+        if(number == 1) {
             String totalPageString = response.getHeaderString("X-Total-Pages");
             total = Integer.valueOf(totalPageString);
             LOGGER.trace("TOTAL PAGES {}", total);
