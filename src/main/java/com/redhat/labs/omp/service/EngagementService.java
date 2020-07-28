@@ -4,6 +4,7 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -178,19 +179,26 @@ public class EngagementService {
 
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
 
-        List<Engagement> engagementList = new ArrayList<>();
+        return
+            projects
+                .parallelStream()
+                .map(project -> {
+                    return getEngagement(project, true);
+                })
+                .filter(optional -> optional.isPresent())
+                .map(optional -> {
+                    return optional.get();
+                })
+                .collect(Collectors.toList());
 
-        for (Project project : projects) {
-            LOGGER.debug("project id {}", project.getId());
-            Optional<Engagement> engagement = getEngagement(project, true);
-            if(engagement.isPresent() ) {
-                engagementList.add(engagement.get());
-            }
-        }
-
-        return engagementList;
     }
-    
+
+    public Integer countAllEngagements() {
+
+        return getAllEngagements().size();
+
+    }
+
     public Engagement getEngagement(String namespaceOrId, boolean includeStatus) {
         Engagement engagement = null;
 
@@ -215,7 +223,7 @@ public class EngagementService {
         return engagement;
     }
     
-    private Optional<Engagement> getEngagement(Project project, boolean includeStatus) {
+    public Optional<Engagement> getEngagement(Project project, boolean includeStatus) {
         Engagement engagement = null;
         
         Optional<File> engagementFile = fileService.getFileAllow404(project.getId(), ENGAGEMENT_FILE);
