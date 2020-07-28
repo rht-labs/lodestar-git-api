@@ -1,10 +1,6 @@
 package com.redhat.labs.omp.resource;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
@@ -125,24 +121,6 @@ public class EngagementResource {
         
         Status status = engagementService.getProjectStatus(customer, engagement);
         return Response.ok().entity(status).build();
-    }
-
-    @GET
-    @Path("/count")
-    public Response getEngagementCount() {
-
-        Instant start = Instant.now();
-
-        Integer count = engagementService.countAllEngagements();
-
-        Instant end = Instant.now();
-        long elapsed = Duration.between(start, end).getSeconds();
-
-        Map<String, String> map = new HashMap<>();
-        map.put("count", count.toString());
-        map.put("elapsed_time", String.valueOf(elapsed));
-        return Response.ok(map).build();
-
     }
 
 }

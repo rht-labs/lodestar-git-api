@@ -193,12 +193,6 @@ public class EngagementService {
 
     }
 
-    public Integer countAllEngagements() {
-
-        return getAllEngagements().size();
-
-    }
-
     public Engagement getEngagement(String namespaceOrId, boolean includeStatus) {
         Engagement engagement = null;
 
@@ -223,7 +217,7 @@ public class EngagementService {
         return engagement;
     }
     
-    public Optional<Engagement> getEngagement(Project project, boolean includeStatus) {
+    private Optional<Engagement> getEngagement(Project project, boolean includeStatus) {
         Engagement engagement = null;
         
         Optional<File> engagementFile = fileService.getFileAllow404(project.getId(), ENGAGEMENT_FILE);
