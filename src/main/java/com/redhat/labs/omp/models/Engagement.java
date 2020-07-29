@@ -2,6 +2,8 @@ package com.redhat.labs.omp.models;
 
 import java.util.List;
 
+import javax.json.bind.annotation.JsonbProperty;
+
 import com.redhat.labs.omp.models.gitlab.Commit;
 
 import lombok.AllArgsConstructor;
@@ -42,5 +44,10 @@ public class Engagement {
     private Status status;
     private List<Commit> commits;
     private CreationDetails creationDetails;
+
+    @JsonbProperty("engagement_region")
+    private String region;
+    @JsonbProperty("engagement_type")
+    private String type;
 
 }
