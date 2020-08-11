@@ -51,7 +51,7 @@ It accepts the following variables
 | `gitLabPersonalAccessToken`  | The access token to use to auth against GitLab  |
 | `engagementsRepositoryId`  | The ID of the GitLab group under which to create new projects  |
 
-This will spin up all of the usual resources that this service needs in production, plus a `BuildConfig` configured to build it from source from the Git repository specified. To trigger this build, use `oc start-build omp-git-api`.
+This will spin up all of the usual resources that this service needs in production, plus a `BuildConfig` configured to build it from source from the Git repository specified. To trigger this build, use `oc start-build lodestar-git-api`.
 
 ## Config Map Configurations
 

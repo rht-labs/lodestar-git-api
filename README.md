@@ -52,7 +52,7 @@ Deployment template will read from the above secret and inject following env var
 
 | Name | Example Value | Required |
 |------|---------------|----------|
-| OMP_LOGGING | DEBUG | False |
+| LODESTAR_LOGGING | DEBUG | False |
 
 ### GitLab
 
@@ -108,7 +108,7 @@ You can run your application using Quarkus using:
 ```
 
 # logging
-export OMP_LOGGING=DEBUG
+export LODESTAR_LOGGING=DEBUG
 
 # gitlab
 export GITLAB_API_URL=<The base url of your git api. ie https://gitlab.com>
@@ -125,5 +125,5 @@ export ENGAGEMENTS_REPOSITORY_ID=<Parent project id where repos will be saved>
 ./mvnw clean package
 
 # run the application
-java -jar target/open-management-portal-git-api-*-runner.jar
+java -jar target/lodestar-git-api-*-runner.jar
 ```
