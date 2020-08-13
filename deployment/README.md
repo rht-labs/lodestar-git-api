@@ -15,13 +15,13 @@ If you are not familiar with Helm - how to configure it and run - you can start 
 1. Clone the target repo:
 
 ```
-git clone https://github.com/rht-labs/open-management-portal-git-api
+git clone https://github.com/rht-labs/lodestar-git-api
 ```
 
 2. Change into to the `deployment` directory:
 
 ```
-cd open-management-portal-git-api/deployment
+cd lodestar-git-api/deployment
 ```
 
 3. Deploy using the following Helm command:
@@ -29,7 +29,7 @@ cd open-management-portal-git-api/deployment
 ```shell script
 helm template . \
   --values values-dev.yaml \
-  --set git.uri=https://github.com/rht-labs/open-management-portal-git-api.git \
+  --set git.uri=https://github.com/rht-labs/lodestar-git-api.git \
   --set git.ref=master \
   --set configRepositoryId=<your-config-repository-id> \
   --set deployKey=<your-gitlab-deploy-key-id> \
