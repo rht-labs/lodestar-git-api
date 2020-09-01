@@ -50,4 +50,7 @@ public class Engagement {
     @JsonbProperty("engagement_type")
     private String type;
 
+    @JsonbProperty("engagement_categories")
+    private List<Category> categories;
+
 }
