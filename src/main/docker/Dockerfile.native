@@ -7,11 +7,11 @@
 #
 # Then, build the image with:
 #
-# docker build -f src/main/docker/Dockerfile.native -t quarkus/open-management-portal-git-api .
+# docker build -f src/main/docker/Dockerfile.native -t quarkus/lodestar-git-api .
 #
 # Then run the container using:
 #
-# docker run -i --rm -p 8080:8080 quarkus/open-management-portal-git-api
+# docker run -i --rm -p 8080:8080 quarkus/lodestar-git-api
 #
 ###
 FROM registry.access.redhat.com/ubi8/ubi-minimal

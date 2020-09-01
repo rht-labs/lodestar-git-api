@@ -1,4 +1,4 @@
-name: omp-git-api
+name: lodestar-git-api
 
 servicePort: 8080
 
