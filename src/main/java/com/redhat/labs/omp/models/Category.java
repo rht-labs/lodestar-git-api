@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class Category {
 
     private String name;
+    private Integer count;
 
 }
