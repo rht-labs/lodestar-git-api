@@ -53,4 +53,6 @@ public class Engagement {
     @JsonbProperty("engagement_categories")
     private List<Category> categories;
 
+    private List<Artifact> artifacts;
+
 }
