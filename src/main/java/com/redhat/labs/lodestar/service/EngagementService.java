@@ -245,6 +245,7 @@ public class EngagementService {
         //Git api is read only here.
         engagement.setCommits(null);
         engagement.setStatus(null);
+        engagement.setCommitMessage(null);
 
         String fileContent = json.toJson(engagement);
         return File.builder().content(fileContent).filePath(ENGAGEMENT_FILE).build();
