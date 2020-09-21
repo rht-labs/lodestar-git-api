@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -29,7 +30,7 @@ class EngagementServiceTest {
     @Test void testCreateEngagementUpdateProject() {
         
         Engagement e = Engagement.builder().customerName("updated").projectName("updated2").build();
-        Project project = engagementService.createEngagement(e, "Test Banana", "test@test.com");
+        Project project = engagementService.createEngagement(e, "Test Banana", "test@test.com", Optional.empty(), Optional.empty());
         assertFalse(project.isFirst());
             
     }
@@ -38,7 +39,7 @@ class EngagementServiceTest {
         
         Engagement e = Engagement.builder().customerName("customer").projectName("project").build();
         Exception exception = assertThrows(UnexpectedGitLabResponseException.class, () -> {
-            engagementService.createEngagement(e, "Test Banana", "test@test.com");
+            engagementService.createEngagement(e, "Test Banana", "test@test.com", Optional.empty(), Optional.empty());
         });
         
         assertEquals("failed to create group", exception.getMessage());
@@ -55,7 +56,7 @@ class EngagementServiceTest {
         
         Engagement e = Engagement.builder().customerName("project1").projectName("project1").build();
         Exception exception = assertThrows(UnexpectedGitLabResponseException.class, () -> {
-            engagementService.createEngagement(e, "Test Banana", "fail@commitmultiplefiles.com");
+            engagementService.createEngagement(e, "Test Banana", "fail@commitmultiplefiles.com", Optional.empty(), Optional.empty());
         });
 
         assertEquals("failed to commit files for engagement creation.", exception.getMessage());
