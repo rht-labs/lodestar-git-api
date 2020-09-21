@@ -54,5 +54,6 @@ public class Engagement {
     private List<Category> categories;
 
     private List<Artifact> artifacts;
+    private String commitMessage;
 
 }

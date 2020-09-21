@@ -87,13 +87,16 @@ public class EngagementService {
         Project project = createProjectStucture(engagement);
         engagement.setProjectId(project.getId());
 
+        // get commit message before creating file
+        Optional<String> commitMessageOptional = Optional.ofNullable(engagement.getCommitMessage());
+
         // get all template files
         List<File> repoFiles = new ArrayList<>();
         repoFiles.add(createEngagmentFile(engagement));
 
         // create actions for multiple commit
         CommitMultiple commit = createCommitMultiple(repoFiles, project.getId(), DEFAULT_BRANCH, author,
-                authorEmail, project.isFirst());
+                authorEmail, project.isFirst(), commitMessageOptional);
 
         if (LOGGER.isDebugEnabled()) {
             commit.getActions().stream().forEach(file -> LOGGER.debug("Action File path :: {}", file.getFilePath()));
@@ -242,6 +245,7 @@ public class EngagementService {
         //Git api is read only here.
         engagement.setCommits(null);
         engagement.setStatus(null);
+        engagement.setCommitMessage(null);
 
         String fileContent = json.toJson(engagement);
         return File.builder().content(fileContent).filePath(ENGAGEMENT_FILE).build();
@@ -312,15 +316,17 @@ public class EngagementService {
     }
 
     private CommitMultiple createCommitMultiple(List<File> filesToCommit, Integer projectId, String branch,
-            String authorName, String authorEmail, boolean isNew) {
+            String authorName, String authorEmail, boolean isNew, Optional<String> commitMessageOptional) {
 
         List<Action> actions = new ArrayList<>();
 
         // convert each file to action - parallelStream was bringing inconsistent
         // results
         filesToCommit.stream().forEach(file -> actions.add(createAction(file, isNew)));
-        
-        String commitMessage = isNew ? commitMessage("Engagement created") : commitMessage("Engagement updated");
+
+        // use message if provided.  otherwise, defaults
+        String commitMessage = commitMessageOptional
+                .orElse(isNew ? commitMessage("Engagement created") : commitMessage("Engagement updated"));
 
         return CommitMultiple.builder().id(projectId).branch(branch).commitMessage(commitMessage).actions(actions)
                 .authorName(authorName).authorEmail(authorEmail).build();
