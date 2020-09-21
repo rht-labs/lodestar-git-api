@@ -1,6 +1,7 @@
 package com.redhat.labs.lodestar.resource;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
@@ -44,9 +45,10 @@ public class EngagementResource {
     @Counted(name = "engagement", description = "How many engagements request have been requested")
     @Timed(name = "performedCreates", description = "How much time it takes to create an engagement", unit = MetricUnits.MILLISECONDS)
     public Response createEngagement(Engagement engagement, @Context UriInfo uriInfo,
-            @NotBlank @QueryParam("username") String author, @NotBlank @QueryParam("userEmail") String authorEmail) {
+            @NotBlank @QueryParam("username") String author, @NotBlank @QueryParam("userEmail") String authorEmail,
+            @QueryParam("newCustomerName") Optional<String> newCustomerName, @QueryParam("newProjectName") Optional<String> newProjectName) {
 
-        Project project = engagementService.createEngagement(engagement, author, authorEmail);
+        Project project = engagementService.createEngagement(engagement, author, authorEmail, newCustomerName, newProjectName);
 
         UriBuilder builder = uriInfo.getAbsolutePathBuilder();
         builder.path(Integer.toString(project.getId()));

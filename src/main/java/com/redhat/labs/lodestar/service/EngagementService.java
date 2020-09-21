@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -81,10 +82,11 @@ public class EngagementService {
     }
 
     // create an engagement
-    public Project createEngagement(Engagement engagement, String author, String authorEmail) {
+    public Project createEngagement(Engagement engagement, String author, String authorEmail, 
+            Optional<String> newCustomerName, Optional<String> newProjectName) {
 
         // create project structure
-        Project project = createProjectStucture(engagement);
+        Project project = createProjectStucture(engagement, newCustomerName, newProjectName);
         engagement.setProjectId(project.getId());
 
         // get commit message before creating file
@@ -92,7 +94,7 @@ public class EngagementService {
 
         // get all template files
         List<File> repoFiles = new ArrayList<>();
-        repoFiles.add(createEngagmentFile(engagement));
+        repoFiles.add(createEngagmentFile(engagement, newCustomerName, newProjectName));
 
         // create actions for multiple commit
         CommitMultiple commit = createCommitMultiple(repoFiles, project.getId(), DEFAULT_BRANCH, author,
@@ -241,29 +243,44 @@ public class EngagementService {
         return Optional.ofNullable(engagement);
     }
 
-    private File createEngagmentFile(Engagement engagement) {
+    private File createEngagmentFile(Engagement engagement, Optional<String> newCustomerName,
+            Optional<String> newProjectName) {
+
         //Git api is read only here.
         engagement.setCommits(null);
         engagement.setStatus(null);
         engagement.setCommitMessage(null);
 
+        // update customer name is supplied
+        if(newCustomerName.isPresent()) {
+            engagement.setCustomerName(newCustomerName.get());
+        }
+
+        // update project name is supplied
+        if(newProjectName.isPresent()) {
+            engagement.setProjectName(newProjectName.get());
+        }
+
         String fileContent = json.toJson(engagement);
         return File.builder().content(fileContent).filePath(ENGAGEMENT_FILE).build();
     }
 
-    private Project createProjectStucture(Engagement engagement) {
+    private Project createProjectStucture(Engagement engagement, Optional<String> newCustomerName,
+            Optional<String> newProjectName) {
 
         // create group for customer name
-        Group customerGroup = getOrCreateGroup(engagement.getCustomerName(),
+        Group customerGroup = getCreateOrUpdateGroup(
                 Group.builder().name(engagement.getCustomerName())
                         .path(GitLabPathUtils.generateValidPath(engagement.getCustomerName()))
-                        .parentId(engagementRepositoryId).build());
+                        .parentId(engagementRepositoryId).build(),
+                        newCustomerName);
 
         // create group for project name
-        Group projectGroup = getOrCreateGroup(engagement.getProjectName(),
+        Group projectGroup = getCreateOrUpdateGroup(
                 Group.builder().name(engagement.getProjectName())
                         .path(GitLabPathUtils.generateValidPath(engagement.getProjectName()))
-                        .parentId(customerGroup.getId()).build());
+                        .parentId(customerGroup.getId()).build(),
+                        newProjectName);
 
         // create project under project name group
         Project project = getOrCreateProject(projectGroup.getId(), ENGAGEMENT_PROJECT_NAME, Project.builder()
@@ -276,9 +293,9 @@ public class EngagementService {
 
     }
 
-    private Group getOrCreateGroup(String groupName, Group groupToCreate) {
+    private Group getOrCreateGroup(Group groupToCreate) {
 
-        Optional<Group> optional = groupService.getGitLabGroupByName(groupName, groupToCreate.getParentId());
+        Optional<Group> optional = groupService.getGitLabGroupByName(groupToCreate.getName(), groupToCreate.getParentId());
 
         if (!optional.isPresent()) {
 
@@ -292,6 +309,35 @@ public class EngagementService {
         }
 
         return optional.get();
+
+    }
+
+    private Group updateGroupNameAndPath(String newName, String currentName, Integer parentId) {
+
+        // get existing group
+        Optional<Group> optional = groupService.getGitLabGroupByName(currentName, parentId);
+        Group existing = optional.orElseThrow(() -> 
+            new WebApplicationException("failed to find group with name '" + currentName + "'", 404));
+
+        existing.setName(newName);
+        existing.setPath(GitLabPathUtils.generateValidPath(newName));
+
+        optional = groupService.updateGitLabGroup(existing.getId(), existing);
+        return optional.orElseThrow(() -> 
+            new WebApplicationException("failed to update group name '" + newName + 
+                    "' and path '" + existing.getPath() + "'", 500));
+
+    }
+
+    private Group getCreateOrUpdateGroup(Group group, Optional<String> newGroupName) {
+
+        // get or create group if group name not changed
+        if (newGroupName.isEmpty()) {
+            return getOrCreateGroup(group);
+        }
+
+        // update name/path of group if changed
+        return updateGroupNameAndPath(newGroupName.get(), group.getName(), group.getParentId());
 
     }
 
