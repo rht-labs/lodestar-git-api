@@ -77,7 +77,7 @@ public class ProjectStructureService {
 
     }
 
-    private ProjectStructure getExistingProjectStructure(Engagement engagement, String engagementPathPrefix) {
+    ProjectStructure getExistingProjectStructure(Engagement engagement, String engagementPathPrefix) {
 
         ProjectStructureBuilder builder = ProjectStructure.builder();
         Optional<Project> project = Optional.empty();
@@ -124,7 +124,7 @@ public class ProjectStructureService {
 
     }
 
-    private Group processNameChange(String newName, Integer parentId, Optional<Group> group, boolean hasSubgroups) {
+    Group processNameChange(String newName, Integer parentId, Optional<Group> group, boolean hasSubgroups) {
 
         Optional<Group> newGroup = Optional.empty();
 
@@ -165,7 +165,7 @@ public class ProjectStructureService {
 
     }
 
-    private Group createGroup(String name, Integer parentId) {
+    Group createGroup(String name, Integer parentId) {
 
         return groupService
                 .createGitLabGroup(Group.builder().name(name).path(GitLabPathUtils.generateValidPath(name))
@@ -174,16 +174,16 @@ public class ProjectStructureService {
 
     }
 
-    private Optional<Group> getGroupByName(String name, Integer parentId) {
+    Optional<Group> getGroupByName(String name, Integer parentId) {
         return groupService.getSubgroups(parentId).stream()
                 .filter(g -> g.getName().equals(name) && g.getParentId().equals(parentId)).findFirst();
     }
 
-    private Group getOrCreateGroup(String name, Integer parentId) {
+    Group getOrCreateGroup(String name, Integer parentId) {
         return getGroupByName(name, parentId).orElseGet(() -> createGroup(name, parentId));
     }
 
-    private Optional<Project> createOrUpdateProject(Optional<Project> project,
+    Optional<Project> createOrUpdateProject(Optional<Project> project,
             Optional<Integer> existingParentIdOptional, Integer parentId) {
 
         if (project.isEmpty()) {
@@ -207,16 +207,14 @@ public class ProjectStructureService {
 
     }
 
-    private Optional<Project> createProject(Integer parentId) {
+    Optional<Project> createProject(Integer parentId) {
 
         return projectService.createProject(
                 Project.builder().name(ENGAGEMENT_PROJECT_NAME).visibility("private").namespaceId(parentId).build());
 
     }
 
-    // TODO: below should be async
-
-    private void cleanupGroups(ProjectStructure existingProjectStructure) {
+    void cleanupGroups(ProjectStructure existingProjectStructure) {
 
         // do nothing if project missing or has not been moved
         if (existingProjectStructure.getProject().isEmpty() || !existingProjectStructure.getProject().get().isMoved()) {
@@ -233,7 +231,7 @@ public class ProjectStructureService {
 
     }
 
-    private void removeGroupIfEmpty(Integer groupId, int retryCount) {
+    void removeGroupIfEmpty(Integer groupId, int retryCount) {
 
         int count = 0;
 
@@ -268,7 +266,7 @@ public class ProjectStructureService {
 
     }
 
-    public Optional<Project> findProjectByPath(String engagementPathPrefix, String customerName, String projectName) {
+    Optional<Project> findProjectByPath(String engagementPathPrefix, String customerName, String projectName) {
 
         String customerPath = GitLabPathUtils.generateValidPath(customerName);
         String projectPath = GitLabPathUtils.generateValidPath(projectName);
