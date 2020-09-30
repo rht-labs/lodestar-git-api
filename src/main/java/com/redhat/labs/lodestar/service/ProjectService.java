@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
@@ -81,8 +82,19 @@ public class ProjectService {
     }
         
     public Optional<Project> getProjectByIdOrPath(String idOrPath) {
-        Project project = gitLabService.getProjectById(idOrPath);
-        return Optional.ofNullable(project);
+
+        try {
+            return Optional.ofNullable(gitLabService.getProjectById(idOrPath));
+        } catch(WebApplicationException wae) {
+
+            if(wae.getResponse().getStatus() == 404) {
+                return Optional.empty();
+            }
+
+            throw wae;
+
+        }
+
     }
     
     // create a project
@@ -99,6 +111,7 @@ public class ProjectService {
         // try to create project
         Project createdProject = gitLabService.createProject(project);
         if (null != createdProject) {
+            createdProject.setFirst(true);
             optional = Optional.of(createdProject);
         }
 
