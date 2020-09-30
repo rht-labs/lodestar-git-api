@@ -18,6 +18,7 @@ import com.redhat.labs.lodestar.models.gitlab.Commit;
 import com.redhat.labs.lodestar.models.gitlab.DeployKey;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.models.gitlab.ProjectSearchResults;
+import com.redhat.labs.lodestar.models.gitlab.ProjectTransfer;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 
 @ApplicationScoped
@@ -143,6 +144,12 @@ public class ProjectService {
         LOGGER.debug("total commits for project {} {}", projectId, page.size());
           
         return page.getResults();
+    }
+
+    public Optional<Project> transferProject(Integer projectId, Integer newGroupId) {
+
+        return gitLabService.transferProject(projectId, ProjectTransfer.builder().id(projectId).namespace(newGroupId).build());
+
     }
 
 }

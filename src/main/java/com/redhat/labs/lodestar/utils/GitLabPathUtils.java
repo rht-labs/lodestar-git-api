@@ -37,4 +37,13 @@ public class GitLabPathUtils {
 
     }
 
+    public static String getPath(String engagementPathPrefix, String customerName, String engagementName) {
+        return new StringBuilder(engagementPathPrefix)
+                .append("/")
+                .append(customerName)
+                .append("/")
+                .append(engagementName)
+                .append("/iac").toString();
+    }
+
 }
