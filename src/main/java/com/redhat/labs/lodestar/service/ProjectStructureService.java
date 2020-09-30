@@ -11,6 +11,8 @@ import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.lodestar.models.Engagement;
 import com.redhat.labs.lodestar.models.ProjectStructure;
@@ -20,10 +22,16 @@ import com.redhat.labs.lodestar.models.gitlab.Namespace;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.utils.GitLabPathUtils;
 
+import io.quarkus.vertx.ConsumeEvent;
+import io.vertx.mutiny.core.eventbus.EventBus;
+
 @ApplicationScoped
 public class ProjectStructureService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectStructure.class);
+
     private static final String ENGAGEMENT_PROJECT_NAME = "iac";
+    private static final String CLEANUP_EVENT = "cleanup.project.structure.event";
 
     @ConfigProperty(name = "engagements.repository.id")
     Integer engagementRepositoryId;
@@ -34,7 +42,12 @@ public class ProjectStructureService {
     @Inject
     ProjectService projectService;
 
+    @Inject
+    EventBus eventBus;
+
     public Project createOrUpdateProjectStructure(Engagement engagement, String engagementPathPrefix) {
+
+        Instant begin = Instant.now();
 
         // get the existing structure if not new
         ProjectStructure existingProjectStructure = getExistingProjectStructure(engagement, engagementPathPrefix);
@@ -51,7 +64,13 @@ public class ProjectStructureService {
                 existingProjectStructure.getProjectGroupId(), projectGroup.getId());
 
         // clean up groups if project moved
-        cleanupGroups(existingProjectStructure);
+        eventBus.sendAndForget(CLEANUP_EVENT, existingProjectStructure);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("create or update project structure took {} ms",
+                    Duration.between(begin, Instant.now()).toMillis());
+            ;
+        }
 
         return project
                 .orElseThrow(() -> new WebApplicationException("failed to create or update project structure", 500));
@@ -257,6 +276,11 @@ public class ProjectStructureService {
 
         return projectService.getProjectByIdOrPath(fullPath);
 
+    }
+
+    @ConsumeEvent(value = CLEANUP_EVENT, blocking = true)
+    void consumeCleanupProjectStructureEvent(ProjectStructure existingProjectStructure) {
+        cleanupGroups(existingProjectStructure);
     }
 
 }
