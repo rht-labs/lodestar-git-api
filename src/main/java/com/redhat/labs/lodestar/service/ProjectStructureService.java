@@ -90,11 +90,10 @@ public class ProjectStructureService {
             if (project.isEmpty()) {
                 return builder.build();
             }
-        } else {
-            // get project group by id
-            project = projectService.getProjectById(engagement.getProjectId());
         }
 
+        // get project group by id
+        project = projectService.getProjectById(engagement.getProjectId());
         builder.project(project);
 
         // get project group
@@ -183,8 +182,8 @@ public class ProjectStructureService {
         return getGroupByName(name, parentId).orElseGet(() -> createGroup(name, parentId));
     }
 
-    Optional<Project> createOrUpdateProject(Optional<Project> project,
-            Optional<Integer> existingParentIdOptional, Integer parentId) {
+    Optional<Project> createOrUpdateProject(Optional<Project> project, Optional<Integer> existingParentIdOptional,
+            Integer parentId) {
 
         if (project.isEmpty()) {
             return createProject(parentId);

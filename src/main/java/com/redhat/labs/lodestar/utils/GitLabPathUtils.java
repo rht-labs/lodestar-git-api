@@ -38,7 +38,7 @@ public class GitLabPathUtils {
     }
 
     public static String getPath(String engagementPathPrefix, String customerName, String engagementName) {
-        return new StringBuilder(engagementPathPrefix)
+        return new StringBuilder(engagementPathPrefix == null ? "" : engagementPathPrefix)
                 .append("/")
                 .append(customerName)
                 .append("/")
