@@ -24,10 +24,9 @@ import com.redhat.labs.lodestar.models.Engagement;
 import com.redhat.labs.lodestar.models.Status;
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Hook;
-import com.redhat.labs.lodestar.models.gitlab.Namespace;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
-import com.redhat.labs.lodestar.utils.GitLabPathUtils;
+import com.redhat.labs.lodestar.utils.MockUtils;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
@@ -42,25 +41,12 @@ public class EngagementServiceTest {
     @RestClient
     GitLabService gitLabService;
 
-    // create engagement new project - DONE
-    // create engagement update project - DONE
-    // create engagement group fail
-    // engagement by namespace not found
-    // commit file fail
-    // get hooks none
-    // test no status
-
-    Integer repoId = 2;
-    Integer customerGroupId = 2222;
-    Integer projectGroupId = 3333;
-    Integer projectId = 4444;
-
     @Test void testCreateEngagementNewProject() {
 
         // given
-        Group customerGroup = mockCustomerGroup("new");
-        Group projectGroup = mockProjectGroup("new2");
-        Project iacProject = mockIacProject();
+        Group customerGroup = MockUtils.mockCustomerGroup("new");
+        Group projectGroup = MockUtils.mockProjectGroup("new2");
+        Project iacProject = MockUtils.mockIacProject();
 
         // no project exists with id or customer/project name combo
         given(gitLabService.getProjectById(Mockito.anyString())).willReturn(null);
@@ -86,14 +72,14 @@ public class EngagementServiceTest {
     @Test void testCreateEngagementUpdateProject() {
 
         // given
-        Group customerGroup = mockCustomerGroup("updated");
-        Group projectGroup = mockProjectGroup("updated2");
-        Project iacProject = mockIacProject();
+        Group customerGroup = MockUtils.mockCustomerGroup("updated");
+        Group projectGroup = MockUtils.mockProjectGroup("updated2");
+        Project iacProject = MockUtils.mockIacProject();
 
         // all projects and groups exist, no customer group subgroups
         given(gitLabService.getProjectById(Mockito.anyString())).willReturn(iacProject);
-        given(gitLabService.getGroupByIdOrPath(String.valueOf(projectGroupId))).willReturn(projectGroup);
-        given(gitLabService.getGroupByIdOrPath(String.valueOf(customerGroupId))).willReturn(customerGroup);
+        given(gitLabService.getGroupByIdOrPath(String.valueOf(MockUtils.PROJECT_GROUP_ID))).willReturn(projectGroup);
+        given(gitLabService.getGroupByIdOrPath(String.valueOf(MockUtils.CUSTOMER_GROUP_ID))).willReturn(customerGroup);
         given(gitLabService.getSubGroups(Mockito.anyInt(), Mockito.any(Integer.class), Mockito.any(Integer.class)))
                 .willReturn(Response.ok(Arrays.asList()).header("X-Total-Pages", 1).build());
 
@@ -103,7 +89,7 @@ public class EngagementServiceTest {
         // no webhooks
         given(gitLabService.getFile(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).willReturn(null);
 
-        Engagement e = Engagement.builder().projectId(projectId).customerName("updated").projectName("updated2")
+        Engagement e = Engagement.builder().projectId(MockUtils.PROJECT_ID).customerName("updated").projectName("updated2")
                 .build();
         Project project = engagementService.createEngagement(e, "Test Banana", "test@test.com");
         assertFalse(project.isFirst());
@@ -142,9 +128,9 @@ public class EngagementServiceTest {
     @Test void testCreateEngagementCommitFileFail() {
 
         // given
-        Group customerGroup = mockCustomerGroup("project1");
-        Group projectGroup = mockProjectGroup("project1");
-        Project iacProject = mockIacProject();
+        Group customerGroup = MockUtils.mockCustomerGroup("project1");
+        Group projectGroup = MockUtils.mockProjectGroup("project1");
+        Project iacProject = MockUtils.mockIacProject();
 
         // no project exists with id or customer/project name combo
         given(gitLabService.getProjectById(Mockito.anyString())).willReturn(null);
@@ -169,8 +155,8 @@ public class EngagementServiceTest {
 
     @Test void testGetHooksNone() {
 
-        given(gitLabService.getProjectById(Mockito.anyString())).willReturn(mockIacProject());
-        given(gitLabService.getProjectHooks(projectId)).willReturn(Arrays.asList());
+        given(gitLabService.getProjectById(Mockito.anyString())).willReturn(MockUtils.mockIacProject());
+        given(gitLabService.getProjectHooks(MockUtils.PROJECT_ID)).willReturn(Arrays.asList());
 
         List<Hook> hooks = engagementService.getHooks("nope", "nada");
         assertNotNull(hooks);
@@ -186,29 +172,6 @@ public class EngagementServiceTest {
         assertNull(status);
     }
 
-    private Group mockCustomerGroup(String customerName) {
-        return mockGroup(customerName, customerGroupId, repoId);
-    }
 
-    private Group mockProjectGroup(String projectName) {
-        return mockGroup(projectName, projectGroupId, customerGroupId);
-    }
-
-    private Project mockIacProject() {
-        return mockProject(projectId, "iac", "private", mockNamespace(projectGroupId, customerGroupId));
-    }
-
-    private Group mockGroup(String name, Integer groupId, Integer parentId) {
-        return Group.builder().id(groupId).name(name).path(GitLabPathUtils.generateValidPath(name)).parentId(parentId)
-                .build();
-    }
-
-    private Project mockProject(Integer id, String name, String visibility, Namespace namespace) {
-        return Project.builder().id(id).name(name).visibility(visibility).namespace(namespace).build();
-    }
-
-    private Namespace mockNamespace(Integer id, Integer parentId) {
-        return Namespace.builder().id(id).parentId(parentId).build();
-    }
 
 }

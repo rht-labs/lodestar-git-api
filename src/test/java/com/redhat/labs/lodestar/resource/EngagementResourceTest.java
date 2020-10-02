@@ -2,17 +2,36 @@ package com.redhat.labs.lodestar.resource;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.BDDMockito.given;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+
+import javax.ws.rs.core.Response;
+
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 
+import com.redhat.labs.lodestar.models.gitlab.File;
+import com.redhat.labs.lodestar.models.gitlab.Group;
+import com.redhat.labs.lodestar.models.gitlab.Project;
+import com.redhat.labs.lodestar.rest.client.GitLabService;
+import com.redhat.labs.lodestar.utils.EncodingUtils;
+import com.redhat.labs.lodestar.utils.MockUtils;
 import com.redhat.labs.lodestar.utils.ResourceLoader;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.mockito.InjectMock;
 import io.restassured.http.ContentType;
 
 @QuarkusTest
 class EngagementResourceTest {
 
+    @InjectMock
+    @RestClient
+    GitLabService gitLabService;
     
     @Test
     void testGetAllEngagementsSuccess() {
@@ -53,6 +72,27 @@ class EngagementResourceTest {
     
     @Test
     void testCreateEngagementSuccess() {
+
+        Group customerGroup = MockUtils.mockCustomerGroup("new");
+        Group projectGroup = MockUtils.mockProjectGroup("new2");
+        Project iacProject = MockUtils.mockIacProject();
+
+        // no project exists with id or customer/project name combo
+        BDDMockito.given(gitLabService.getProjectById(Mockito.anyString())).willReturn(null);
+        BDDMockito.given(gitLabService.getSubGroups(Mockito.anyInt(), Mockito.any(Integer.class), Mockito.any(Integer.class)))
+                .willReturn(Response.ok(Arrays.asList()).header("X-Total-Pages", 1).build());
+
+        // create groups
+        BDDMockito.given(gitLabService.createGroup(Mockito.any(Group.class))).willReturn(customerGroup, projectGroup);
+        BDDMockito.given(gitLabService.createProject(Mockito.any(Project.class))).willReturn(iacProject);
+
+        // make file commit succeed
+        BDDMockito.given(gitLabService.commitMultipleFiles(Mockito.anyInt(), Mockito.any()))
+                .willReturn(Response.status(201).build());
+        // no webhooks
+        BDDMockito.given(gitLabService.getFile(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).willReturn(null);
+
+
         given()
             .when()
                 .contentType(ContentType.JSON)
@@ -66,6 +106,24 @@ class EngagementResourceTest {
 
     @Test
     void testUpdateEngagementSuccess() {
+
+        Group customerGroup = MockUtils.mockCustomerGroup("customer A");
+        Group projectGroup = MockUtils.mockProjectGroup("project1");
+        Project iacProject = MockUtils.mockIacProject();
+
+        // all projects and groups exist, no customer group subgroups
+        BDDMockito.given(gitLabService.getProjectById(Mockito.anyString())).willReturn(iacProject);
+        BDDMockito.given(gitLabService.getGroupByIdOrPath(String.valueOf(MockUtils.PROJECT_GROUP_ID))).willReturn(projectGroup);
+        BDDMockito.given(gitLabService.getGroupByIdOrPath(String.valueOf(MockUtils.CUSTOMER_GROUP_ID))).willReturn(customerGroup);
+        BDDMockito.given(gitLabService.getSubGroups(Mockito.anyInt(), Mockito.any(Integer.class), Mockito.any(Integer.class)))
+                .willReturn(Response.ok(Arrays.asList()).header("X-Total-Pages", 1).build());
+
+        // make file commit succeed
+        BDDMockito.given(gitLabService.commitMultipleFiles(Mockito.anyInt(), Mockito.any()))
+                .willReturn(Response.status(201).build());
+        // no webhooks
+        BDDMockito.given(gitLabService.getFile(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).willReturn(null);
+
         given()
             .when()
                 .contentType(ContentType.JSON)
@@ -124,6 +182,11 @@ class EngagementResourceTest {
     
     @Test
     void testGetStatusSuccess() {
+
+        String content = ResourceLoader.load("status.json");
+        content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
+        BDDMockito.given(gitLabService.getFile(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).willReturn(File.builder().content(content).build());
+
         given()
             .when()
                 .contentType(ContentType.JSON)
