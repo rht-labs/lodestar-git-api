@@ -56,5 +56,6 @@ public class Engagement {
 
     private List<Artifact> artifacts;
     private String commitMessage;
+    private List<UseCase> useCases;
 
 }
