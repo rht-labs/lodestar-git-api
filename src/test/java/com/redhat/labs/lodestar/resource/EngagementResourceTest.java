@@ -2,20 +2,26 @@ package com.redhat.labs.lodestar.resource;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.BDDMockito.given;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 
+import com.redhat.labs.lodestar.config.JsonMarshaller;
+import com.redhat.labs.lodestar.models.gitlab.Commit;
 import com.redhat.labs.lodestar.models.gitlab.File;
 import com.redhat.labs.lodestar.models.gitlab.Group;
+import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 import com.redhat.labs.lodestar.utils.EncodingUtils;
@@ -32,9 +38,42 @@ class EngagementResourceTest {
     @InjectMock
     @RestClient
     GitLabService gitLabService;
-    
+
+    @BeforeEach
+    void setup() {
+
+        // set the engagement path prefix
+        Group g = Group.builder().fullPath("top/dog").build();
+        BDDMockito.given(gitLabService.getGroupByIdOrPath("2")).willReturn(g);
+
+    }
+
     @Test
     void testGetAllEngagementsSuccess() {
+
+        // get engagements by group
+        List<Project> projects = new ArrayList<>();
+        projects.add(Project.builder().id(2 * 10).name("Project " + (2*10)).build());
+        Response r = Response.ok(projects).header("X-Total-Pages", 1).build();
+        BDDMockito.given(gitLabService.getProjectsbyGroup(2, true, 100, 1)).willReturn(r);
+
+        // get engagement file
+        String content = ResourceLoader.load("engagement.json");
+        content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
+        File f = File.builder().filePath("engagement.json").content(content).build();
+        BDDMockito.given(gitLabService.getFile("20", "engagement.json", "master")).willReturn(f);
+
+        // get commits
+        BDDMockito.given(gitLabService.getCommitLog("0", 100, 1))
+            .willReturn(Response.ok(new ArrayList<Commit>()).header("X-Total-Pages", 0).build());
+
+
+        // get status file
+        String statusContent = ResourceLoader.load("status.json");
+        content = new String(EncodingUtils.base64Encode(statusContent.getBytes()), StandardCharsets.UTF_8);
+        File statusFile = File.builder().filePath("status.json").content(content).build();
+        BDDMockito.given(gitLabService.getFile("20", "status.json", "master")).willReturn(statusFile);
+
         
         given()
             .when()
@@ -57,6 +96,16 @@ class EngagementResourceTest {
     
     @Test
     void tesetGetEngagementByNamespace() {
+
+        BDDMockito.given(gitLabService.getProjectById(Mockito.anyString())).willReturn(Project.builder().id(66).build());
+        String content = ResourceLoader.load("engagement.json");
+        content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
+        File f =  File.builder().filePath("engagement.json").content(content).build();
+        BDDMockito.given(gitLabService.getFile("66", "engagement.json", "master")).willReturn(f);
+        BDDMockito.given(
+                gitLabService.getCommitLog(Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
+                .willReturn(Response.ok(new ArrayList<Commit>()).header("X-Total-Pages", 0).build());
+
         given()
             .pathParam("namespace", "top/dog/jello/tutti-frutti/iac")
             .when()
@@ -137,6 +186,16 @@ class EngagementResourceTest {
     
     @Test
     void testGetWebhooksSuccess() {
+
+        Project p = Project.builder().id(99).build();
+        BDDMockito.given(gitLabService.getProjectById("top/dog/jello/lemon/iac")).willReturn(p);
+
+        List<Hook> hookList = new ArrayList<>();
+        Hook hook = Hook.builder().id(13).url("http://webhook.edu/hook").token("token").projectId(99)
+                    .pushEvents(true).pushEventsBranchFilter("master").build();
+        hookList.add(hook);
+        BDDMockito.given(gitLabService.getProjectHooks(99)).willReturn(hookList);
+
         given()
             .when()
                 .contentType(ContentType.JSON)
@@ -149,6 +208,17 @@ class EngagementResourceTest {
     
     @Test
     void testCreateProjectHookSuccess() {
+
+        // Get Project
+        Project p = Project.builder().id(66).build();
+        BDDMockito.given(gitLabService.getProjectById("top/dog/jello/tutti-frutti/iac")).willReturn(p);
+
+        // Get Hooks for Project
+        // Create Hook
+        BDDMockito.given(gitLabService.createProjectHook(Mockito.eq(66), Mockito.any(Hook.class)))
+            .willReturn(Response.status(Status.CREATED).build());
+
+
         given()
             .when()
                 .contentType(ContentType.JSON)
@@ -202,6 +272,28 @@ class EngagementResourceTest {
     
     @Test
     void testGetProjectSuccess() {
+
+        // get engagements by group
+        Project p = Project.builder().id(2 * 10).name("Project " + (2*10)).build();
+        BDDMockito.given(gitLabService.getProjectById("top/dog/jello/lemon/iac")).willReturn(p);
+
+        // get engagement file
+        String content = ResourceLoader.load("engagement.json");
+        content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
+        File f = File.builder().filePath("engagement.json").content(content).build();
+        BDDMockito.given(gitLabService.getFile("20", "engagement.json", "master")).willReturn(f);
+
+        // get commits
+        BDDMockito.given(gitLabService.getCommitLog("0", 100, 1))
+            .willReturn(Response.ok(new ArrayList<Commit>()).header("X-Total-Pages", 0).build());
+
+        // get status file
+        String statusContent = ResourceLoader.load("status.json");
+        content = new String(EncodingUtils.base64Encode(statusContent.getBytes()), StandardCharsets.UTF_8);
+        File statusFile = File.builder().filePath("status.json").content(content).build();
+        BDDMockito.given(gitLabService.getFile("20", "status.json", "master")).willReturn(statusFile);
+
+
         given()
             .when()
                 .contentType(ContentType.JSON)
@@ -221,6 +313,14 @@ class EngagementResourceTest {
     
     @Test
     void testGetCommitsSuccess() {
+
+        Group g = Group.builder().fullPath("top/dog").build();
+        BDDMockito.given(gitLabService.getGroupByIdOrPath("2")).willReturn(g);
+        String content = ResourceLoader.load("commits.yaml");
+        List<Commit> commitList = new JsonMarshaller().fromYaml(content, Commit.class);
+        Response r = Response.ok(commitList).header("X-Total-Pages", 1).build();
+        BDDMockito.given(gitLabService.getCommitLog("top/dog/jello/lemon/iac", 100, 1)).willReturn(r);
+
         given()
             .when()
                 .contentType(ContentType.JSON)
