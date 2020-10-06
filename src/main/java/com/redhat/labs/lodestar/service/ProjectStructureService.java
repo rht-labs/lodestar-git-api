@@ -93,7 +93,9 @@ public class ProjectStructureService {
         }
 
         // get project group by id
-        project = projectService.getProjectById(engagement.getProjectId());
+        if(project.isEmpty()) {
+            project = projectService.getProjectById(engagement.getProjectId());
+        }
         builder.project(project);
 
         // get project group
