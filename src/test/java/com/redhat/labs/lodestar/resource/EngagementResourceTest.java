@@ -3,29 +3,17 @@ package com.redhat.labs.lodestar.resource;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
-import org.mockito.Mockito;
 
-import com.redhat.labs.lodestar.config.JsonMarshaller;
-import com.redhat.labs.lodestar.models.gitlab.Commit;
-import com.redhat.labs.lodestar.models.gitlab.CommitMultiple;
-import com.redhat.labs.lodestar.models.gitlab.File;
 import com.redhat.labs.lodestar.models.gitlab.Group;
-import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
-import com.redhat.labs.lodestar.utils.EncodingUtils;
 import com.redhat.labs.lodestar.utils.MockUtils;
 import com.redhat.labs.lodestar.utils.ResourceLoader;
 
@@ -45,7 +33,7 @@ class EngagementResourceTest {
 
         // set the engagement path prefix
         Group g = Group.builder().fullPath("top/dog").build();
-        BDDMockito.given(gitLabService.getGroupByIdOrPath("2")).willReturn(g);
+        MockUtils.setGetGroupByIdOrPathMock(gitLabService, 2, g);
 
     }
 
@@ -55,17 +43,17 @@ class EngagementResourceTest {
         // get engagements by group
         List<Project> projects = new ArrayList<>();
         projects.add(Project.builder().id(20).name("Project " + (20)).build());
-        setGetProjectsByGroupMock(20, projects);
+        MockUtils.setGetProjectsByGroupMock(gitLabService, 20, projects);
 
         // get engagement file
-        setGetFileForEngagementJsonMock(20, true);
+        MockUtils.setGetFileForEngagementJsonMock(gitLabService, 20, true);
 
         // get commits
-        setGetCommitLogMock(0, 0);
+        MockUtils.setGetCommitLogMock(gitLabService, 0, 0);
 
 
         // get status file
-        setGetFileForStatusJsonMock(20, true);
+        MockUtils.setGetFileForStatusJsonMock(gitLabService, 20, true);
 
         given()
             .when()
@@ -90,13 +78,13 @@ class EngagementResourceTest {
     void tesetGetEngagementByNamespace() {
 
         // get projects by id
-        Integer projectId = setGetProjectByPathMock("top/dog/jello/tutti-frutti/iac", true, Optional.empty());
+        Integer projectId = MockUtils.setGetProjectByPathMock(gitLabService, "top/dog/jello/tutti-frutti/iac", true, Optional.empty());
 
         // get engagement json
-        setGetFileForEngagementJsonMock(projectId, true);
+        MockUtils.setGetFileForEngagementJsonMock(gitLabService, projectId, true);
 
         // get commit log
-        setGetCommitLogMock(0, 0);
+        MockUtils.setGetCommitLogMock(gitLabService, 0, 0);
 
         given()
             .pathParam("namespace", "top/dog/jello/tutti-frutti/iac")
@@ -118,12 +106,12 @@ class EngagementResourceTest {
         Group projectGroup = MockUtils.mockProjectGroup("new2");
         Project iacProject = MockUtils.mockIacProject();
 
-        setGetProjectByIdMock(null, false, Optional.empty());
-        setGetSubgroupsMock(Optional.empty(), false);
-        setCreateGroupMock(customerGroup, projectGroup);
-        setCreateProjectMock(iacProject);
-        setCommitMultipleFilesMock(true);
-        setGetFileMock("runtime/webhooks.yaml", String.valueOf(iacProject.getId()), false);
+        MockUtils.setGetProjectByIdMock(gitLabService, null, false, Optional.empty());
+        MockUtils.setGetSubgroupsMock(gitLabService, Optional.empty(), false);
+        MockUtils.setCreateGroupMock(gitLabService, customerGroup, projectGroup);
+        MockUtils.setCreateProjectMock(gitLabService, iacProject);
+        MockUtils.setCommitMultipleFilesMock(gitLabService, true);
+        MockUtils.setGetFileMock(gitLabService, "runtime/webhooks.yaml", String.valueOf(iacProject.getId()), false);
 
         given()
             .when()
@@ -143,12 +131,12 @@ class EngagementResourceTest {
         Group projectGroup = MockUtils.mockProjectGroup("project1");
         Project iacProject = MockUtils.mockIacProject();
 
-        setGetProjectByIdMock(iacProject.getId(), true, Optional.of(iacProject));
-        setGetGroupByIdOrPathMock(customerGroup.getId(), customerGroup);
-        setGetGroupByIdOrPathMock(projectGroup.getId(), projectGroup);
-        setGetSubgroupsMock(Optional.empty(), false);
-        setCommitMultipleFilesMock(true);
-        setGetFileMock("runtime/webhooks.yaml", String.valueOf(iacProject.getId()), false);
+        MockUtils.setGetProjectByIdMock(gitLabService, iacProject.getId(), true, Optional.of(iacProject));
+        MockUtils.setGetGroupByIdOrPathMock(gitLabService, customerGroup.getId(), customerGroup);
+        MockUtils.setGetGroupByIdOrPathMock(gitLabService, projectGroup.getId(), projectGroup);
+        MockUtils.setGetSubgroupsMock(gitLabService, Optional.empty(), false);
+        MockUtils.setCommitMultipleFilesMock(gitLabService, true);
+        MockUtils.setGetFileMock(gitLabService, "runtime/webhooks.yaml", String.valueOf(iacProject.getId()), false);
 
         given()
             .when()
@@ -165,8 +153,8 @@ class EngagementResourceTest {
     void testGetWebhooksSuccess() {
 
         Project p = Project.builder().id(99).build();
-        setGetProjectByPathMock("top/dog/jello/lemon/iac", true, Optional.of(p));
-        setGetProjectHookMock(99);
+        MockUtils.setGetProjectByPathMock(gitLabService, "top/dog/jello/lemon/iac", true, Optional.of(p));
+        MockUtils.setGetProjectHookMock(gitLabService, 99);
 
         given()
             .when()
@@ -183,8 +171,8 @@ class EngagementResourceTest {
 
         // Get Project
         Project p = Project.builder().id(66).build();
-        setGetProjectByPathMock("top/dog/jello/tutti-frutti/iac", true, Optional.of(p));
-        setCreateProjectHookMock(66);
+        MockUtils.setGetProjectByPathMock(gitLabService, "top/dog/jello/tutti-frutti/iac", true, Optional.of(p));
+        MockUtils.setCreateProjectHookMock(gitLabService, 66);
 
         given()
             .when()
@@ -220,7 +208,7 @@ class EngagementResourceTest {
     @Test
     void testGetStatusSuccess() {
 
-        setGetFileForStatusJsonMock("top/dog/jello/lemon/iac", true);
+        MockUtils.setGetFileForStatusJsonMock(gitLabService, "top/dog/jello/lemon/iac", true);
 
         given()
             .when()
@@ -239,10 +227,10 @@ class EngagementResourceTest {
     void testGetProjectSuccess() {
 
         Project p = Project.builder().id(20).name("Project " + (20)).build();
-        setGetProjectByPathMock("top/dog/jello/lemon/iac", true, Optional.of(p));
-        setGetFileForEngagementJsonMock(20, true);
-        setGetCommitLogMock(0, 0);
-        setGetFileForStatusJsonMock(20, true);
+        MockUtils.setGetProjectByPathMock(gitLabService, "top/dog/jello/lemon/iac", true, Optional.of(p));
+        MockUtils.setGetFileForEngagementJsonMock(gitLabService, 20, true);
+        MockUtils.setGetCommitLogMock(gitLabService, 0, 0);
+        MockUtils.setGetFileForStatusJsonMock(gitLabService, 20, true);
 
         given()
             .when()
@@ -264,7 +252,7 @@ class EngagementResourceTest {
     @Test
     void testGetCommitsSuccess() {
 
-        setGetCommitLogMock("top/dog/jello/lemon/iac", 1);
+        MockUtils.setGetCommitLogMock(gitLabService, "top/dog/jello/lemon/iac", 1);
 
         given()
             .when()
@@ -281,137 +269,6 @@ class EngagementResourceTest {
                         + "\"short_id\":\"7865570d\",\"title\":\"Update status.json\",\"web_url\":\"https://gitlab.example.com/store/jello/lemon/iac/-/commit/7865570dc63b1463d9fb4d02bd09ff46d244e694\"},{\"author_email\":\"mmarner@example.com\","
                         + "\"author_name\":\"Mitch Marner\",\"authored_date\":\"2020-06-04T22:34:10.000+00:00\",\"committed_date\":\"2020-06-04T22:34:10.000+00:00\",\"id\":\"dd0cc0fa7868210e2eb5a030f07cc0221dd6bc9f\","
                         + "\"message\":\"Bump OCP version (jacob test)\",\"short_id\":\"dd0cc0fa\",\"title\":\"Bump OCP version (test)\",\"web_url\":\"https://gitlab.example.com/store/jello/lemon/iac/-/commit/dd0cc0fa7868210e2eb5a030f07cc0221dd6bc9f\"}]"));
-    }
-
-    ///////////////////////
-    
-    // get projects by group
-    void setGetProjectsByGroupMock(Integer projectId, List<Project> projects) {
-        Response r = Response.ok(projects).header("X-Total-Pages", 1).build();
-        BDDMockito.given(gitLabService.getProjectsbyGroup(2, true, 100, 1)).willReturn(r);
-    }
-
-    // get projects by id/path
-    Integer setGetProjectByPathMock(String path, boolean projectExists, Optional<Project> projectToReturn) {
-        Project p = null;
-        if(projectExists) {
-            p = projectToReturn.orElse(Project.builder().id(path.length()).build());
-        }
-        BDDMockito.given(gitLabService.getProjectById(Mockito.eq(path))).willReturn(p);
-        return path.length();
-    }
-
-    void setGetProjectByIdMock(Integer id, boolean projectExists, Optional<Project> projectToReturn) {
-        Project p = null;
-        if(projectExists) {
-            p = projectToReturn .orElse(Project.builder().id(id).build());
-        }
-        BDDMockito.given(gitLabService.getProjectById(Mockito.eq(String.valueOf(id)))).willReturn(p);
-    }
-
-    boolean isIdOrPathNumeric(String idOrPath) {
-        try {
-            Integer.valueOf(idOrPath);
-            return true;
-        } catch(NumberFormatException e) {
-            return false;
-        }
-
-    }
-
-    // get engagement file
-    void setGetFileForEngagementJsonMock(Integer projectId, boolean exists) {
-        setGetFileMock("engagement.json", String.valueOf(projectId), exists);
-    }
-
-    // get commits
-    void setGetCommitLogMock(Integer projectId, Integer expectedPagesReturned) {
-        setGetCommitLogMock(String.valueOf(projectId), expectedPagesReturned);
-    }
-
-    void setGetCommitLogMock(String projectIdOrPath, Integer expectedPagesReturned) {
-
-        List<Commit> commitList = new ArrayList<Commit>();
-
-        if (expectedPagesReturned > 0) {
-            String content = ResourceLoader.load("commits.yaml");
-            commitList = new JsonMarshaller().fromYaml(content, Commit.class);
-        }
-
-        BDDMockito.given(gitLabService.getCommitLog(projectIdOrPath, 100, 1))
-            .willReturn(Response.ok(commitList).header("X-Total-Pages", expectedPagesReturned).build());
-
-    }
-
-    // get status file
-    void setGetFileForStatusJsonMock(Integer projectId, boolean exists) {
-        setGetFileForStatusJsonMock(String.valueOf(projectId), exists);
-    }
-
-    void setGetFileForStatusJsonMock(String path, boolean exists) {
-        setGetFileMock("status.json", path, exists);
-    }
-
-    void setGetFileMock(String fileName, String projectIdOrPath, boolean exists) {
-
-        File file = null;
-        if (exists) {
-            String content = ResourceLoader.load(fileName);
-            content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
-            file = File.builder().filePath(fileName).content(content).build();
-        }
-        BDDMockito.given(gitLabService.getFile(projectIdOrPath, fileName, "master")).willReturn(file);
-
-    }
-
-    // get subgroups
-    void setGetSubgroupsMock(Optional<Integer> groupId, boolean hasSubgroups) {
-
-        List<Group> groups = new ArrayList<Group>();
-        // TODO:  add more if required
-
-        BDDMockito.given(gitLabService.getSubGroups(Mockito.anyInt(), Mockito.eq(100), Mockito.eq(1)))
-            .willReturn(Response.ok(groups).header("X-Total-Pages", 1).build());
-
-    }
-
-    // create group
-    void setCreateGroupMock(Group customerGroup, Group projectGroup) {
-        BDDMockito.given(gitLabService.createGroup(Mockito.any(Group.class))).willReturn(customerGroup, projectGroup);
-    }
-
-    // create project
-    void setCreateProjectMock(Project project) {
-        BDDMockito.given(gitLabService.createProject(Mockito.any(Project.class))).willReturn(project);
-    }
-
-    // commit multiple files
-    void setCommitMultipleFilesMock(boolean succeed) {
-        int statusCode = succeed ? 201 : 500;
-        BDDMockito.given(gitLabService.commitMultipleFiles(Mockito.anyInt(), Mockito.any(CommitMultiple.class)))
-            .willReturn(Response.status(statusCode).build());
-    }
-
-    // get group by id or path
-    void setGetGroupByIdOrPathMock(Integer groupId, Group group) {
-        BDDMockito.given(gitLabService.getGroupByIdOrPath(String.valueOf(groupId))).willReturn(group);
-    }
-
-    // get project hooks
-    void setGetProjectHookMock(Integer projectId) {
-
-        List<Hook> hookList = new ArrayList<>();
-        Hook hook = Hook.builder().id(13).url("http://webhook.edu/hook").token("token").projectId(projectId)
-                    .pushEvents(true).pushEventsBranchFilter("master").build();
-        hookList.add(hook);
-        BDDMockito.given(gitLabService.getProjectHooks(projectId)).willReturn(hookList);
-
-    }
-
-    // create project hooks
-    void setCreateProjectHookMock(Integer projectId) {
-        BDDMockito.given(gitLabService.createProjectHook(Mockito.eq(projectId), Mockito.any(Hook.class)))
-            .willReturn(Response.status(Status.CREATED).build());
     }
 
 }
