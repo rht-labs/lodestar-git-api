@@ -65,7 +65,7 @@ Deployment template will read from the above secret and inject following env var
 
 | Name | Example Value | Required |
 |------|---------------|----------|
-| OMMIT_FILTERED_EMAIL_LIST | bot@bot.com,tob@tob.com | False |
+| COMMIT_FILTERED_EMAIL_LIST | bot@bot.com,tob@tob.com | False |
 
 ### Config Resource 
 
