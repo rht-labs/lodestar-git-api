@@ -161,6 +161,7 @@ public class ProjectService {
         LOGGER.debug("total commits for project {} {}", projectId, page.size());
           
         return page.getResults().stream().filter(e -> !commitFilteredEmails.contains(e.getAuthorEmail())).collect(Collectors.toList());
+
     }
 
     public Optional<Project> transferProject(Integer projectId, Integer newGroupId) {
