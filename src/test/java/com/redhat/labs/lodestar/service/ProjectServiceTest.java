@@ -101,7 +101,7 @@ class ProjectServiceTest {
     @Test void getCommitsMultiPage() {
         List<Commit> commits = projectService.getCommitLog("multi/page/iac");
         assertNotNull(commits);
-        assertEquals(8, commits.size());
+        assertEquals(6, commits.size());
         
     }
 }

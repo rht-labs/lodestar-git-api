@@ -2,6 +2,7 @@ package com.redhat.labs.lodestar.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -35,6 +36,9 @@ public class ProjectService {
     
     @ConfigProperty(name = "commit.page.size")
     int commitPageSize;
+    
+    @ConfigProperty(name = "commit.filter.list")
+    List<String> commitFilteredEmails;
 
     // get a project - this could be a replaced by a direct call to the project via the path
     // but must consider changes to the path for special characters
@@ -156,7 +160,7 @@ public class ProjectService {
         
         LOGGER.debug("total commits for project {} {}", projectId, page.size());
           
-        return page.getResults();
+        return page.getResults().stream().filter(e -> !commitFilteredEmails.contains(e.getAuthorEmail())).collect(Collectors.toList());
     }
 
     public Optional<Project> transferProject(Integer projectId, Integer newGroupId) {
