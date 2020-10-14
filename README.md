@@ -61,7 +61,7 @@ Deployment template will read from the above secret and inject following env var
 | GITLAB_API_URL | https://acmegit.com | True |
 | DEPLOY_KEY | 0 | True |
 
-### COMMITS
+### Commits
 
 | Name | Example Value | Required |
 |------|---------------|----------|
