@@ -1,6 +1,7 @@
 package com.redhat.labs.lodestar.service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -102,7 +103,7 @@ public class ConfigService {
         if (Files.isReadable(path)) {
             LOGGER.debug("Loading config file {}", file);
             try {
-                return new String(Files.readAllBytes(path));
+                return new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             } catch (IOException e) {
                 LOGGER.error(String.format("Found but unable to read file %s", file), e);
             }
