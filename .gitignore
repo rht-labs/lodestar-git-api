@@ -1,6 +1,7 @@
 .applier/roles
 .idea/
 .adhoc
+.env
 
 # Created by https://www.gitignore.io/api/code,java,linux,macos,windows,eclipse,java-web,intellij
 # Edit at https://www.gitignore.io/?templates=code,java,linux,macos,windows,eclipse,java-web,intellij
