@@ -219,6 +219,7 @@ public class EngagementService {
         
         return engagement;
     }
+
     
     private Optional<Engagement> getEngagement(Project project, boolean includeStatus) {
         Engagement engagement = null;
