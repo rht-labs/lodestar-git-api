@@ -1,6 +1,7 @@
 package com.redhat.labs.lodestar.rest.client;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -14,19 +15,23 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.annotation.ClientHeaderParam;
+import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import org.jboss.resteasy.annotations.jaxrs.PathParam;
 
+import com.redhat.labs.lodestar.exception.mapper.GitLabServiceResponseMapper;
 import com.redhat.labs.lodestar.models.gitlab.CommitMultiple;
 import com.redhat.labs.lodestar.models.gitlab.DeployKey;
 import com.redhat.labs.lodestar.models.gitlab.File;
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.Project;
+import com.redhat.labs.lodestar.models.gitlab.ProjectTransfer;
 import com.redhat.labs.lodestar.resources.filter.Logged;
 
 @Path("/api/v4")
 @RegisterRestClient(configKey = "gitlab.api")
+@RegisterProvider(value = GitLabServiceResponseMapper.class, priority = 50)
 @ClientHeaderParam(name = "Private-Token", value = "{com.redhat.labs.lodestar.config.GitLabConfig.getPersonalAccessToken}")
 public interface GitLabService {
 
@@ -40,7 +45,7 @@ public interface GitLabService {
     //reference: https://docs.gitlab.com/ee/api/groups.html#list-a-groups-subgroups
     @GET
     @Path("/groups/{id}/subgroups")
-    List<Group> getSubGroups(@PathParam("id") @Encoded Integer groupId); 
+    Response getSubGroups(@PathParam("id") @Encoded Integer groupId, @QueryParam("per_page") Integer perPage, @QueryParam("page") Integer page); 
 
     // reference: https://docs.gitlab.com/ee/api/groups.html#new-group
     @POST
@@ -131,6 +136,12 @@ public interface GitLabService {
     @Produces("application/json")
     @Consumes("application/json")
     List<Hook> getProjectHooks(@PathParam("id") @Encoded Integer projectId);
+
+    @PUT
+    @Logged
+    @Path("/projects/{id}/transfer")
+    @Produces("application/json")
+    Optional<Project> transferProject(@PathParam("id") @Encoded Integer projectId, ProjectTransfer projectTransfer);
 
     // FILES
 

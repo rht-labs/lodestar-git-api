@@ -133,10 +133,12 @@ public class Project {
     private Boolean packagesEnabled;
     @JsonbProperty("path_with_namespace")
     private String pathWithNamespace;
-    
+    private Namespace namespace;
 
     @JsonbTransient
     private boolean first;
+    @JsonbTransient
+    private boolean moved;
 
     // TODO: Can expose avatar as well, just need to figure out what type to use.
     // avatar mixed no Image file for avatar of the group. Introduced in GitLab 12.9

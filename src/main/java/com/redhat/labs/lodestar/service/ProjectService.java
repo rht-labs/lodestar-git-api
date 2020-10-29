@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
@@ -19,6 +20,7 @@ import com.redhat.labs.lodestar.models.gitlab.Commit;
 import com.redhat.labs.lodestar.models.gitlab.DeployKey;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.models.gitlab.ProjectSearchResults;
+import com.redhat.labs.lodestar.models.gitlab.ProjectTransfer;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 
 @ApplicationScoped
@@ -84,8 +86,19 @@ public class ProjectService {
     }
         
     public Optional<Project> getProjectByIdOrPath(String idOrPath) {
-        Project project = gitLabService.getProjectById(idOrPath);
-        return Optional.ofNullable(project);
+
+        try {
+            return Optional.ofNullable(gitLabService.getProjectById(idOrPath));
+        } catch(WebApplicationException wae) {
+
+            if(wae.getResponse().getStatus() == 404) {
+                return Optional.empty();
+            }
+
+            throw wae;
+
+        }
+
     }
     
     // create a project
@@ -102,6 +115,7 @@ public class ProjectService {
         // try to create project
         Project createdProject = gitLabService.createProject(project);
         if (null != createdProject) {
+            createdProject.setFirst(true);
             optional = Optional.of(createdProject);
         }
 
@@ -147,6 +161,13 @@ public class ProjectService {
         LOGGER.debug("total commits for project {} {}", projectId, page.size());
           
         return page.getResults().stream().filter(e -> !commitFilteredEmails.contains(e.getAuthorEmail())).collect(Collectors.toList());
+
+    }
+
+    public Optional<Project> transferProject(Integer projectId, Integer newGroupId) {
+
+        return gitLabService.transferProject(projectId, ProjectTransfer.builder().id(projectId).namespace(newGroupId).build());
+
     }
 
 }
