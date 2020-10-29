@@ -1,11 +1,5 @@
 package com.redhat.labs.lodestar.models;
 
-import java.util.List;
-
-import javax.json.bind.annotation.JsonbProperty;
-
-import com.redhat.labs.lodestar.models.gitlab.Commit;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Engagement {
+public class HostingProvider {
   private String id;
 
   private String additionalDetails;
