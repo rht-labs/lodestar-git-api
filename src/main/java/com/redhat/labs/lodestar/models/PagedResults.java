@@ -44,7 +44,7 @@ public class PagedResults<T> {
     }
     
     public void update(Response response, GenericType<List<T>> type) {
-        LOGGER.debug("update");
+        LOGGER.trace("page result update");
         
         if(number == 1) {
             String totalPageString = response.getHeaderString("X-Total-Pages");
