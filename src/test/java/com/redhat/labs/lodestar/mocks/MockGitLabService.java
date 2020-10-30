@@ -321,6 +321,10 @@ public class MockGitLabService implements GitLabService {
         if("multi/page/iac".equals(projectId)) {
             return Response.ok(commitList).header("X-Total-Pages", 2).build();
         }
+
+        if("multi/page/missingheader".equals(projectId)) {
+            return Response.ok(commitList).build();
+        }
         
         return Response.ok(new ArrayList<Commit>()).header("X-Total-Pages", 0).build();
     }

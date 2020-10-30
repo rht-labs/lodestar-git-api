@@ -151,7 +151,7 @@ public class ProjectService {
     }
     
     public List<Commit> getCommitLog(String projectId) {
-        PagedResults<Commit> page = new PagedResults<>();
+        PagedResults<Commit> page = new PagedResults<>(commitPageSize);
         
         while(page.hasMore()) {
             Response response = gitLabService.getCommitLog(projectId, commitPageSize, page.getNumber());

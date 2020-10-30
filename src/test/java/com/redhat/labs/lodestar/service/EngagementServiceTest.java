@@ -16,6 +16,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -40,6 +41,15 @@ public class EngagementServiceTest {
     @InjectMock
     @RestClient
     GitLabService gitLabService;
+
+   @BeforeEach
+    void setup() {
+
+        // set the engagement path prefix
+        Group g = Group.builder().fullPath("top/dog").build();
+        MockUtils.setGetGroupByIdOrPathMock(gitLabService, 2, g);
+
+    }
 
     @Test void testCreateEngagementNewProject() {
 
