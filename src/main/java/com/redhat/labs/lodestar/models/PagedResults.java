@@ -60,7 +60,7 @@ public class PagedResults<T> {
         }
         List<T> responseSet = response.readEntity(type);
         
-        //There were no results so don't get any more.
+        //There weren't enough  results to fetch another page
         if(responseSet.size() < pageSize && total == UNDEFINED_PAGE_COUNT) {
             total = 1;
         }
