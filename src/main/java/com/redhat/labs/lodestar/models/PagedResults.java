@@ -26,10 +26,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PagedResults<T> {
     public static final Logger LOGGER = LoggerFactory.getLogger(PagedResults.class);
-            
+    
+    private static final int UNDEFINED_PAGE_COUNT = 10000;
+    private int pageSize;
     @Builder.Default private int number = 1;
     @Builder.Default private int total = 1;
     @Builder.Default private List<T> results = new ArrayList<>();
+    
+    public PagedResults(int pageSize) {
+        this();
+        this.pageSize = pageSize;
+    }
     
     
     public boolean hasMore() {
@@ -37,18 +44,33 @@ public class PagedResults<T> {
     }
     
     public void update(Response response, GenericType<List<T>> type) {
+        LOGGER.trace("page result update");
         
         if(number == 1) {
             String totalPageString = response.getHeaderString("X-Total-Pages");
-            total = Integer.valueOf(totalPageString);
+            
+            if(totalPageString == null) {
+                total = UNDEFINED_PAGE_COUNT; //Should not be able to get this high
+                LOGGER.debug("X-Total-Pages header is missing");
+            } else {
+                total = Integer.valueOf(totalPageString);
+            }
+            
             LOGGER.trace("TOTAL PAGES {}", total);
         }
-        List<T> p = response.readEntity(type);
-        results.addAll(p);
+        List<T> responseSet = response.readEntity(type);
+        
+        //There weren't enough  results to fetch another page
+        if(responseSet.size() < pageSize && total == UNDEFINED_PAGE_COUNT) {
+            total = 1;
+        }
+        
+        results.addAll(responseSet);
         number++;
     }
     
     public int size() {
         return results.size();
     }
+  
 }

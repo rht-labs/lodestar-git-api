@@ -3,6 +3,7 @@ package com.redhat.labs.lodestar.mocks;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.WebApplicationException;
@@ -21,6 +22,7 @@ import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.Namespace;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.models.gitlab.ProjectSearchResults;
+import com.redhat.labs.lodestar.models.gitlab.ProjectTransfer;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 import com.redhat.labs.lodestar.utils.EncodingUtils;
 import com.redhat.labs.lodestar.utils.ResourceLoader;
@@ -253,10 +255,10 @@ public class MockGitLabService implements GitLabService {
     }
 
     @Override
-    public List<Group> getSubGroups(Integer groupId) {
+    public Response getSubGroups(Integer groupId, Integer perPage, Integer page) {
         List<Group> groups = new ArrayList<>();
         groups.add(Group.builder().id(groupId + 1).name("Group 1").build());
-        return groups;
+        return Response.ok(groups).build();
     }
 
     @Override
@@ -319,8 +321,18 @@ public class MockGitLabService implements GitLabService {
         if("multi/page/iac".equals(projectId)) {
             return Response.ok(commitList).header("X-Total-Pages", 2).build();
         }
+
+        if("multi/page/missingheader".equals(projectId)) {
+            return Response.ok(commitList).build();
+        }
         
         return Response.ok(new ArrayList<Commit>()).header("X-Total-Pages", 0).build();
+    }
+
+    @Override
+    public Optional<Project> transferProject(Integer projectId, ProjectTransfer projectTransfer) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

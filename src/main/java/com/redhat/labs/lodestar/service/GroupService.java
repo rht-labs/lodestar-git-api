@@ -52,7 +52,20 @@ public class GroupService {
         return optional;
 
     }
-    
+
+    public List<Group> getSubgroups(Integer groupId) {
+
+        PagedResults<Group> page = new PagedResults<>();
+
+        while(page.hasMore()) {
+            Response response = gitLabService.getSubGroups(groupId, commitPageSize, page.getNumber());
+            page.update(response, new GenericType<List<Group>>() {});
+        }
+
+        return page.getResults();
+
+    }
+
     public Optional<Group> getGitLabGroupByById(int id) {
         return getGitLabGroupByByIdOrPath(String.valueOf(id));
     }

@@ -104,4 +104,11 @@ class ProjectServiceTest {
         assertEquals(6, commits.size());
         
     }
+
+    //Will only get first page since the page size will be larger
+    @Test void getCommitsMultiPageMissingHeader() {
+        List<Commit> commits = projectService.getCommitLog("multi/page/missingheader");
+        assertNotNull(commits);
+        assertEquals(3, commits.size());
+    }
 }

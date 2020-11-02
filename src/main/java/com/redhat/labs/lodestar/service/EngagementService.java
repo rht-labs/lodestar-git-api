@@ -34,7 +34,6 @@ import com.redhat.labs.lodestar.utils.GitLabPathUtils;
 public class EngagementService {
     public static final Logger LOGGER = LoggerFactory.getLogger(EngagementService.class);
 
-    private static final String ENGAGEMENT_PROJECT_NAME = "iac";
     private static final String DEFAULT_BRANCH = "master";
     private static final String ENGAGEMENT_FILE = "engagement.json";
     private static final String STATUS_FILE = "status.json";
@@ -63,6 +62,9 @@ public class EngagementService {
     HookService hookService;
 
     @Inject
+    ProjectStructureService structureService;
+
+    @Inject
     JsonMarshaller json;
     
     @Inject
@@ -84,7 +86,7 @@ public class EngagementService {
     public Project createEngagement(Engagement engagement, String author, String authorEmail) {
 
         // create project structure
-        Project project = createProjectStucture(engagement);
+        Project project = structureService.createOrUpdateProjectStructure(engagement, engagementPathPrefix);
         engagement.setProjectId(project.getId());
 
         // get commit message before creating file
@@ -123,7 +125,7 @@ public class EngagementService {
     }
     
     public List<Commit> getCommitLog(String customerName, String engagementName) {
-        String projectPath = getPath(customerName, engagementName);
+        String projectPath = GitLabPathUtils.getPath(engagementPathPrefix, customerName, engagementName);
         return projectService.getCommitLog(projectPath);
     }
     
@@ -154,7 +156,7 @@ public class EngagementService {
     
     public Status getProjectStatus(String customerName, String engagementName) {
         Status status = null;
-        Optional<File> file = fileService.getFile(this.getPath(customerName, engagementName), STATUS_FILE);
+        Optional<File> file = fileService.getFile(GitLabPathUtils.getPath(engagementPathPrefix, customerName, engagementName), STATUS_FILE);
         if(file.isPresent()) {
             status = json.fromJson(file.get().getContent(), Status.class);
         }
@@ -163,7 +165,7 @@ public class EngagementService {
     }
     
     public Optional<Project> getProject(String customerName, String engagementName) {
-        String fullPath = this.getPath(customerName, engagementName);
+        String fullPath = GitLabPathUtils.getPath(engagementPathPrefix, customerName, engagementName);
         
         LOGGER.debug("Full path {}", fullPath);
         return projectService.getProjectByIdOrPath(fullPath);
@@ -252,70 +254,6 @@ public class EngagementService {
         return File.builder().content(fileContent).filePath(ENGAGEMENT_FILE).build();
     }
 
-    private Project createProjectStucture(Engagement engagement) {
-
-        // create group for customer name
-        Group customerGroup = getOrCreateGroup(engagement.getCustomerName(),
-                Group.builder().name(engagement.getCustomerName())
-                        .path(GitLabPathUtils.generateValidPath(engagement.getCustomerName()))
-                        .parentId(engagementRepositoryId).build());
-
-        // create group for project name
-        Group projectGroup = getOrCreateGroup(engagement.getProjectName(),
-                Group.builder().name(engagement.getProjectName())
-                        .path(GitLabPathUtils.generateValidPath(engagement.getProjectName()))
-                        .parentId(customerGroup.getId()).build());
-
-        // create project under project name group
-        Project project = getOrCreateProject(projectGroup.getId(), ENGAGEMENT_PROJECT_NAME, Project.builder()
-                .name(ENGAGEMENT_PROJECT_NAME).visibility("private").namespaceId(projectGroup.getId()).build());
-
-        // enable deployment key on project
-        projectService.enableDeploymentKeyOnProject(project.getId(), deployKey);
-
-        return project;
-
-    }
-
-    private Group getOrCreateGroup(String groupName, Group groupToCreate) {
-
-        Optional<Group> optional = groupService.getGitLabGroupByName(groupName, groupToCreate.getParentId());
-
-        if (!optional.isPresent()) {
-
-            // try to create group
-            optional = groupService.createGitLabGroup(groupToCreate);
-
-            if (!optional.isPresent()) {
-                throw new UnexpectedGitLabResponseException("failed to create group");
-            }
-
-        }
-
-        return optional.get();
-
-    }
-
-    private Project getOrCreateProject(Integer namespaceId, String projectName, Project project) {
-
-        Optional<Project> optional = projectService.getProjectByName(namespaceId, projectName);
-
-        if (!optional.isPresent()) {
-
-            // try to create project
-            optional = projectService.createProject(project);
-
-            if (!optional.isPresent()) {
-                throw new UnexpectedGitLabResponseException("failed to create project");
-            }
-
-            optional.get().setFirst(true);
-        }
-
-        return optional.get();
-
-    }
-
     private CommitMultiple createCommitMultiple(List<File> filesToCommit, Integer projectId, String branch,
             String authorName, String authorEmail, boolean isNew, Optional<String> commitMessageOptional) {
 
@@ -361,15 +299,6 @@ public class EngagementService {
                 Character.lowSurrogate(mysteryAnimalCodePoint) };
 
         return String.valueOf(mysteryEmoji);
-    }
-    
-    private String getPath(String customerName, String engagementName) {
-        return new StringBuilder(engagementPathPrefix)
-                .append("/")
-                .append(customerName)
-                .append("/")
-                .append(engagementName)
-                .append("/iac").toString();
     }
 
 }
