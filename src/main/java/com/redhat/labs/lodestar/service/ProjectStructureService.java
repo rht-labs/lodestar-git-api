@@ -35,6 +35,9 @@ public class ProjectStructureService {
 
     @ConfigProperty(name = "engagements.repository.id")
     Integer engagementRepositoryId;
+    
+    @ConfigProperty(name = "gitlab.deploy.key")
+    Integer deployKey;
 
     @Inject
     GroupService groupService;
@@ -62,6 +65,11 @@ public class ProjectStructureService {
 
         Optional<Project> project = createOrUpdateProject(existingProjectStructure.getProject(),
                 existingProjectStructure.getProjectGroupId(), projectGroup.getId());
+        
+        // enable deployment key on project
+        if(project.isPresent()) {
+            projectService.enableDeploymentKeyOnProject(project.get().getId(), deployKey);
+        }
 
         // clean up groups if project moved
         eventBus.sendAndForget(CLEANUP_EVENT, existingProjectStructure);

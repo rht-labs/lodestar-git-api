@@ -46,9 +46,6 @@ public class EngagementService {
     @ConfigProperty(name = "stripPathPrefix", defaultValue = "schema/")
     String stripPathPrefix;
 
-    @ConfigProperty(name = "gitlab.deploy.key")
-    Integer deployKey;
-
     @Inject
     ProjectService projectService;
 
