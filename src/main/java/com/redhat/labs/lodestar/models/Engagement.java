@@ -36,7 +36,7 @@ public class Engagement {
     private String additionalDetails;
     private Launch launch;
     private List<EngagementUser> engagementUsers;
-    private List<HostingProvider> hostingProviders;
+    private List<HostingEnvironment> hostingEnvironments;
     
     private Status status;
     private List<Commit> commits;
