@@ -25,4 +25,6 @@ public class HostingEnvironment {
   private String ocpVersion;
 
   private String environmentName;
+
+  private String ocpClusterSize;
 }
