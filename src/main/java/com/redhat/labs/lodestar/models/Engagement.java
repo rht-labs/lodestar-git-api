@@ -37,7 +37,7 @@ public class Engagement {
     private Launch launch;
     private List<EngagementUser> engagementUsers;
     private List<HostingEnvironment> hostingEnvironments;
-    
+
     private Status status;
     private List<Commit> commits;
     private CreationDetails creationDetails;

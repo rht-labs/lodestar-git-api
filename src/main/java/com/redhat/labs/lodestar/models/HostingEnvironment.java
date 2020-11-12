@@ -10,21 +10,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HostingEnvironment {
-  private String id;
+    private String id;
 
-  private String additionalDetails;
+    private String additionalDetails;
 
-  private String ocpCloudProviderName;
+    private String ocpCloudProviderName;
 
-  private String ocpCloudProviderRegion;
+    private String ocpCloudProviderRegion;
 
-  private String ocpPersistentStorageSize;
+    private String ocpPersistentStorageSize;
 
-  private String ocpSubDomain;
+    private String ocpSubDomain;
 
-  private String ocpVersion;
+    private String ocpVersion;
 
-  private String environmentName;
+    private String environmentName;
 
-  private String ocpClusterSize;
+    private String ocpClusterSize;
 }
