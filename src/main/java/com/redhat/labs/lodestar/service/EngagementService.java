@@ -103,8 +103,7 @@ public class EngagementService {
         repoFiles.add(createEngagmentFile(engagement));
 
         // create user reset file if required
-        List<File> resetFiles = createUserManagementFiles(engagement);
-        repoFiles.addAll(resetFiles);
+        repoFiles.addAll(createUserManagementFiles(engagement));
 
         // create actions for multiple commit
         CommitMultiple commit = createCommitMultiple(repoFiles, project.getId(), DEFAULT_BRANCH, author, authorEmail,
