@@ -276,12 +276,8 @@ public class EngagementService {
             // create file name
             String fileName = getUserManagementFileName(user.getUuid());
 
-            // create full path for file name
-            String fileNameWithPath = getUserManagementPath(engagement.getCustomerName(), engagement.getProjectName(),
-                    fileName);
-
             // see if file exists
-            Optional<File> userResetFile = fileService.getFileAllow404(engagement.getProjectId(), fileNameWithPath);
+            Optional<File> userResetFile = fileService.getFileAllow404(engagement.getProjectId(), fileName);
 
             if (userResetFile.isEmpty()) {
 
@@ -300,12 +296,8 @@ public class EngagementService {
     }
 
     private String getUserManagementFileName(String uuid) {
-        return USER_MGMT_FILE.replace(USER_MGMT_FILE_PLACEHOLDER, uuid);
-    }
-
-    private String getUserManagementPath(String customerName, String projectName, String fileName) {
-        return new StringBuilder(GitLabPathUtils.getPath(engagementPathPrefix, customerName, projectName)).append("/")
-                .append(orchestrationQueueDirectory).append("/").append(fileName).toString();
+        return new StringBuilder(orchestrationQueueDirectory).append("/")
+                .append(USER_MGMT_FILE.replace(USER_MGMT_FILE_PLACEHOLDER, uuid)).toString();
     }
 
     private CommitMultiple createCommitMultiple(List<File> filesToCommit, Integer projectId, String branch,
