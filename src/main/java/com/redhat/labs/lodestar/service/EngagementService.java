@@ -17,6 +17,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.redhat.labs.lodestar.config.JsonMarshaller;
 import com.redhat.labs.lodestar.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.lodestar.models.Engagement;
@@ -102,7 +103,7 @@ public class EngagementService {
         List<File> repoFiles = new ArrayList<>();
         repoFiles.add(createEngagmentFile(engagement));
 
-        // create user reset file if required
+        // create user reset file(s) if required
         repoFiles.addAll(createUserManagementFiles(engagement));
 
         // create actions for multiple commit
@@ -259,38 +260,18 @@ public class EngagementService {
 
     private List<File> createUserManagementFiles(Engagement engagement) {
 
-        List<File> userResetFiles = new ArrayList<>();
-
         if (null == engagement.getEngagementUsers()) {
-            return userResetFiles;
+            return Lists.newArrayList();
         }
 
-        // get all users that requested a reset
-        List<EngagementUser> users = engagement.getEngagementUsers().stream().filter(user -> user.isReset())
-                .collect(Collectors.toList());
-
-        // create file for each reset request only if the file doesn't already exist
-        for (EngagementUser user : users) {
-
-            // create file name
-            String fileName = getUserManagementFileName(user.getUuid());
-
-            // see if file exists
-            Optional<File> userResetFile = fileService.getFileAllow404(engagement.getProjectId(), fileName);
-
-            if (userResetFile.isEmpty()) {
-
-                // create file
-                String userAsJson = json.toJson(user);
-
-                File resetFile = File.builder().content(userAsJson).filePath(fileName).build();
-                userResetFiles.add(resetFile);
-
-            }
-
-        }
-
-        return userResetFiles;
+        return engagement.getEngagementUsers().stream().filter(user -> user.isReset())
+                .filter(user -> fileService
+                        .getFileAllow404(engagement.getProjectId(), getUserManagementFileName(user.getUuid()))
+                        .isEmpty())
+                .map(user -> {
+                    return File.builder().content(json.toJson(user)).filePath(getUserManagementFileName(user.getUuid()))
+                            .build();
+                }).collect(Collectors.toList());
 
     }
 
