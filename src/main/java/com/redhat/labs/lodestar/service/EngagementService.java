@@ -262,6 +262,10 @@ public class EngagementService {
 
         List<File> userResetFiles = new ArrayList<>();
 
+        if (null == engagement.getEngagementUsers()) {
+            return userResetFiles;
+        }
+
         // get all users that requested a reset
         List<EngagementUser> users = engagement.getEngagementUsers().stream().filter(user -> user.isReset())
                 .collect(Collectors.toList());
@@ -320,7 +324,8 @@ public class EngagementService {
                 .collect(Collectors.toList());
 
         // merge the actions
-        List<Action> actions = Stream.of(userManagementFiles, otherFiles).flatMap(x -> x.stream()).collect(Collectors.toList());
+        List<Action> actions = Stream.of(userManagementFiles, otherFiles).flatMap(x -> x.stream())
+                .collect(Collectors.toList());
 
         // use message if provided. otherwise, defaults
         String commitMessage = commitMessageOptional
