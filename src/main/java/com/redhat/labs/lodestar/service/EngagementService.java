@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import com.redhat.labs.lodestar.config.JsonMarshaller;
 import com.redhat.labs.lodestar.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.lodestar.models.Engagement;
-import com.redhat.labs.lodestar.models.EngagementUser;
 import com.redhat.labs.lodestar.models.Status;
 import com.redhat.labs.lodestar.models.gitlab.Action;
 import com.redhat.labs.lodestar.models.gitlab.Commit;
