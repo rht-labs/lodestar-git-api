@@ -35,7 +35,7 @@ public class ProjectStructureService {
 
     @ConfigProperty(name = "engagements.repository.id")
     Integer engagementRepositoryId;
-    
+
     @ConfigProperty(name = "gitlab.deploy.key")
     Integer deployKey;
 
@@ -65,9 +65,9 @@ public class ProjectStructureService {
 
         Optional<Project> project = createOrUpdateProject(existingProjectStructure.getProject(),
                 existingProjectStructure.getProjectGroupId(), projectGroup.getId());
-        
+
         // enable deployment key on project
-        if(project.isPresent()) {
+        if (project.isPresent()) {
             projectService.enableDeploymentKeyOnProject(project.get().getId(), deployKey);
         }
 
@@ -101,7 +101,7 @@ public class ProjectStructureService {
         }
 
         // get project group by id
-        if(project.isEmpty()) {
+        if (project.isEmpty()) {
             project = projectService.getProjectById(engagement.getProjectId());
         }
         builder.project(project);
@@ -230,13 +230,10 @@ public class ProjectStructureService {
             return;
         }
 
-        Instant begin = Instant.now();
         // remove project group
         removeGroupIfEmpty(existingProjectStructure.getProjectGroupId().get(), 5);
         // remove customer group
         removeGroupIfEmpty(existingProjectStructure.getCustomerGroupId().get(), 5);
-
-        System.out.println("cleanup elapsed time: " + Duration.between(begin, Instant.now()).toMillis() + " ms");
 
     }
 
@@ -264,11 +261,9 @@ public class ProjectStructureService {
 
             count += 1;
             try {
-                System.out.println("sleeping for " + count * 1 + " seconds.");
                 TimeUnit.SECONDS.sleep(count * 1);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
 
         }

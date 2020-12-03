@@ -3,8 +3,10 @@ package com.redhat.labs.lodestar.service;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -18,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.redhat.labs.lodestar.config.JsonMarshaller;
 import com.redhat.labs.lodestar.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.lodestar.models.Engagement;
+import com.redhat.labs.lodestar.models.EngagementUser;
 import com.redhat.labs.lodestar.models.Status;
 import com.redhat.labs.lodestar.models.gitlab.Action;
 import com.redhat.labs.lodestar.models.gitlab.Commit;
@@ -37,6 +40,9 @@ public class EngagementService {
     private static final String DEFAULT_BRANCH = "master";
     private static final String ENGAGEMENT_FILE = "engagement.json";
     private static final String STATUS_FILE = "status.json";
+    private static final String USER_MGMT_FILE_PREFIX = "user-management-";
+    private static final String USER_MGMT_FILE = USER_MGMT_FILE_PREFIX + "UUID.json";
+    private static final String USER_MGMT_FILE_PLACEHOLDER = "UUID";
 
     private String engagementPathPrefix;
 
@@ -45,6 +51,9 @@ public class EngagementService {
 
     @ConfigProperty(name = "stripPathPrefix", defaultValue = "schema/")
     String stripPathPrefix;
+
+    @ConfigProperty(name = "orchestration.queue.directory", defaultValue = "queue")
+    String orchestrationQueueDirectory;
 
     @Inject
     ProjectService projectService;
@@ -92,6 +101,10 @@ public class EngagementService {
         // get all template files
         List<File> repoFiles = new ArrayList<>();
         repoFiles.add(createEngagmentFile(engagement));
+
+        // create user reset file if required
+        List<File> resetFiles = createUserManagementFiles(engagement);
+        repoFiles.addAll(resetFiles);
 
         // create actions for multiple commit
         CommitMultiple commit = createCommitMultiple(repoFiles, project.getId(), DEFAULT_BRANCH, author, authorEmail,
@@ -245,14 +258,69 @@ public class EngagementService {
         return File.builder().content(fileContent).filePath(ENGAGEMENT_FILE).build();
     }
 
+    private List<File> createUserManagementFiles(Engagement engagement) {
+
+        List<File> userResetFiles = new ArrayList<>();
+
+        // get all users that requested a reset
+        List<EngagementUser> users = engagement.getEngagementUsers().stream().filter(user -> user.isReset())
+                .collect(Collectors.toList());
+
+        // create file for each reset request only if the file doesn't already exist
+        for (EngagementUser user : users) {
+
+            // create file name
+            String fileName = getUserManagementFileName(user.getUuid());
+
+            // create full path for file name
+            String fileNameWithPath = getUserManagementPath(engagement.getCustomerName(), engagement.getProjectName(),
+                    fileName);
+
+            // see if file exists
+            Optional<File> userResetFile = fileService.getFileAllow404(engagement.getProjectId(), fileNameWithPath);
+
+            if (userResetFile.isEmpty()) {
+
+                // create file
+                String userAsJson = json.toJson(user);
+
+                File resetFile = File.builder().content(userAsJson).filePath(fileName).build();
+                userResetFiles.add(resetFile);
+
+            }
+
+        }
+
+        return userResetFiles;
+
+    }
+
+    private String getUserManagementFileName(String uuid) {
+        return USER_MGMT_FILE.replace(USER_MGMT_FILE_PLACEHOLDER, uuid);
+    }
+
+    private String getUserManagementPath(String customerName, String projectName, String fileName) {
+        return new StringBuilder(GitLabPathUtils.getPath(engagementPathPrefix, customerName, projectName)).append("/")
+                .append(orchestrationQueueDirectory).append("/").append(fileName).toString();
+    }
+
     private CommitMultiple createCommitMultiple(List<File> filesToCommit, Integer projectId, String branch,
             String authorName, String authorEmail, boolean isNew, Optional<String> commitMessageOptional) {
 
-        List<Action> actions = new ArrayList<>();
+        // Split files between user-management files and all others
+        Map<Boolean, List<File>> fileMap = filesToCommit.stream()
+                .collect(Collectors.partitioningBy(file -> file.getFilePath().contains(USER_MGMT_FILE_PREFIX)));
 
-        // convert each file to action - parallelStream was bringing inconsistent
-        // results
-        filesToCommit.stream().forEach(file -> actions.add(createAction(file, isNew)));
+        // create actions for each user management file
+        List<Action> userManagementFiles = fileMap.get(true).stream().map(file -> createAction(file, true))
+                .collect(Collectors.toList());
+
+        // create actions for all other files
+        List<Action> otherFiles = fileMap.get(false).stream().map(file -> createAction(file, isNew))
+                .collect(Collectors.toList());
+
+        // merge the actions
+        List<Action> actions = Stream.of(userManagementFiles, otherFiles).flatMap(x -> x.stream()).collect(Collectors.toList());
 
         // use message if provided. otherwise, defaults
         String commitMessage = commitMessageOptional
