@@ -3,8 +3,10 @@ package com.redhat.labs.lodestar.service;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
@@ -15,6 +17,7 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.redhat.labs.lodestar.config.JsonMarshaller;
 import com.redhat.labs.lodestar.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.lodestar.models.Engagement;
@@ -37,6 +40,9 @@ public class EngagementService {
     private static final String DEFAULT_BRANCH = "master";
     private static final String ENGAGEMENT_FILE = "engagement.json";
     private static final String STATUS_FILE = "status.json";
+    private static final String USER_MGMT_FILE_PREFIX = "user-management-";
+    private static final String USER_MGMT_FILE = USER_MGMT_FILE_PREFIX + "UUID.json";
+    private static final String USER_MGMT_FILE_PLACEHOLDER = "UUID";
 
     private String engagementPathPrefix;
 
@@ -45,6 +51,9 @@ public class EngagementService {
 
     @ConfigProperty(name = "stripPathPrefix", defaultValue = "schema/")
     String stripPathPrefix;
+
+    @ConfigProperty(name = "orchestration.queue.directory", defaultValue = "queue")
+    String orchestrationQueueDirectory;
 
     @Inject
     ProjectService projectService;
@@ -92,6 +101,9 @@ public class EngagementService {
         // get all template files
         List<File> repoFiles = new ArrayList<>();
         repoFiles.add(createEngagmentFile(engagement));
+
+        // create user reset file(s) if required
+        repoFiles.addAll(createUserManagementFiles(engagement));
 
         // create actions for multiple commit
         CommitMultiple commit = createCommitMultiple(repoFiles, project.getId(), DEFAULT_BRANCH, author, authorEmail,
@@ -245,14 +257,46 @@ public class EngagementService {
         return File.builder().content(fileContent).filePath(ENGAGEMENT_FILE).build();
     }
 
+    private List<File> createUserManagementFiles(Engagement engagement) {
+
+        if (null == engagement.getEngagementUsers()) {
+            return Lists.newArrayList();
+        }
+
+        return engagement.getEngagementUsers().stream().filter(user -> user.isReset())
+                .filter(user -> fileService
+                        .getFileAllow404(engagement.getProjectId(), getUserManagementFileName(user.getUuid()))
+                        .isEmpty())
+                .map(user -> {
+                    return File.builder().content(json.toJson(user)).filePath(getUserManagementFileName(user.getUuid()))
+                            .build();
+                }).collect(Collectors.toList());
+
+    }
+
+    private String getUserManagementFileName(String uuid) {
+        return new StringBuilder(orchestrationQueueDirectory).append("/")
+                .append(USER_MGMT_FILE.replace(USER_MGMT_FILE_PLACEHOLDER, uuid)).toString();
+    }
+
     private CommitMultiple createCommitMultiple(List<File> filesToCommit, Integer projectId, String branch,
             String authorName, String authorEmail, boolean isNew, Optional<String> commitMessageOptional) {
 
-        List<Action> actions = new ArrayList<>();
+        // Split files between user-management files and all others
+        Map<Boolean, List<File>> fileMap = filesToCommit.stream()
+                .collect(Collectors.partitioningBy(file -> file.getFilePath().contains(USER_MGMT_FILE_PREFIX)));
 
-        // convert each file to action - parallelStream was bringing inconsistent
-        // results
-        filesToCommit.stream().forEach(file -> actions.add(createAction(file, isNew)));
+        // create actions for each user management file
+        List<Action> userManagementFiles = fileMap.get(true).stream().map(file -> createAction(file, true))
+                .collect(Collectors.toList());
+
+        // create actions for all other files
+        List<Action> otherFiles = fileMap.get(false).stream().map(file -> createAction(file, isNew))
+                .collect(Collectors.toList());
+
+        // merge the actions
+        List<Action> actions = Stream.of(userManagementFiles, otherFiles).flatMap(x -> x.stream())
+                .collect(Collectors.toList());
 
         // use message if provided. otherwise, defaults
         String commitMessage = commitMessageOptional
