@@ -152,6 +152,18 @@ public class MockGitLabService implements GitLabService {
     @Override
     public File getFile(String projectId, String filePath, String ref) {
 
+        if ("210".equals(projectId)) {
+            String content = ResourceLoader.load("engagement-archived.json");
+            content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
+            return File.builder().filePath(filePath).content(content).build();
+        }
+
+        if ("220".equals(projectId)) {
+            String content = ResourceLoader.load("engagement-not-archived.json");
+            content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
+            return File.builder().filePath(filePath).content(content).build();
+        }
+
         if ("schema/meta.dat".equalsIgnoreCase(filePath)) {
             String content = "./residency.yml";
             content = new String(EncodingUtils.base64Encode(content.getBytes()), StandardCharsets.UTF_8);
@@ -249,8 +261,17 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public Response getProjectsbyGroup(Integer groupId, Boolean includeSubgroups, int page, int pageSize) {
+
         List<Project> projects = new ArrayList<>();
-        projects.add(Project.builder().id(groupId * 10).name("Project " + (groupId*10)).build());
+        
+        if (200 == groupId) {
+
+            projects.add(Project.builder().id(groupId + 10).name("iac").build());
+            projects.add(Project.builder().id(groupId + 20).name("iac").build());
+
+        } else {
+            projects.add(Project.builder().id(groupId * 10).name("Project " + (groupId*10)).build());
+        }
         return Response.ok(projects).header("X-Total-Pages", 1).build();
     }
 
