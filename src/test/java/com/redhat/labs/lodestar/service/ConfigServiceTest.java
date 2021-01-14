@@ -13,6 +13,7 @@ import com.redhat.labs.lodestar.exception.FileNotFoundException;
 import com.redhat.labs.lodestar.mocks.MockGitLabService;
 import com.redhat.labs.lodestar.models.gitlab.File;
 import com.redhat.labs.lodestar.models.gitlab.HookConfig;
+import com.redhat.labs.lodestar.rest.client.GitLabService;
 import com.redhat.labs.lodestar.utils.ResourceLoader;
 
 import io.quarkus.runtime.StartupEvent;
@@ -24,7 +25,12 @@ class ConfigServiceTest {
         service.configFile = "src/test/resources/lodestar-runtime-config.yaml";
         service.webHooksFile = "src/test/resources/webhooks.yaml";
         service.marshaller = new JsonMarshaller();
-        
+
+        ProjectService projectService = new ProjectService();
+        projectService.gitLabService = new MockGitLabService();
+        service.projectService = projectService;        
+        service.engagementRepositoryId = 0;
+
         service.onStart(new StartupEvent());
         File config = service.getConfigFile();
 
@@ -40,9 +46,16 @@ class ConfigServiceTest {
         service.webHooksFile = "src/test/resources/webhooks.yaml";
         service.marshaller = new JsonMarshaller();
 
+        GitLabService gitLabService = new MockGitLabService();
+
         FileService fileService = new FileService();
-        fileService.gitLabService = new MockGitLabService();
+        fileService.gitLabService = gitLabService;
         service.fileService = fileService;
+
+        ProjectService projectService = new ProjectService();
+        projectService.gitLabService = gitLabService;
+        service.projectService = projectService;        
+        service.engagementRepositoryId = 0;
 
         service.onStart(new StartupEvent());
         File config = service.getConfigFile();
@@ -73,7 +86,12 @@ class ConfigServiceTest {
         service.configFile = "src/test/resources/lodestar-runtime-config.yaml";
         service.webHooksFile = "src/test/resources/webhooks.yaml";
         service.marshaller = new JsonMarshaller();
-        
+
+        ProjectService projectService = new ProjectService();
+        projectService.gitLabService = new MockGitLabService();
+        service.projectService = projectService;        
+        service.engagementRepositoryId = 0;
+
         service.onStart(new StartupEvent());
         List<HookConfig> hookConfigList = service.getHookConfig();
         
