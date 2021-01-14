@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import io.quarkus.runtime.StartupEvent;
+import lombok.Setter;
 
 /**
  * Used converting String to Objects (non-request, non-response)
@@ -32,6 +33,7 @@ import io.quarkus.runtime.StartupEvent;
 public class JsonMarshaller {
     public static Logger LOGGER = LoggerFactory.getLogger(JsonMarshaller.class);
 
+    @Setter
     private Jsonb jsonb;
     
     private ObjectMapper om = new ObjectMapper(new YAMLFactory());

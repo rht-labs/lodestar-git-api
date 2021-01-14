@@ -29,7 +29,6 @@ import com.redhat.labs.lodestar.models.gitlab.File;
 import com.redhat.labs.lodestar.models.gitlab.FileAction;
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Hook;
-import com.redhat.labs.lodestar.models.gitlab.HookConfig;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.utils.GitLabPathUtils;
 
@@ -73,9 +72,6 @@ public class EngagementService {
     @Inject
     JsonMarshaller json;
 
-    @Inject
-    ConfigService configService;
-
     @PostConstruct
     public void setPathPrefix() {
         Optional<Group> groupOption = groupService.getGitLabGroupByById(engagementRepositoryId);
@@ -117,17 +113,6 @@ public class EngagementService {
         if (!fileService.createFiles(project.getId(), commit)) {
             throw new UnexpectedGitLabResponseException("failed to commit files for engagement creation.");
         }
-
-        List<HookConfig> hookConfigs = configService.getHookConfig();
-        hookConfigs.stream().forEach(hookC -> {
-            Hook hook = Hook.builder().projectId(engagement.getProjectId()).pushEvents(true).url(hookC.getBaseUrl())
-                    .token(hookC.getToken()).build();
-            if (project.isFirst()) { // No need to check for existing hooks first time
-                hookService.createProjectHook(engagement.getProjectId(), hook);
-            } else {
-                hookService.createOrUpdateProjectHook(engagement.getProjectId(), hook);
-            }
-        });
 
         return project;
 
@@ -226,7 +211,7 @@ public class EngagementService {
         return engagement;
     }
 
-    private Optional<Engagement> getEngagement(Project project, boolean includeStatus) {
+    public Optional<Engagement> getEngagement(Project project, boolean includeStatus) {
         Engagement engagement = null;
 
         Optional<File> engagementFile = fileService.getFileAllow404(project.getId(), ENGAGEMENT_FILE);
