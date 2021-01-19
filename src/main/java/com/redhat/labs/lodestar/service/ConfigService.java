@@ -2,6 +2,7 @@ package com.redhat.labs.lodestar.service;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -153,15 +154,21 @@ public class ConfigService {
         Optional<Engagement> engagement = engagementService.getEngagement(project, false);
         if (engagement.isPresent() && null != engagement.get().getArchiveDate()) {
 
-            ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Z"));
-            ZonedDateTime archiveDate = ZonedDateTime.parse(engagement.get().getArchiveDate());
+            try {
 
-            LOGGER.info("is past archive date: {}", now.isAfter(archiveDate));
-            return now.isAfter(archiveDate);
+                ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Z"));
+                ZonedDateTime archiveDate = ZonedDateTime.parse(engagement.get().getArchiveDate());
+
+                LOGGER.debug("is past archive date: {}", now.isAfter(archiveDate));
+                return now.isAfter(archiveDate);
+
+            } catch (DateTimeParseException dtpe) {
+                LOGGER.warn("failed to parse archive date: {}", dtpe.getMessage());
+            }
 
         }
 
-        LOGGER.info("engagement for project {} not found.", project);
+        LOGGER.debug("engagement for project {} not found or failed to parse archive date.", project);
         return false;
 
     }
