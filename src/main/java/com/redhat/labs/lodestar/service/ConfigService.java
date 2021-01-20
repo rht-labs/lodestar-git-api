@@ -130,7 +130,8 @@ public class ConfigService {
         projects.stream().filter(project -> project.getName().equals(IAC))
                 .filter(project -> !engagementIsArchived(project)).forEach(project -> {
 
-                    LOGGER.debug("updating project: {}", project.getNamespace().getFullPath());
+                    LOGGER.debug("updating project: {}",
+                            (null != project.getNamespace()) ? project.getNamespace().getFullPath() : project.getId());
 
                     hookConfigs.stream().forEach(hookC -> {
                         Hook hook = Hook.builder().projectId(project.getId()).pushEvents(true).url(hookC.getBaseUrl())

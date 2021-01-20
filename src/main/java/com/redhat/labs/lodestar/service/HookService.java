@@ -114,7 +114,7 @@ public class HookService {
         Optional<URI> existingUri = getUri(existing.getUrl());
 
         if (incomingUri.isPresent() && existingUri.isPresent()) {
-            return incomingUri.get().getPath().startsWith(existingUri.get().getPath());
+            return incomingUri.get().getPath().equals(existingUri.get().getPath());
         }
 
         return false;
