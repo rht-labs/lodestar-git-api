@@ -290,7 +290,7 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public Response createProjectHook(Integer projectId, Hook hook) {
-        if(projectId == 66) {
+        if(projectId == 66 || projectId == 220) {
             return Response.status(Status.CREATED).build();
         }
         
@@ -299,7 +299,7 @@ public class MockGitLabService implements GitLabService {
 
     @Override
     public Response updateProjectHook(Integer projectId, Integer hookId, Hook hook) {
-        if(projectId == 99) {
+        if(projectId == 99 || projectId == 220) {
             return Response.ok().build();
         } 
         return null;
@@ -354,6 +354,12 @@ public class MockGitLabService implements GitLabService {
     public Optional<Project> transferProject(Integer projectId, ProjectTransfer projectTransfer) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void deleteProjectHook(Integer projectId, Integer hookId) {
+        // do nothing
+        
     }
 
 }

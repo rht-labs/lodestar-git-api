@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
+import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
@@ -24,7 +24,6 @@ import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.HookConfig;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 
-import io.quarkus.runtime.StartupEvent;
 import io.quarkus.scheduler.Scheduled;
 
 @ApplicationScoped
@@ -70,20 +69,10 @@ public class ConfigService {
     JsonMarshaller marshaller;
 
     /**
-     * Loads webhook and configuration data on startup.
-     * 
-     * @param event
-     */
-    void onStart(@Observes StartupEvent event) {
-        loadWebHookData();
-        loadConfigurationData();
-    }
-
-    /**
      * Periodically reloads the web hook and configuration data if the configured
      * files have been modified.
      */
-    @Scheduled(every = "10s")
+    @Scheduled(every = "30s")
     void reloadConfigMapData() {
         loadWebHookData();
         loadConfigurationData();
@@ -126,15 +115,20 @@ public class ConfigService {
 
         List<HookConfig> hookConfigs = getHookConfig();
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
-
+        LOGGER.debug("number of projects found: {}", projects.size());
         projects.stream().filter(project -> project.getName().equals(IAC))
                 .filter(project -> !engagementIsArchived(project)).forEach(project -> {
+
+                    LOGGER.debug("updating project: {}",
+                            (null != project.getNamespace()) ? project.getNamespace().getFullPath() : project.getId());
 
                     hookConfigs.stream().forEach(hookC -> {
                         Hook hook = Hook.builder().projectId(project.getId()).pushEvents(true).url(hookC.getBaseUrl())
                                 .token(hookC.getToken()).build();
-                        LOGGER.trace("updating project {} \n\twith hook {}", project, hook);
-                        hookService.createOrUpdateProjectHook(project.getId(), hook);
+                        LOGGER.debug("\tupdating webhook {}", hook.getUrl());
+                        Response response = hookService.createOrUpdateProjectHook(project.getId(), hook);
+                        LOGGER.debug("\t\tservice response code: {}", response.getStatus());
+                        response.close();
 
                     });
 
@@ -154,21 +148,25 @@ public class ConfigService {
         Optional<Engagement> engagement = engagementService.getEngagement(project, false);
         if (engagement.isPresent() && null != engagement.get().getArchiveDate()) {
 
+            Engagement e = engagement.get();
+
             try {
 
                 ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Z"));
-                ZonedDateTime archiveDate = ZonedDateTime.parse(engagement.get().getArchiveDate());
+                ZonedDateTime archiveDate = ZonedDateTime.parse(e.getArchiveDate());
 
-                LOGGER.debug("is past archive date: {}", now.isAfter(archiveDate));
-                return now.isAfter(archiveDate);
+                boolean isPast = now.isAfter(archiveDate);
+
+                LOGGER.debug("{}:{} is past archive date: {}", e.getCustomerName(), e.getProjectName(), isPast);
+                return isPast;
 
             } catch (DateTimeParseException dtpe) {
-                LOGGER.warn("failed to parse archive date: {}", dtpe.getMessage());
+                LOGGER.warn("failed to parse archive date: {}, for {}:{}", dtpe.getMessage(), e.getCustomerName(),
+                        e.getProjectName());
             }
 
         }
 
-        LOGGER.debug("engagement for project {} not found or failed to parse archive date.", project);
         return false;
 
     }
@@ -189,7 +187,6 @@ public class ConfigService {
         if (configurationConfigMap.getContent().isPresent()) {
             configuration = File.builder().filePath(configFile).content(configurationConfigMap.getContent().get())
                     .build();
-            LOGGER.debug("Loaded Runtime Config from File, {}", configFile);
         }
 
     }

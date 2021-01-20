@@ -37,7 +37,6 @@ public class HookService {
         Response response;
         List<Hook> hooks = getProjectHooks(projectId);
         Optional<Hook> existingHook = hooks.stream().filter(h -> hookMatches(hook, h)).findFirst();
-        LOGGER.debug("existing hook: {}", existingHook);
 
         if (existingHook.isEmpty()) {
             response = createProjectHook(projectId, hook);
@@ -84,6 +83,21 @@ public class HookService {
      */
     public List<Hook> getProjectHooks(int projectId) {
         return gitLabService.getProjectHooks(projectId);
+    }
+
+    /**
+     * Removes all hooks from the given project ID.
+     * 
+     * @param projectId
+     */
+    public void deleteProjectHooks(Integer projectId) {
+
+        List<Hook> hooks = getProjectHooks(projectId);
+        hooks.stream().forEach(hook -> {
+            LOGGER.debug("project {} - removing hook {}", projectId, hook);
+            gitLabService.deleteProjectHook(projectId, hook.getId());
+        });
+
     }
 
     /**

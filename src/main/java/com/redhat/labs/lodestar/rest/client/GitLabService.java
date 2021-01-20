@@ -129,7 +129,12 @@ public interface GitLabService {
     @Path("/projects/{id}/hooks/{hookId}")
     @Produces("application/json")
     Response updateProjectHook(@PathParam("id") @Encoded Integer projectId, @PathParam("hookId") @Encoded Integer hookId, Hook hook);
-    
+
+    @DELETE
+    @Logged
+    @Path("/projects/{id}/hooks/{hookId}")
+    void deleteProjectHook(@PathParam("id") @Encoded Integer projectId, @PathParam("hookId") @Encoded Integer hookId);
+
     @GET
     @Logged
     @Path("/projects/{id}/hooks")
