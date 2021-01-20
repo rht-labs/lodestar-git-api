@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 
@@ -25,7 +24,7 @@ import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.HookConfig;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 
-import io.quarkus.runtime.StartupEvent;
+import io.quarkus.scheduler.Scheduled;
 
 @ApplicationScoped
 public class ConfigService {
@@ -70,20 +69,10 @@ public class ConfigService {
     JsonMarshaller marshaller;
 
     /**
-     * Loads webhook and configuration data on startup.
-     * 
-     * @param event
-     */
-    void onStart(@Observes StartupEvent event) {
-        loadWebHookData();
-        loadConfigurationData();
-    }
-
-    /**
      * Periodically reloads the web hook and configuration data if the configured
      * files have been modified.
      */
-//    @Scheduled(every = "10s")
+    @Scheduled(every = "30s")
     void reloadConfigMapData() {
         loadWebHookData();
         loadConfigurationData();
