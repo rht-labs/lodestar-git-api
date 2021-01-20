@@ -20,8 +20,6 @@ import com.redhat.labs.lodestar.models.gitlab.HookConfig;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 import com.redhat.labs.lodestar.utils.ResourceLoader;
 
-import io.quarkus.runtime.StartupEvent;
-
 class ConfigServiceTest {
 
     @Test void testGetConfigFilePreLoaded() {
@@ -35,7 +33,7 @@ class ConfigServiceTest {
         service.projectService = projectService;        
         service.engagementRepositoryId = 0;
 
-        service.onStart(new StartupEvent());
+        service.reloadConfigMapData();
         File config = service.getConfigFile();
 
         assertNotNull(config);
@@ -61,7 +59,7 @@ class ConfigServiceTest {
         service.projectService = projectService;        
         service.engagementRepositoryId = 0;
 
-        service.onStart(new StartupEvent());
+        service.reloadConfigMapData();
         File config = service.getConfigFile();
 
         assertNotNull(config);
@@ -96,7 +94,7 @@ class ConfigServiceTest {
         service.projectService = projectService;        
         service.engagementRepositoryId = 0;
 
-        service.onStart(new StartupEvent());
+        service.reloadConfigMapData();
         List<HookConfig> hookConfigList = service.getHookConfig();
         
         assertNotNull(hookConfigList);
@@ -115,7 +113,7 @@ class ConfigServiceTest {
         fileService.gitLabService = new MockGitLabService();
         service.fileService = fileService;
         
-        service.onStart(new StartupEvent());
+        service.reloadConfigMapData();
         List<HookConfig> hookConfigList = service.getHookConfig();
         
         assertNotNull(hookConfigList);
@@ -133,7 +131,7 @@ class ConfigServiceTest {
         fileService.gitLabService = new MockGitLabService();
         service.fileService = fileService;
         
-        service.onStart(new StartupEvent());
+        service.reloadConfigMapData();
         List<HookConfig> hookConfigList = service.getHookConfig();
         
         assertNotNull(hookConfigList);
