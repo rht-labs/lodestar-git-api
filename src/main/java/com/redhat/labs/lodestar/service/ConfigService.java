@@ -122,7 +122,7 @@ public class ConfigService {
                     LOGGER.debug("updating project: {}",
                             (null != project.getNamespace()) ? project.getNamespace().getFullPath() : project.getId());
 
-                    hookConfigs.parallelStream().forEach(hookC -> {
+                    hookConfigs.stream().forEach(hookC -> {
                         Hook hook = Hook.builder().projectId(project.getId()).pushEvents(true).url(hookC.getBaseUrl())
                                 .token(hookC.getToken()).build();
                         LOGGER.debug("\tupdating webhook {}", hook.getUrl());
