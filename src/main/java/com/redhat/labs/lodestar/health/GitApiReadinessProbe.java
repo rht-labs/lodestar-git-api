@@ -1,6 +1,10 @@
 package com.redhat.labs.lodestar.health;
 
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
 import org.eclipse.microprofile.health.HealthCheckResponseBuilder;
@@ -9,13 +13,12 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-import javax.ws.rs.core.Response;
-
 @Readiness
 @ApplicationScoped
 public class GitApiReadinessProbe implements HealthCheck{
+
+    @ConfigProperty(name = "engagements.repository.id")
+    Integer engagementRepositoryId;
 
     @Inject
     @RestClient
@@ -36,7 +39,6 @@ public class GitApiReadinessProbe implements HealthCheck{
     }
 
     private boolean checkGitLabConnection() {
-        Response r = gitLabService.getProjects();
-        return r.getStatus() == 200;
+        return null != gitLabService.getGroupByIdOrPath(String.valueOf(engagementRepositoryId));
     }
 }
