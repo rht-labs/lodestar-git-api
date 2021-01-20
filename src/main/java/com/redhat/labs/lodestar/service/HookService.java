@@ -37,7 +37,6 @@ public class HookService {
         Response response;
         List<Hook> hooks = getProjectHooks(projectId);
         Optional<Hook> existingHook = hooks.stream().filter(h -> hookMatches(hook, h)).findFirst();
-        LOGGER.debug("existing hook: {}", existingHook);
 
         if (existingHook.isEmpty()) {
             response = createProjectHook(projectId, hook);
@@ -87,6 +86,21 @@ public class HookService {
     }
 
     /**
+     * Removes all hooks from the given project ID.
+     * 
+     * @param projectId
+     */
+    public void deleteProjectHooks(Integer projectId) {
+
+        List<Hook> hooks = getProjectHooks(projectId);
+        hooks.stream().forEach(hook -> {
+            LOGGER.debug("project {} - removing hook {}", projectId, hook);
+            gitLabService.deleteProjectHook(projectId, hook.getId());
+        });
+
+    }
+
+    /**
      * Returns true if the paths of the two {@link Hook} URLs match. Note this
      * ignores the protocol and host name.
      * 
@@ -100,7 +114,7 @@ public class HookService {
         Optional<URI> existingUri = getUri(existing.getUrl());
 
         if (incomingUri.isPresent() && existingUri.isPresent()) {
-            return incomingUri.get().getPath().equals(existingUri.get().getPath());
+            return incomingUri.get().getPath().startsWith(existingUri.get().getPath());
         }
 
         return false;

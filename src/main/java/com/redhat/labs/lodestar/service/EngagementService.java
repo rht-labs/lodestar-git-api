@@ -42,6 +42,7 @@ public class EngagementService {
     private static final String USER_MGMT_FILE_PREFIX = "user-management-";
     private static final String USER_MGMT_FILE = USER_MGMT_FILE_PREFIX + "UUID.json";
     private static final String USER_MGMT_FILE_PLACEHOLDER = "UUID";
+    private static final String IAC = "iac";
 
     private String engagementPathPrefix;
 
@@ -147,6 +148,15 @@ public class EngagementService {
         }
 
         return created;
+    }
+
+    public void deleteHooks() {
+
+        List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
+        projects.stream().filter(project -> project.getName().equals(IAC)).forEach(project -> {
+            hookService.deleteProjectHooks(project.getId());
+        });
+
     }
 
     public Status getProjectStatus(String customerName, String engagementName) {

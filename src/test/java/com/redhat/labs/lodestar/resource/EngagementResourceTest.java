@@ -55,7 +55,89 @@ class EngagementResourceTest {
         MockUtils.setGetFileForStatusJsonMock(gitLabService, 20, true);
 
         given().when().contentType(ContentType.JSON).get("/api/v1/engagements").then().statusCode(200).body(is(
-                "[{\"archive_date\":\"20210125\",\"commits\":[],\"customer_contact_email\":\"reg@chiefs.com\",\"customer_contact_name\":\"Reg Dunlop\",\"customer_name\":\"customer1\",\"description\":\"Charleston\",\"end_date\":\"20201225\",\"engagement_lead_email\":\"doug93@leafs.com\",\"engagement_lead_name\":\"Doug Gilmour\",\"location\":\"Raleigh, NC\",\"project_id\":0,\"project_name\":\"project1\",\"public_reference\":false,\"start_date\":\"20200202\",\"status\":{\"messages\":[{\"message\":\"This is message 1\",\"severity\":\"INFO\",\"updated\":\"2020-06-23T21:25:31Z\"},{\"message\":\"This is message 2\",\"severity\":\"CRITICAL\",\"updated\":\"2020-06-22T11:15:11Z\"},{\"message\":\"This is message 3\",\"severity\":\"SUCCESS\",\"updated\":\"2020-06-22T10:25:31Z\"}],\"overall_status\":\"yellow\",\"subsystems\":[{\"access_urls\":[{\"Web Console\":\"https://console......\"},{\"API\":\"https://api.....:6443\"}],\"info\":\"Deployment In Progress\",\"messages\":[{\"message\":\"This is message 1\",\"severity\":\"INFO\",\"updated\":\"2020-06-23T21:25:31Z\"}],\"name\":\"openshift\",\"state\":\"provisioning\",\"status\":\"yellow\",\"updated\":\"2020-06-23T09:25:31Z\"},{\"access_urls\":[{\"atlassian\":\"https://mycompany.atlassian.net\"}],\"messages\":[{\"message\":\"This is message 1\",\"severity\":\"INFO\",\"updated\":\"2020-06-23T21:25:31Z\"}],\"name\":\"atlassian\",\"state\":\"operational\",\"status\":\"green\",\"updated\":\"2020-06-22T20:15:37Z\"}]},\"technical_lead_email\":\"wendel17@leafs.com\",\"technical_lead_name\":\"Wendel Clark\"}]"));
+                "\n[\n" + 
+                "    {\n" + 
+                "        \"archive_date\": \"20210125\",\n" + 
+                "        \"commits\": [\n" + 
+                "        ],\n" + 
+                "        \"customer_contact_email\": \"reg@chiefs.com\",\n" + 
+                "        \"customer_contact_name\": \"Reg Dunlop\",\n" + 
+                "        \"customer_name\": \"customer1\",\n" + 
+                "        \"description\": \"Charleston\",\n" + 
+                "        \"end_date\": \"20201225\",\n" + 
+                "        \"engagement_lead_email\": \"doug93@leafs.com\",\n" + 
+                "        \"engagement_lead_name\": \"Doug Gilmour\",\n" + 
+                "        \"location\": \"Raleigh, NC\",\n" + 
+                "        \"project_id\": 0,\n" + 
+                "        \"project_name\": \"project1\",\n" + 
+                "        \"public_reference\": false,\n" + 
+                "        \"start_date\": \"20200202\",\n" + 
+                "        \"status\": {\n" + 
+                "            \"messages\": [\n" + 
+                "                {\n" + 
+                "                    \"message\": \"This is message 1\",\n" + 
+                "                    \"severity\": \"INFO\",\n" + 
+                "                    \"updated\": \"2020-06-23T21:25:31Z\"\n" + 
+                "                },\n" + 
+                "                {\n" + 
+                "                    \"message\": \"This is message 2\",\n" + 
+                "                    \"severity\": \"CRITICAL\",\n" + 
+                "                    \"updated\": \"2020-06-22T11:15:11Z\"\n" + 
+                "                },\n" + 
+                "                {\n" + 
+                "                    \"message\": \"This is message 3\",\n" + 
+                "                    \"severity\": \"SUCCESS\",\n" + 
+                "                    \"updated\": \"2020-06-22T10:25:31Z\"\n" + 
+                "                }\n" + 
+                "            ],\n" + 
+                "            \"overall_status\": \"yellow\",\n" + 
+                "            \"subsystems\": [\n" + 
+                "                {\n" + 
+                "                    \"access_urls\": [\n" + 
+                "                        {\n" + 
+                "                            \"Web Console\": \"https://console......\"\n" + 
+                "                        },\n" + 
+                "                        {\n" + 
+                "                            \"API\": \"https://api.....:6443\"\n" + 
+                "                        }\n" + 
+                "                    ],\n" + 
+                "                    \"info\": \"Deployment In Progress\",\n" + 
+                "                    \"messages\": [\n" + 
+                "                        {\n" + 
+                "                            \"message\": \"This is message 1\",\n" + 
+                "                            \"severity\": \"INFO\",\n" + 
+                "                            \"updated\": \"2020-06-23T21:25:31Z\"\n" + 
+                "                        }\n" + 
+                "                    ],\n" + 
+                "                    \"name\": \"openshift\",\n" + 
+                "                    \"state\": \"provisioning\",\n" + 
+                "                    \"status\": \"yellow\",\n" + 
+                "                    \"updated\": \"2020-06-23T09:25:31Z\"\n" + 
+                "                },\n" + 
+                "                {\n" + 
+                "                    \"access_urls\": [\n" + 
+                "                        {\n" + 
+                "                            \"atlassian\": \"https://mycompany.atlassian.net\"\n" + 
+                "                        }\n" + 
+                "                    ],\n" + 
+                "                    \"messages\": [\n" + 
+                "                        {\n" + 
+                "                            \"message\": \"This is message 1\",\n" + 
+                "                            \"severity\": \"INFO\",\n" + 
+                "                            \"updated\": \"2020-06-23T21:25:31Z\"\n" + 
+                "                        }\n" + 
+                "                    ],\n" + 
+                "                    \"name\": \"atlassian\",\n" + 
+                "                    \"state\": \"operational\",\n" + 
+                "                    \"status\": \"green\",\n" + 
+                "                    \"updated\": \"2020-06-22T20:15:37Z\"\n" + 
+                "                }\n" + 
+                "            ]\n" + 
+                "        },\n" + 
+                "        \"technical_lead_email\": \"wendel17@leafs.com\",\n" + 
+                "        \"technical_lead_name\": \"Wendel Clark\"\n" + 
+                "    }\n" + 
+                "]"));
 
     }
 
@@ -74,7 +156,25 @@ class EngagementResourceTest {
 
         given().pathParam("namespace", "top/dog/jello/tutti-frutti/iac").when().contentType(ContentType.JSON)
                 .get("/api/v1/engagements/namespace/{namespace}").then().statusCode(200).body(is(
-                        "{\"archive_date\":\"20210125\",\"commits\":[],\"customer_contact_email\":\"reg@chiefs.com\",\"customer_contact_name\":\"Reg Dunlop\",\"customer_name\":\"customer1\",\"description\":\"Charleston\",\"end_date\":\"20201225\",\"engagement_lead_email\":\"doug93@leafs.com\",\"engagement_lead_name\":\"Doug Gilmour\",\"location\":\"Raleigh, NC\",\"project_id\":0,\"project_name\":\"project1\",\"public_reference\":false,\"start_date\":\"20200202\",\"technical_lead_email\":\"wendel17@leafs.com\",\"technical_lead_name\":\"Wendel Clark\"}"));
+                        "\n{\n" + 
+                        "    \"archive_date\": \"20210125\",\n" + 
+                        "    \"commits\": [\n" + 
+                        "    ],\n" + 
+                        "    \"customer_contact_email\": \"reg@chiefs.com\",\n" + 
+                        "    \"customer_contact_name\": \"Reg Dunlop\",\n" + 
+                        "    \"customer_name\": \"customer1\",\n" + 
+                        "    \"description\": \"Charleston\",\n" + 
+                        "    \"end_date\": \"20201225\",\n" + 
+                        "    \"engagement_lead_email\": \"doug93@leafs.com\",\n" + 
+                        "    \"engagement_lead_name\": \"Doug Gilmour\",\n" + 
+                        "    \"location\": \"Raleigh, NC\",\n" + 
+                        "    \"project_id\": 0,\n" + 
+                        "    \"project_name\": \"project1\",\n" + 
+                        "    \"public_reference\": false,\n" + 
+                        "    \"start_date\": \"20200202\",\n" + 
+                        "    \"technical_lead_email\": \"wendel17@leafs.com\",\n" + 
+                        "    \"technical_lead_name\": \"Wendel Clark\"\n" + 
+                        "}"));
     }
 
     @Test
@@ -124,8 +224,16 @@ class EngagementResourceTest {
 
         given().when().contentType(ContentType.JSON).get("/api/v1/engagements/customer/jello/lemon/hooks").then()
                 .statusCode(200)
-                .body(is("[{\"id\":13,\"project_id\":99,\"push_events\":true,\"push_events_branch_filter\""
-                        + ":\"master\",\"token\":\"token\",\"url\":\"http://webhook.edu/hook\"}]"));
+                .body(is("\n[\n" + 
+                        "    {\n" + 
+                        "        \"id\": 13,\n" + 
+                        "        \"project_id\": 99,\n" + 
+                        "        \"push_events\": true,\n" + 
+                        "        \"push_events_branch_filter\": \"master\",\n" + 
+                        "        \"token\": \"token\",\n" + 
+                        "        \"url\": \"http://webhook.edu/hook\"\n" + 
+                        "    }\n" + 
+                        "]"));
     }
 
     @Test
@@ -163,11 +271,68 @@ class EngagementResourceTest {
         given().when().contentType(ContentType.JSON).get("/api/v1/engagements/customer/jello/lemon/status").then()
                 .statusCode(200)
                 .body(is(
-                        "{\"messages\":[{\"message\":\"This is message 1\",\"severity\":\"INFO\",\"updated\":\"2020-06-23T21:25:31Z\"},{\"message\":\"This is message 2\",\"severity\":\"CRITICAL\",\"updated\":\"2020-06-22T11:15:11Z\"},"
-                                + "{\"message\":\"This is message 3\",\"severity\":\"SUCCESS\",\"updated\":\"2020-06-22T10:25:31Z\"}],\"overall_status\":\"yellow\",\"subsystems\":[{\"access_urls\":[{\"Web Console\":\"https://console......\"},"
-                                + "{\"API\":\"https://api.....:6443\"}],\"info\":\"Deployment In Progress\",\"messages\":[{\"message\":\"This is message 1\",\"severity\":\"INFO\",\"updated\":\"2020-06-23T21:25:31Z\"}],\"name\":\"openshift\","
-                                + "\"state\":\"provisioning\",\"status\":\"yellow\",\"updated\":\"2020-06-23T09:25:31Z\"},{\"access_urls\":[{\"atlassian\":\"https://mycompany.atlassian.net\"}],\"messages\":[{\"message\":\"This is message 1\","
-                                + "\"severity\":\"INFO\",\"updated\":\"2020-06-23T21:25:31Z\"}],\"name\":\"atlassian\",\"state\":\"operational\",\"status\":\"green\",\"updated\":\"2020-06-22T20:15:37Z\"}]}"));
+                        "\n{\n" + 
+                        "    \"messages\": [\n" + 
+                        "        {\n" + 
+                        "            \"message\": \"This is message 1\",\n" + 
+                        "            \"severity\": \"INFO\",\n" + 
+                        "            \"updated\": \"2020-06-23T21:25:31Z\"\n" + 
+                        "        },\n" + 
+                        "        {\n" + 
+                        "            \"message\": \"This is message 2\",\n" + 
+                        "            \"severity\": \"CRITICAL\",\n" + 
+                        "            \"updated\": \"2020-06-22T11:15:11Z\"\n" + 
+                        "        },\n" + 
+                        "        {\n" + 
+                        "            \"message\": \"This is message 3\",\n" + 
+                        "            \"severity\": \"SUCCESS\",\n" + 
+                        "            \"updated\": \"2020-06-22T10:25:31Z\"\n" + 
+                        "        }\n" + 
+                        "    ],\n" + 
+                        "    \"overall_status\": \"yellow\",\n" + 
+                        "    \"subsystems\": [\n" + 
+                        "        {\n" + 
+                        "            \"access_urls\": [\n" + 
+                        "                {\n" + 
+                        "                    \"Web Console\": \"https://console......\"\n" + 
+                        "                },\n" + 
+                        "                {\n" + 
+                        "                    \"API\": \"https://api.....:6443\"\n" + 
+                        "                }\n" + 
+                        "            ],\n" + 
+                        "            \"info\": \"Deployment In Progress\",\n" + 
+                        "            \"messages\": [\n" + 
+                        "                {\n" + 
+                        "                    \"message\": \"This is message 1\",\n" + 
+                        "                    \"severity\": \"INFO\",\n" + 
+                        "                    \"updated\": \"2020-06-23T21:25:31Z\"\n" + 
+                        "                }\n" + 
+                        "            ],\n" + 
+                        "            \"name\": \"openshift\",\n" + 
+                        "            \"state\": \"provisioning\",\n" + 
+                        "            \"status\": \"yellow\",\n" + 
+                        "            \"updated\": \"2020-06-23T09:25:31Z\"\n" + 
+                        "        },\n" + 
+                        "        {\n" + 
+                        "            \"access_urls\": [\n" + 
+                        "                {\n" + 
+                        "                    \"atlassian\": \"https://mycompany.atlassian.net\"\n" + 
+                        "                }\n" + 
+                        "            ],\n" + 
+                        "            \"messages\": [\n" + 
+                        "                {\n" + 
+                        "                    \"message\": \"This is message 1\",\n" + 
+                        "                    \"severity\": \"INFO\",\n" + 
+                        "                    \"updated\": \"2020-06-23T21:25:31Z\"\n" + 
+                        "                }\n" + 
+                        "            ],\n" + 
+                        "            \"name\": \"atlassian\",\n" + 
+                        "            \"state\": \"operational\",\n" + 
+                        "            \"status\": \"green\",\n" + 
+                        "            \"updated\": \"2020-06-22T20:15:37Z\"\n" + 
+                        "        }\n" + 
+                        "    ]\n" + 
+                        "}"));
     }
 
     @Test
@@ -181,7 +346,87 @@ class EngagementResourceTest {
 
         given().when().contentType(ContentType.JSON).queryParam("includeStatus", true)
                 .get("/api/v1/engagements/customer/jello/lemon").then().statusCode(200).body(is(
-                        "{\"archive_date\":\"20210125\",\"commits\":[],\"customer_contact_email\":\"reg@chiefs.com\",\"customer_contact_name\":\"Reg Dunlop\",\"customer_name\":\"customer1\",\"description\":\"Charleston\",\"end_date\":\"20201225\",\"engagement_lead_email\":\"doug93@leafs.com\",\"engagement_lead_name\":\"Doug Gilmour\",\"location\":\"Raleigh, NC\",\"project_id\":0,\"project_name\":\"project1\",\"public_reference\":false,\"start_date\":\"20200202\",\"status\":{\"messages\":[{\"message\":\"This is message 1\",\"severity\":\"INFO\",\"updated\":\"2020-06-23T21:25:31Z\"},{\"message\":\"This is message 2\",\"severity\":\"CRITICAL\",\"updated\":\"2020-06-22T11:15:11Z\"},{\"message\":\"This is message 3\",\"severity\":\"SUCCESS\",\"updated\":\"2020-06-22T10:25:31Z\"}],\"overall_status\":\"yellow\",\"subsystems\":[{\"access_urls\":[{\"Web Console\":\"https://console......\"},{\"API\":\"https://api.....:6443\"}],\"info\":\"Deployment In Progress\",\"messages\":[{\"message\":\"This is message 1\",\"severity\":\"INFO\",\"updated\":\"2020-06-23T21:25:31Z\"}],\"name\":\"openshift\",\"state\":\"provisioning\",\"status\":\"yellow\",\"updated\":\"2020-06-23T09:25:31Z\"},{\"access_urls\":[{\"atlassian\":\"https://mycompany.atlassian.net\"}],\"messages\":[{\"message\":\"This is message 1\",\"severity\":\"INFO\",\"updated\":\"2020-06-23T21:25:31Z\"}],\"name\":\"atlassian\",\"state\":\"operational\",\"status\":\"green\",\"updated\":\"2020-06-22T20:15:37Z\"}]},\"technical_lead_email\":\"wendel17@leafs.com\",\"technical_lead_name\":\"Wendel Clark\"}"));
+                        "\n{\n" + 
+                        "    \"archive_date\": \"20210125\",\n" + 
+                        "    \"commits\": [\n" + 
+                        "    ],\n" + 
+                        "    \"customer_contact_email\": \"reg@chiefs.com\",\n" + 
+                        "    \"customer_contact_name\": \"Reg Dunlop\",\n" + 
+                        "    \"customer_name\": \"customer1\",\n" + 
+                        "    \"description\": \"Charleston\",\n" + 
+                        "    \"end_date\": \"20201225\",\n" + 
+                        "    \"engagement_lead_email\": \"doug93@leafs.com\",\n" + 
+                        "    \"engagement_lead_name\": \"Doug Gilmour\",\n" + 
+                        "    \"location\": \"Raleigh, NC\",\n" + 
+                        "    \"project_id\": 0,\n" + 
+                        "    \"project_name\": \"project1\",\n" + 
+                        "    \"public_reference\": false,\n" + 
+                        "    \"start_date\": \"20200202\",\n" + 
+                        "    \"status\": {\n" + 
+                        "        \"messages\": [\n" + 
+                        "            {\n" + 
+                        "                \"message\": \"This is message 1\",\n" + 
+                        "                \"severity\": \"INFO\",\n" + 
+                        "                \"updated\": \"2020-06-23T21:25:31Z\"\n" + 
+                        "            },\n" + 
+                        "            {\n" + 
+                        "                \"message\": \"This is message 2\",\n" + 
+                        "                \"severity\": \"CRITICAL\",\n" + 
+                        "                \"updated\": \"2020-06-22T11:15:11Z\"\n" + 
+                        "            },\n" + 
+                        "            {\n" + 
+                        "                \"message\": \"This is message 3\",\n" + 
+                        "                \"severity\": \"SUCCESS\",\n" + 
+                        "                \"updated\": \"2020-06-22T10:25:31Z\"\n" + 
+                        "            }\n" + 
+                        "        ],\n" + 
+                        "        \"overall_status\": \"yellow\",\n" + 
+                        "        \"subsystems\": [\n" + 
+                        "            {\n" + 
+                        "                \"access_urls\": [\n" + 
+                        "                    {\n" + 
+                        "                        \"Web Console\": \"https://console......\"\n" + 
+                        "                    },\n" + 
+                        "                    {\n" + 
+                        "                        \"API\": \"https://api.....:6443\"\n" + 
+                        "                    }\n" + 
+                        "                ],\n" + 
+                        "                \"info\": \"Deployment In Progress\",\n" + 
+                        "                \"messages\": [\n" + 
+                        "                    {\n" + 
+                        "                        \"message\": \"This is message 1\",\n" + 
+                        "                        \"severity\": \"INFO\",\n" + 
+                        "                        \"updated\": \"2020-06-23T21:25:31Z\"\n" + 
+                        "                    }\n" + 
+                        "                ],\n" + 
+                        "                \"name\": \"openshift\",\n" + 
+                        "                \"state\": \"provisioning\",\n" + 
+                        "                \"status\": \"yellow\",\n" + 
+                        "                \"updated\": \"2020-06-23T09:25:31Z\"\n" + 
+                        "            },\n" + 
+                        "            {\n" + 
+                        "                \"access_urls\": [\n" + 
+                        "                    {\n" + 
+                        "                        \"atlassian\": \"https://mycompany.atlassian.net\"\n" + 
+                        "                    }\n" + 
+                        "                ],\n" + 
+                        "                \"messages\": [\n" + 
+                        "                    {\n" + 
+                        "                        \"message\": \"This is message 1\",\n" + 
+                        "                        \"severity\": \"INFO\",\n" + 
+                        "                        \"updated\": \"2020-06-23T21:25:31Z\"\n" + 
+                        "                    }\n" + 
+                        "                ],\n" + 
+                        "                \"name\": \"atlassian\",\n" + 
+                        "                \"state\": \"operational\",\n" + 
+                        "                \"status\": \"green\",\n" + 
+                        "                \"updated\": \"2020-06-22T20:15:37Z\"\n" + 
+                        "            }\n" + 
+                        "        ]\n" + 
+                        "    },\n" + 
+                        "    \"technical_lead_email\": \"wendel17@leafs.com\",\n" + 
+                        "    \"technical_lead_name\": \"Wendel Clark\"\n" + 
+                        "}"));
     }
 
     @Test
@@ -192,13 +437,41 @@ class EngagementResourceTest {
         given().when().contentType(ContentType.JSON).get("/api/v1/engagements/customer/jello/lemon/commits").then()
                 .statusCode(200)
                 .body(is(
-                        "[{\"author_email\":\"mmarner@example.com\",\"author_name\":\"Mitch Marner\",\"authored_date\":\"2020-06-16T00:12:18.000+00:00\",\"committed_date\":\"2020-06-16T00:12:18.000+00:00\","
-                                + "\"id\":\"5178ffab3566ac591af95c3383d1c5916de4a3a9\",\"message\":\"Update engagement.json\",\"short_id\":\"5178ffab\",\"title\":\"Update engagement.json\","
-                                + "\"web_url\":\"https://gitlab.example.com/store/jello/lemon/iac/-/commit/5178ffab3566ac591af95c3383d1c5916de4a3a9\"},{\"author_email\":\"jtavares@example.com\",\"author_name\":\"John Tavares\","
-                                + "\"authored_date\":\"2020-06-11T16:46:19.000+00:00\",\"committed_date\":\"2020-06-11T16:46:19.000+00:00\",\"id\":\"7865570dc63b1463d9fb4d02bd09ff46d244e694\",\"message\":\"Update status.json\","
-                                + "\"short_id\":\"7865570d\",\"title\":\"Update status.json\",\"web_url\":\"https://gitlab.example.com/store/jello/lemon/iac/-/commit/7865570dc63b1463d9fb4d02bd09ff46d244e694\"},{\"author_email\":\"mmarner@example.com\","
-                                + "\"author_name\":\"Mitch Marner\",\"authored_date\":\"2020-06-04T22:34:10.000+00:00\",\"committed_date\":\"2020-06-04T22:34:10.000+00:00\",\"id\":\"dd0cc0fa7868210e2eb5a030f07cc0221dd6bc9f\","
-                                + "\"message\":\"Bump OCP version (jacob test)\",\"short_id\":\"dd0cc0fa\",\"title\":\"Bump OCP version (test)\",\"web_url\":\"https://gitlab.example.com/store/jello/lemon/iac/-/commit/dd0cc0fa7868210e2eb5a030f07cc0221dd6bc9f\"}]"));
+                        "\n[\n" + 
+                        "    {\n" + 
+                        "        \"author_email\": \"mmarner@example.com\",\n" + 
+                        "        \"author_name\": \"Mitch Marner\",\n" + 
+                        "        \"authored_date\": \"2020-06-16T00:12:18.000+00:00\",\n" + 
+                        "        \"committed_date\": \"2020-06-16T00:12:18.000+00:00\",\n" + 
+                        "        \"id\": \"5178ffab3566ac591af95c3383d1c5916de4a3a9\",\n" + 
+                        "        \"message\": \"Update engagement.json\",\n" + 
+                        "        \"short_id\": \"5178ffab\",\n" + 
+                        "        \"title\": \"Update engagement.json\",\n" + 
+                        "        \"web_url\": \"https://gitlab.example.com/store/jello/lemon/iac/-/commit/5178ffab3566ac591af95c3383d1c5916de4a3a9\"\n" + 
+                        "    },\n" + 
+                        "    {\n" + 
+                        "        \"author_email\": \"jtavares@example.com\",\n" + 
+                        "        \"author_name\": \"John Tavares\",\n" + 
+                        "        \"authored_date\": \"2020-06-11T16:46:19.000+00:00\",\n" + 
+                        "        \"committed_date\": \"2020-06-11T16:46:19.000+00:00\",\n" + 
+                        "        \"id\": \"7865570dc63b1463d9fb4d02bd09ff46d244e694\",\n" + 
+                        "        \"message\": \"Update status.json\",\n" + 
+                        "        \"short_id\": \"7865570d\",\n" + 
+                        "        \"title\": \"Update status.json\",\n" + 
+                        "        \"web_url\": \"https://gitlab.example.com/store/jello/lemon/iac/-/commit/7865570dc63b1463d9fb4d02bd09ff46d244e694\"\n" + 
+                        "    },\n" + 
+                        "    {\n" + 
+                        "        \"author_email\": \"mmarner@example.com\",\n" + 
+                        "        \"author_name\": \"Mitch Marner\",\n" + 
+                        "        \"authored_date\": \"2020-06-04T22:34:10.000+00:00\",\n" + 
+                        "        \"committed_date\": \"2020-06-04T22:34:10.000+00:00\",\n" + 
+                        "        \"id\": \"dd0cc0fa7868210e2eb5a030f07cc0221dd6bc9f\",\n" + 
+                        "        \"message\": \"Bump OCP version (jacob test)\",\n" + 
+                        "        \"short_id\": \"dd0cc0fa\",\n" + 
+                        "        \"title\": \"Bump OCP version (test)\",\n" + 
+                        "        \"web_url\": \"https://gitlab.example.com/store/jello/lemon/iac/-/commit/dd0cc0fa7868210e2eb5a030f07cc0221dd6bc9f\"\n" + 
+                        "    }\n" + 
+                        "]"));
     }
 
 }

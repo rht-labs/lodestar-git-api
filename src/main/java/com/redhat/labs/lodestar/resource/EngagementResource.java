@@ -5,6 +5,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -126,6 +127,17 @@ public class EngagementResource {
 
         Status status = engagementService.getProjectStatus(customer, engagement);
         return Response.ok().entity(status).build();
+    }
+
+    @DELETE
+    @Path("/hooks")
+    @Counted(name = "delete-hooks", description = "Count of delete-hooks requests")
+    @Timed(name = "performedHooksDelete", description = "Time to delete hooks", unit = MetricUnits.MILLISECONDS)
+    public Response deleteAllHooks() {
+
+        engagementService.deleteHooks();
+        return Response.ok().build();
+
     }
 
 }

@@ -17,7 +17,10 @@ public class VersionResourceTest {
             .get("/api/v1/version")
         .then()
             .statusCode(200)
-            .body(is("{\"git_commit\":\"not.set\",\"git_tag\":\"not.set\"}"));
+            .body(is("\n{\n" + 
+                    "    \"git_commit\": \"not.set\",\n" + 
+                    "    \"git_tag\": \"not.set\"\n" + 
+                    "}"));
     }   
 }
     

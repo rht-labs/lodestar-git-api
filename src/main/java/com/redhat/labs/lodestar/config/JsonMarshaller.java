@@ -8,11 +8,8 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
+import javax.inject.Inject;
 import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.config.PropertyNamingStrategy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +18,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-import io.quarkus.runtime.StartupEvent;
 import lombok.Setter;
 
 /**
@@ -33,19 +29,12 @@ import lombok.Setter;
 public class JsonMarshaller {
     public static Logger LOGGER = LoggerFactory.getLogger(JsonMarshaller.class);
 
+    @Inject
     @Setter
-    private Jsonb jsonb;
+    Jsonb jsonb;
     
     private ObjectMapper om = new ObjectMapper(new YAMLFactory());
-    
-    void onStart(@Observes StartupEvent event) { 
-        JsonbConfig config = new JsonbConfig()
-                .withFormatting(true)
-                .withPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES);
-        jsonb = JsonbBuilder.create(config);
-        
-    }
-    
+
     /**
      * Reads a file from the system and returns the contents transformed into a new object. Must be a list. If this fails
      * for any IOException or the file is not readable it will return null 

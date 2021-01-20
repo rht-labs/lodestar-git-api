@@ -356,4 +356,10 @@ public class MockGitLabService implements GitLabService {
         return null;
     }
 
+    @Override
+    public void deleteProjectHook(Integer projectId, Integer hookId) {
+        // do nothing
+        
+    }
+
 }
