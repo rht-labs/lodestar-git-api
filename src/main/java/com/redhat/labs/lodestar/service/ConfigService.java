@@ -47,6 +47,9 @@ public class ConfigService {
     @ConfigProperty(name = "config.gitlab.ref", defaultValue = "master")
     String gitRef;
 
+    @ConfigProperty(name = "config.reload")
+    Boolean reloadConfig;
+
     ConfigMap hookConfigMap;
     ConfigMap configurationConfigMap;
 
@@ -74,8 +77,10 @@ public class ConfigService {
      */
     @Scheduled(every = "30s")
     void reloadConfigMapData() {
-        loadWebHookData();
-        loadConfigurationData();
+        if(reloadConfig) {
+            loadWebHookData();
+            loadConfigurationData();
+        }
     }
 
     /**
