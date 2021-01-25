@@ -87,17 +87,16 @@ public class ConfigService {
         // create config map
         if (null == hookConfigMap) {
             hookConfigMap = ConfigMap.builder().filePath(webHooksFile).build();
-            LOGGER.trace("setting webhook config map: {}", hookConfigMap);
+            LOGGER.debug("setting webhook config map: {}", hookConfigMap);
         }
 
         // load content from file
         if (hookConfigMap.updateMountedFile()) {
-            LOGGER.trace("loading latest version of webhook file");
 
             // set hook config as list
             if (hookConfigMap.getContent().isPresent()) {
                 hookConfigList = marshaller.fromYaml(hookConfigMap.getContent().get(), HookConfig.class);
-                LOGGER.debug("Hook Config List {}", hookConfigList);
+                LOGGER.debug("Loaded Hook Config List {}", hookConfigList);
             }
 
             // update web hooks
@@ -119,14 +118,20 @@ public class ConfigService {
         projects.stream().filter(project -> project.getName().equals(IAC))
                 .filter(project -> !engagementIsArchived(project)).forEach(project -> {
 
-                    LOGGER.debug("updating project: {}",
-                            (null != project.getNamespace()) ? project.getNamespace().getFullPath() : project.getId());
+                    Integer projectId = project.getId();
 
+                    LOGGER.debug("updating project: {}",
+                            (null != project.getNamespace()) ? project.getNamespace().getFullPath() : projectId);
+
+                    // remove existing webhooks for project
+                    hookService.deleteProjectHooks(projectId);
+
+                    // create hooks from configuration
                     hookConfigs.stream().forEach(hookC -> {
-                        Hook hook = Hook.builder().projectId(project.getId()).pushEvents(true).url(hookC.getBaseUrl())
+                        Hook hook = Hook.builder().projectId(projectId).pushEvents(true).url(hookC.getBaseUrl())
                                 .token(hookC.getToken()).build();
-                        LOGGER.debug("\tupdating webhook {}", hook.getUrl());
-                        Response response = hookService.createOrUpdateProjectHook(project.getId(), hook);
+                        LOGGER.debug("\tcreating webhook {}", hook.getUrl());
+                        Response response = hookService.createProjectHook(projectId, hook);
                         LOGGER.debug("\t\tservice response code: {}", response.getStatus());
                         response.close();
 
