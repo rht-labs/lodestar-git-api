@@ -48,7 +48,7 @@ public class ConfigService {
     String gitRef;
 
     @ConfigProperty(name = "config.reload")
-    Boolean reloadConfig;
+    boolean reloadConfig;
 
     ConfigMap hookConfigMap;
     ConfigMap configurationConfigMap;
