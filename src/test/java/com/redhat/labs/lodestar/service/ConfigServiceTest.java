@@ -33,6 +33,7 @@ class ConfigServiceTest {
         service.projectService = projectService;        
         service.engagementRepositoryId = 0;
 
+        service.reloadConfig = true;
         service.reloadConfigMapData();
         File config = service.getConfigFile();
 
@@ -94,6 +95,7 @@ class ConfigServiceTest {
         service.projectService = projectService;        
         service.engagementRepositoryId = 0;
 
+        service.reloadConfig = true;
         service.reloadConfigMapData();
         List<HookConfig> hookConfigList = service.getHookConfig();
         
