@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import com.redhat.labs.lodestar.models.Engagement;
 import com.redhat.labs.lodestar.models.ProjectStructure;
 import com.redhat.labs.lodestar.models.ProjectStructure.ProjectStructureBuilder;
+import com.redhat.labs.lodestar.models.events.DeleteProjectEvent;
+import com.redhat.labs.lodestar.models.events.EventType;
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Namespace;
 import com.redhat.labs.lodestar.models.gitlab.Project;
@@ -31,7 +33,6 @@ public class ProjectStructureService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectStructure.class);
 
     private static final String ENGAGEMENT_PROJECT_NAME = "iac";
-    private static final String CLEANUP_EVENT = "cleanup.project.structure.event";
 
     @ConfigProperty(name = "engagements.repository.id")
     Integer engagementRepositoryId;
@@ -72,7 +73,7 @@ public class ProjectStructureService {
         }
 
         // clean up groups if project moved
-        eventBus.sendAndForget(CLEANUP_EVENT, existingProjectStructure);
+        eventBus.sendAndForget(EventType.CLEANUP_PROJECT_STRUCTURE_EVENT, existingProjectStructure);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("create or update project structure took {} ms",
@@ -209,7 +210,7 @@ public class ProjectStructureService {
 
         Project toMove = project.get();
         Integer projectId = toMove.getId();
-        toMove.setMoved(true);
+        toMove.setMovedOrDeleted(true);
 
         // move project to new parent/group id
         return projectService.transferProject(projectId, newParentId);
@@ -226,37 +227,57 @@ public class ProjectStructureService {
     void cleanupGroups(ProjectStructure existingProjectStructure) {
 
         // do nothing if project missing or has not been moved
-        if (existingProjectStructure.getProject().isEmpty() || !existingProjectStructure.getProject().get().isMoved()) {
+        if (existingProjectStructure.getProject().isEmpty()
+                || !existingProjectStructure.getProject().get().isMovedOrDeleted()) {
             return;
         }
 
         // remove project group
-        removeGroupIfEmpty(existingProjectStructure.getProjectGroupId().get(), 5);
+        removeGroupIfEmpty(existingProjectStructure.getProjectGroupId().get());
         // remove customer group
-        removeGroupIfEmpty(existingProjectStructure.getCustomerGroupId().get(), 5);
+        removeGroupIfEmpty(existingProjectStructure.getCustomerGroupId().get());
 
     }
 
-    void removeGroupIfEmpty(Integer groupId, int retryCount) {
+    void removeGroupIfEmpty(Integer groupId) {
+
+        removeIfEmpty(5, () -> {
+
+            // remove if no subgroups or projects
+            if (projectService.getProjectsByGroup(groupId, false).isEmpty()
+                    && groupService.getSubgroups(groupId).isEmpty()) {
+                groupService.deleteGroup(groupId);
+            }
+
+            groupService.getGitLabGroupByById(groupId);
+
+        });
+
+    }
+
+    void removeProjectIfExists(Integer projectId) {
+
+        removeIfEmpty(5, () -> {
+            // remove project if it exists
+            projectService.deleteProject(projectId);
+        });
+
+    }
+
+    void removeIfEmpty(int retryCount, Runnable runnable) {
 
         int count = 0;
 
         while (count <= retryCount) {
 
+            LOGGER.debug("removal attempt {} of {}", count, retryCount);
             try {
-
-                // remove if no subgroups or projects
-                if (projectService.getProjectsByGroup(groupId, false).isEmpty()
-                        && groupService.getSubgroups(groupId).isEmpty()) {
-                    groupService.deleteGroup(groupId);
-                }
-
-                groupService.getGitLabGroupByById(groupId);
-
+                runnable.run();
             } catch (WebApplicationException wae) {
                 if (wae.getResponse().getStatus() == 404) {
                     break;
                 }
+                throw wae;
             }
 
             count += 1;
@@ -280,9 +301,35 @@ public class ProjectStructureService {
 
     }
 
-    @ConsumeEvent(value = CLEANUP_EVENT, blocking = true)
+    @ConsumeEvent(value = EventType.DELETE_PROJECT_EVENT, blocking = true)
+    void consumeDeleteProjectEvent(DeleteProjectEvent event) {
+
+        // get the existing structure if not new
+        ProjectStructure projectStructure = getExistingProjectStructure(event.getEngagement(),
+                event.getEngagementPathPrefix());
+
+        Optional<Project> project = projectStructure.getProject();
+        if (project.isPresent()) {
+
+            // remove the project
+            removeProjectIfExists(project.get().getId());
+
+            // set moved or deleted flag
+            project.get().setMovedOrDeleted(true);
+
+            // clean up project structure
+            eventBus.sendAndForget(EventType.CLEANUP_PROJECT_STRUCTURE_EVENT, projectStructure);
+
+        }
+
+    }
+
+    @ConsumeEvent(value = EventType.CLEANUP_PROJECT_STRUCTURE_EVENT, blocking = true)
     void consumeCleanupProjectStructureEvent(ProjectStructure existingProjectStructure) {
+
+        // clean up groups
         cleanupGroups(existingProjectStructure);
+
     }
 
 }
