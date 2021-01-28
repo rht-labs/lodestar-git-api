@@ -74,6 +74,9 @@ public class EngagementService {
     HookService hookService;
 
     @Inject
+    ConfigService configService;
+
+    @Inject
     ProjectStructureService structureService;
 
     @Inject
@@ -122,6 +125,11 @@ public class EngagementService {
         // send commit to gitlab
         if (!fileService.createFiles(project.getId(), commit)) {
             throw new UnexpectedGitLabResponseException("failed to commit files for engagement creation.");
+        }
+
+        // create hooks if new engagement, should already exist if updating
+        if(project.isFirst()) {
+            configService.createWebhooksForEnagement(engagement);
         }
 
         return project;
