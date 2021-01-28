@@ -118,8 +118,10 @@ public class EngagementService {
             throw new UnexpectedGitLabResponseException("failed to commit files for engagement creation.");
         }
 
-        // create or update web hooks 
-        configService.createWebhooksForEnagement(engagement, project.isFirst());
+        // create hooks if new engagement, should already exist if updating
+        if(project.isFirst()) {
+            configService.createWebhooksForEnagement(engagement);
+        }
 
         return project;
 
