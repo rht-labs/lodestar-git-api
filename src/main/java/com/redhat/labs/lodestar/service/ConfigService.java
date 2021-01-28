@@ -77,7 +77,7 @@ public class ConfigService {
      */
     @Scheduled(every = "30s")
     void reloadConfigMapData() {
-        if(reloadConfig) {
+        if (reloadConfig) {
             loadWebHookData();
             loadConfigurationData();
         }
@@ -178,6 +178,28 @@ public class ConfigService {
         }
 
         return false;
+
+    }
+
+    /**
+     * Adds all configured webhooks to the project for the given {@link Engagement}.
+     * 
+     * @param engagement
+     * @param isFirst
+     * 
+     */
+    public void createWebhooksForEnagement(Engagement engagement, boolean isFirst) {
+
+        List<HookConfig> hookConfigs = getHookConfig();
+        hookConfigs.stream().forEach(hookC -> {
+            Hook hook = Hook.builder().projectId(engagement.getProjectId()).pushEvents(true).url(hookC.getBaseUrl())
+                    .token(hookC.getToken()).build();
+            if (isFirst) { // No need to check for existing hooks first time
+                hookService.createProjectHook(engagement.getProjectId(), hook);
+            } else {
+                hookService.createOrUpdateProjectHook(engagement.getProjectId(), hook);
+            }
+        });
 
     }
 
