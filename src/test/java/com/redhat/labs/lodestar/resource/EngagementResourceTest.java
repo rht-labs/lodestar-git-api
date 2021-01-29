@@ -480,7 +480,7 @@ class EngagementResourceTest {
     }
 
     @Test
-    void testDeleteEngagement() {
+    void testDeleteEngagement() throws InterruptedException {
 
         Project project = MockUtils.mockIacProject();
         MockUtils.setGetProjectByPathMock(gitLabService, "top/dog/customer1/project1/iac", true, Optional.of(project));
@@ -498,6 +498,9 @@ class EngagementResourceTest {
             .delete("/api/v1/engagements/customer/customer1/project1")
         .then()
             .statusCode(202);
+
+        // delay before checking invocation
+        TimeUnit.SECONDS.sleep(1);
 
         // validate delete project was called
         Mockito.verify(gitLabService).deleteProjectById(project.getId());
