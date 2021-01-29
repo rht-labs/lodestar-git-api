@@ -480,7 +480,7 @@ class EngagementResourceTest {
     }
 
     @Test
-    void testDeleteEngagement() throws InterruptedException {
+    void testDeleteEngagement() {
 
         Project project = MockUtils.mockIacProject();
         MockUtils.setGetProjectByPathMock(gitLabService, "top/dog/customer1/project1/iac", true, Optional.of(project));
@@ -491,6 +491,7 @@ class EngagementResourceTest {
         
         MockUtils.setGetProjectsByGroupMock(gitLabService, project.getId(), Arrays.asList(), false);
         MockUtils.setDeleteGroupById(gitLabService);
+        MockUtils.setDeleteProjectById(gitLabService);
 
         given()
         .when()

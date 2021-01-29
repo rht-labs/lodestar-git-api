@@ -208,4 +208,8 @@ public class MockUtils {
         BDDMockito.doThrow(new WebApplicationException(404)).when(gitLabService).deleteGroupById(Mockito.anyInt());
     }
 
+    public static void setDeleteProjectById(GitLabService gitLabService) {
+        BDDMockito.doThrow(new WebApplicationException(404)).when(gitLabService).deleteProjectById(Mockito.anyInt());
+    }
+
 }
