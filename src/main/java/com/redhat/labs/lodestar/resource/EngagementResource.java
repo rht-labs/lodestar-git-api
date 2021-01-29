@@ -86,6 +86,17 @@ public class EngagementResource {
         return Response.ok().entity(response).build();
     }
 
+    @DELETE
+    @Path("/customer/{customer}/{engagement}")
+    @Counted(name = "delete-engagement", description = "Count of delete engagement")
+    @Timed(name = "performedEngagementDelete", description = "Time to delete an engagement", unit = MetricUnits.MILLISECONDS)
+    public Response deleteEngagement(@PathParam("customer") String customer, @PathParam("engagement") String engagement) {
+
+        engagementService.deleteEngagement(customer,engagement);
+        return Response.accepted().build();
+
+    }
+
     @POST
     @Path("customer/{customer}/{engagement}/hooks")
     @Counted(name = "create-engagement-hook", description = "Count of create-hook requestst")

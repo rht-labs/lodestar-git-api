@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -27,6 +28,10 @@ public class MockUtils {
     public static Integer CUSTOMER_GROUP_ID = 2222;
     public static Integer PROJECT_GROUP_ID = 3333;
     public static Integer PROJECT_ID = 4444;
+
+    public static Group mockRepositoryGroup() {
+        return Group.builder().fullPath("top/dog").build();
+    }
 
     public static Group mockCustomerGroup(String customerName) {
         return mockGroup(customerName, CUSTOMER_GROUP_ID, REPO_ID);
@@ -54,10 +59,15 @@ public class MockUtils {
     }
 
     // get projects by group
-    public static void setGetProjectsByGroupMock(GitLabService gitLabService, Integer projectId,
-            List<Project> projects) {
+    public static void setGetProjectsByGroupMock(GitLabService gitLabService, Integer projectId, List<Project> projects,
+            boolean hasProject) {
         Response r = Response.ok(projects).header("X-Total-Pages", 1).build();
-        BDDMockito.given(gitLabService.getProjectsbyGroup(2, true, 100, 1)).willReturn(r);
+        if (hasProject) {
+            BDDMockito.given(gitLabService.getProjectsbyGroup(2, true, 100, 1)).willReturn(r);
+        } else {
+            BDDMockito.given(gitLabService.getProjectsbyGroup(Mockito.anyInt(), Mockito.anyBoolean(), Mockito.eq(100),
+                    Mockito.eq(1))).willReturn(r);
+        }
     }
 
     // get projects by id/path
@@ -172,6 +182,11 @@ public class MockUtils {
         BDDMockito.given(gitLabService.getGroupByIdOrPath(String.valueOf(groupId))).willReturn(group);
     }
 
+    public static void setGetGroupByIdOrPathMock(GitLabService gitLabService, String customerName, String projectName) {
+        BDDMockito.given(gitLabService.getGroupByIdOrPath(Mockito.anyString())).willReturn(mockRepositoryGroup(),
+                mockCustomerGroup(customerName), mockProjectGroup(projectName));
+    }
+
     // get project hooks
     public static void setGetProjectHookMock(GitLabService gitLabService, Integer projectId) {
 
@@ -187,6 +202,14 @@ public class MockUtils {
     public static void setCreateProjectHookMock(GitLabService gitLabService, Integer projectId) {
         BDDMockito.given(gitLabService.createProjectHook(Mockito.eq(projectId), Mockito.any(Hook.class)))
                 .willReturn(Response.status(Status.CREATED).build());
+    }
+
+    public static void setDeleteGroupById(GitLabService gitLabService) {
+        BDDMockito.doThrow(new WebApplicationException(404)).when(gitLabService).deleteGroupById(Mockito.anyInt());
+    }
+
+    public static void setDeleteProjectById(GitLabService gitLabService) {
+        BDDMockito.doThrow(new WebApplicationException(404)).when(gitLabService).deleteProjectById(Mockito.anyInt());
     }
 
 }

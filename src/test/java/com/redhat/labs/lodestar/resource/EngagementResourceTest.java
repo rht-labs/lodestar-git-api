@@ -4,12 +4,15 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Project;
@@ -43,7 +46,7 @@ class EngagementResourceTest {
         // get engagements by group
         List<Project> projects = new ArrayList<>();
         projects.add(Project.builder().id(20).name("Project " + (20)).build());
-        MockUtils.setGetProjectsByGroupMock(gitLabService, 20, projects);
+        MockUtils.setGetProjectsByGroupMock(gitLabService, 20, projects, true);
 
         // get engagement file
         MockUtils.setGetFileForEngagementJsonMock(gitLabService, 20, true);
@@ -472,6 +475,34 @@ class EngagementResourceTest {
                         "        \"web_url\": \"https://gitlab.example.com/store/jello/lemon/iac/-/commit/dd0cc0fa7868210e2eb5a030f07cc0221dd6bc9f\"\n" + 
                         "    }\n" + 
                         "]"));
+    }
+
+    @Test
+    void testDeleteEngagement() throws InterruptedException {
+
+        Project project = MockUtils.mockIacProject();
+        MockUtils.setGetProjectByPathMock(gitLabService, "top/dog/customer1/project1/iac", true, Optional.of(project));
+        MockUtils.setGetFileForEngagementJsonMock(gitLabService, project.getId(), true);
+        MockUtils.setGetCommitLogMock(gitLabService, 0, 0);
+        MockUtils.setGetSubgroupsMock(gitLabService, Optional.empty(), false);
+        MockUtils.setGetGroupByIdOrPathMock(gitLabService, "customer1", "project1");
+        
+        MockUtils.setGetProjectsByGroupMock(gitLabService, project.getId(), Arrays.asList(), false);
+        MockUtils.setDeleteGroupById(gitLabService);
+        MockUtils.setDeleteProjectById(gitLabService);
+
+        given()
+        .when()
+            .delete("/api/v1/engagements/customer/customer1/project1")
+        .then()
+            .statusCode(202);
+
+        // delay before checking invocation
+        TimeUnit.SECONDS.sleep(1);
+
+        // validate delete project was called
+        Mockito.verify(gitLabService).deleteProjectById(project.getId());
+        
     }
 
 }

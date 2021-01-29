@@ -138,7 +138,7 @@ public class Project {
     @JsonbTransient
     private boolean first;
     @JsonbTransient
-    private boolean moved;
+    private boolean movedOrDeleted;
 
     // TODO: Can expose avatar as well, just need to figure out what type to use.
     // avatar mixed no Image file for avatar of the group. Introduced in GitLab 12.9
