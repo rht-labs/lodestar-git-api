@@ -12,7 +12,6 @@ public class GitApiLivenessProbe implements HealthCheck {
 
     @Override
     public HealthCheckResponse call() {
-//        TODO - add something here for app down eg skull for app dead?
         return HealthCheckResponse.up("\uD83D\uDC4D");
     }
 }

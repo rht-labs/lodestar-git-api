@@ -13,12 +13,12 @@ import java.io.IOException;
 @Provider
 public class ResponseLoggingFilter implements ContainerResponseFilter {
 
-    public static Logger logger = LoggerFactory.getLogger(ContainerResponseFilter.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(ResponseLoggingFilter.class);
 
     @Override
     public void filter(ContainerRequestContext requestContext,
                        ContainerResponseContext responseContext) throws IOException {
-        logger.info("Request {}", requestContext.getUriInfo());
-        logger.info("Response {}", responseContext.getEntity());
+        LOGGER.info("Request {}", requestContext.getUriInfo());
+        LOGGER.info("Response {}", responseContext.getEntity());
     }
 }

@@ -43,7 +43,7 @@ public class Group {
     private String projectCreationLevel;
 
     @JsonbProperty("auto_devops_enabled")
-    private Boolean AutoDevopsEnabled;
+    private Boolean autoDevopsEnabled;
     @JsonbProperty("subgroup_creation_level")
     private String subgroupCreationLevel;
     @JsonbProperty("emails_disabled")
@@ -63,8 +63,5 @@ public class Group {
     private Integer sharedRunnersMinuteLimit;
     @JsonbProperty("extra_shared_runners_minutes_limit")
     private Integer extraSharedRunnersMinutesLimit;
-
-    // TODO: Can expose avatar as well, just need to figure out what type to use.
-    // avatar mixed no Image file for avatar of the group. Introduced in GitLab 12.9
 
 }

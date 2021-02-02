@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.redhat.labs.lodestar.models.ConfigMap;
 
-public class ConfigMapTest {
+class ConfigMapTest {
 
     final static String READABLE_FILE = "src/test/resources/webhooks.yaml";
     final static String UNREADABLE_FILE = "/ad;lfjasdf";

@@ -15,10 +15,8 @@ public class ApiExceptionMapper implements ExceptionMapper<RuntimeException> {
     public Response toResponse(RuntimeException exception) {
 
         int status = HttpStatus.SC_INTERNAL_SERVER_ERROR;
-
         JsonObject model = Json.createObjectBuilder().add("error", exception.getMessage()).add("code", status).build();
 
-        // TODO: may need to be different response for each type of runtime exception
         return Response.status(status).entity(model.toString()).build();
 
     }

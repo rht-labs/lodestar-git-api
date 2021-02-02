@@ -36,7 +36,7 @@ import com.redhat.labs.lodestar.service.EngagementService;
 @Consumes(MediaType.APPLICATION_JSON)
 public class EngagementResource {
 
-    public static Logger LOGGER = LoggerFactory.getLogger(EngagementResource.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(EngagementResource.class);
 
     @Inject
     EngagementService engagementService;
@@ -104,8 +104,8 @@ public class EngagementResource {
     public Response createProjectHook(Hook hook, @PathParam("customer") String customer,
             @PathParam("engagement") String engagement) {
 
-        Response response = engagementService.createHook(customer, engagement, hook);
-        return response;
+        return  engagementService.createHook(customer, engagement, hook);
+
     }
 
     @GET

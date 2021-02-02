@@ -18,7 +18,7 @@ import com.redhat.labs.lodestar.rest.client.GitLabService;
 
 @ApplicationScoped
 public class HookService {
-    public static Logger LOGGER = LoggerFactory.getLogger(HookService.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(HookService.class);
 
     @Inject
     @RestClient

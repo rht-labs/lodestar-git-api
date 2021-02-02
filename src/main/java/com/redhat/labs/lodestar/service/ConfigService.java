@@ -99,8 +99,9 @@ public class ConfigService {
         if (hookConfigMap.updateMountedFile()) {
 
             // set hook config as list
-            if (hookConfigMap.getContent().isPresent()) {
-                hookConfigList = marshaller.fromYaml(hookConfigMap.getContent().get(), HookConfig.class);
+            Optional<String> content = hookConfigMap.getContent();
+            if (content.isPresent()) {
+                hookConfigList = marshaller.fromYaml(content.get(), HookConfig.class);
                 LOGGER.debug("Loaded Hook Config List {}", hookConfigList);
             }
 
@@ -211,8 +212,9 @@ public class ConfigService {
         // load initial content
         configurationConfigMap.updateMountedFile();
         // create file
-        if (configurationConfigMap.getContent().isPresent()) {
-            configuration = File.builder().filePath(configFile).content(configurationConfigMap.getContent().get())
+        Optional<String> content = configurationConfigMap.getContent();
+        if (content.isPresent()) {
+            configuration = File.builder().filePath(configFile).content(content.get())
                     .build();
         }
 

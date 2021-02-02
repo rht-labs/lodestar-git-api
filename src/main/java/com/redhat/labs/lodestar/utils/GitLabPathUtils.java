@@ -5,7 +5,11 @@ import org.slf4j.LoggerFactory;
 
 public class GitLabPathUtils {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(GitLabPathUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitLabPathUtils.class);
+
+    private GitLabPathUtils() {
+        throw new IllegalStateException("Utility class");
+    }
 
     public static String generateValidPath(String input) {
 

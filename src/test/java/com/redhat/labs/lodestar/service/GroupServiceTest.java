@@ -12,13 +12,13 @@ import com.redhat.labs.lodestar.models.gitlab.Group;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
-public class GroupServiceTest {
+class GroupServiceTest {
 
     @Inject
     GroupService groupService;
     
     @Test
-    public void testGetGitLabGroupByNameNoGroupsExist() {
+    void testGetGitLabGroupByNameNoGroupsExist() {
 
         Optional<Group> optional = groupService.getGitLabGroupByName("customerA", 1);
         Assertions.assertFalse(optional.isPresent());
@@ -26,7 +26,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testGetGitLabGroupByNameMultipleGroupsExistNoMatch() {
+    void testGetGitLabGroupByNameMultipleGroupsExistNoMatch() {
 
         Optional<Group> optional = groupService.getGitLabGroupByName("customer", 1);
         Assertions.assertFalse(optional.isPresent());
@@ -34,7 +34,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testGetGitLabGroupByNameMultipleGroupsExistMatch() {
+    void testGetGitLabGroupByNameMultipleGroupsExistMatch() {
 
         Optional<Group> optional = groupService.getGitLabGroupByName("customer", 10);
         Assertions.assertTrue(optional.isPresent());
