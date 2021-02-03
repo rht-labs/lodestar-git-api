@@ -10,6 +10,7 @@ import static org.mockito.BDDMockito.given;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
@@ -174,6 +175,16 @@ class EngagementServiceTest {
         
     }
 
+    @Test void testGetHooksProjectNotFound() {
+
+        given(gitLabService.getProjectById(Mockito.anyString())).willReturn(null);
+
+        List<Hook> hooks = engagementService.getHooks("nope", "nada");
+        assertNotNull(hooks);
+        assertEquals(0, hooks.size());
+
+    }
+
     @Test void tesetNoStatus() {
 
         given(gitLabService.getFile(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).willReturn(null);
@@ -181,7 +192,5 @@ class EngagementServiceTest {
         Status status = engagementService.getProjectStatus("nope", "nada");
         assertNull(status);
     }
-
-
 
 }

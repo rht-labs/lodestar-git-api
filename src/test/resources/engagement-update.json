@@ -18,5 +18,23 @@
     "project_name": "project1",
     "start_date": "20200202",
     "technical_lead_email": "wendel17@leafs.com",
-    "technical_lead_name": "Wendel Clark"
+    "technical_lead_name": "Wendel Clark",
+    "engagement_users": [
+    	{
+    		"uuid": "9876",
+    		"first_name": "John",
+    		"last_name": "Smith",
+    		"email": "j.s@example.com",
+    		"role": "developer",
+    		"reset": false
+    	},
+    	{
+    		"uuid": "1234",
+    		"first_name": "Jane",
+    		"last_name": "Doe",
+    		"email": "j.d@example.com",
+    		"role": "developer",
+    		"reset": true
+    	}
+    ]
 }

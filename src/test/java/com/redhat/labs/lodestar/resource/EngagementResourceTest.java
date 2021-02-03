@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import com.google.common.collect.Lists;
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
@@ -46,7 +47,7 @@ class EngagementResourceTest {
         // get engagements by group
         List<Project> projects = new ArrayList<>();
         projects.add(Project.builder().id(20).name("Project " + (20)).build());
-        MockUtils.setGetProjectsByGroupMock(gitLabService, 20, projects, true);
+        MockUtils.setGetProjectsByGroupMock(gitLabService, 20, projects, false);
 
         // get engagement file
         MockUtils.setGetFileForEngagementJsonMock(gitLabService, 20, true);
@@ -254,6 +255,12 @@ class EngagementResourceTest {
 
     @Test
     void testCreateProjectHookFailAlreadyExists() {
+
+        // Get Project
+        Project p = Project.builder().id(66).build();
+        MockUtils.setGetProjectByPathMock(gitLabService, "top/dog/jello/lemon/iac", true, Optional.of(p));
+        MockUtils.setGetProjectHookMock(gitLabService, 66);
+
         given().when().contentType(ContentType.JSON)
                 .body("{\"push_events\": true, \"url\": \"http://webhook.edu/hook\"}")
                 .post("/api/v1/engagements/customer/jello/lemon/hooks").then().statusCode(400);
@@ -264,6 +271,37 @@ class EngagementResourceTest {
         given().when().contentType(ContentType.JSON)
                 .body("{\"push_events\": true, \"url\": \"https://lodestar/webhooks/blah\"}")
                 .post("/api/v1/engagements/customer/nope/tutti-frutti/hooks").then().statusCode(400);
+    }
+
+    @Test
+    void testDeleteHooksNoProjects() {
+
+        MockUtils.setGetProjectsByGroupMock(gitLabService, 2, Lists.newArrayList(), false);
+
+        given().when().contentType(ContentType.JSON)
+                .delete("/api/v1/engagements/hooks").then().statusCode(200);
+
+    }
+
+    @Test
+    void testDeleteHooksHasProjectNoHooks() {
+
+        MockUtils.setGetProjectsByGroupMock(gitLabService, 2, Lists.newArrayList(), true);
+        MockUtils.setGetProjectHookMock(gitLabService, 4444);
+
+        given().when().contentType(ContentType.JSON)
+                .delete("/api/v1/engagements/hooks").then().statusCode(200);
+
+    }
+
+    @Test
+    void testDeleteHooksHasProjectAndHooks() {
+
+        MockUtils.setGetProjectsByGroupMock(gitLabService, 2, Lists.newArrayList(), true);
+
+        given().when().contentType(ContentType.JSON)
+                .delete("/api/v1/engagements/hooks").then().statusCode(200);
+
     }
 
     @Test

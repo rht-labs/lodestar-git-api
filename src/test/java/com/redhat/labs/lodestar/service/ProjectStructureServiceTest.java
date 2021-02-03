@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.BDDMockito.given;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
@@ -13,6 +14,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import com.google.common.collect.Lists;
 import com.redhat.labs.lodestar.models.Engagement;
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Namespace;
@@ -34,28 +36,6 @@ class ProjectStructureServiceTest {
     GitLabService gitLabService;
 
     // New Customers and Projects
-
-//    @Test
-//    void testThis() {
-//
-//        String customerName = "customer1";
-//        String projectName = "project1";
-//
-//        Group cGroup = Group.builder().name(customerName).path(GitLabPathUtils.generateValidPath(customerName))
-//                .parentId(null).build();
-//
-//        Group pGroup = Group.builder().name(projectName).path(GitLabPathUtils.generateValidPath(projectName))
-//                .parentId(null).build();
-//
-////        when(groupService.createGitLabGroup(ArgumentMatchers.argThat((g) -> g.getName().equals(customerName)))).thenReturn(Optional.of(cGroup));
-////        when(groupService.createGitLabGroup(ArgumentMatchers.argThat((g) -> g.getName().equals(customerName)))).thenReturn(Optional.of(pGroup));
-//        when(groupService.createGitLabGroup(Mockito.any(Group.class)))
-//                .thenAnswer((i) -> Optional.of(i.getArgument(0, Group.class)));
-//
-//        Optional<Group> group = psService.testThis(customerName);
-//        System.out.print(group.orElse(null));
-//
-//    }
 
     @Test
     void testCreateProjectStructureForNewCustomerAndNewProject() {
@@ -88,6 +68,80 @@ class ProjectStructureServiceTest {
         assertEquals("private", actual.getVisibility());
         assertEquals(3333, actual.getNamespace().getId());
         assertEquals(2222, actual.getNamespace().getParentId());
+
+    }
+
+    @Test
+    void testCreateProjectStructureForCustomerNameChange() {
+
+        // given
+        String customerName = "customer1";
+        String projectName = "project1";
+
+        Group cGroup = Group.builder().name(customerName).path(GitLabPathUtils.generateValidPath(customerName)).id(2222)
+                .parentId(2).build();
+        Group pGroup = Group.builder().name(projectName).path(GitLabPathUtils.generateValidPath(projectName))
+                .parentId(2222).id(3333).build();
+        Project project = Project.builder().id(4444).name("iac").visibility("private")
+                .namespace(Namespace.builder().id(3333).parentId(2222).build()).build();
+        Group newCustomerGroup = Group.builder().name("newCustomer1")
+                .path(GitLabPathUtils.generateValidPath("newCustomer1")).id(2222).parentId(2).build();
+
+        given(gitLabService.getProjectById(Mockito.anyString())).willReturn(project);
+        given(gitLabService.getGroupByIdOrPath(Mockito.anyString())).willReturn(pGroup, cGroup);
+        given(gitLabService.getSubGroups(Mockito.anyInt(), Mockito.eq(100), Mockito.eq(1)))
+                .willReturn(Response.ok(Lists.newArrayList()).header("X-Total-Pages", 1).build());
+        given(gitLabService.updateGroup(Mockito.anyInt(), Mockito.any())).willReturn(newCustomerGroup);
+
+        Engagement engagement = Engagement.builder().customerName("newCustomer1").projectName(projectName).build();
+
+        // when
+        Project actual = psService.createOrUpdateProjectStructure(engagement, "http://some-path/engagements");
+
+        // then
+        assertNotNull(project);
+        assertEquals("iac", actual.getName());
+        assertEquals("private", actual.getVisibility());
+        assertEquals(3333, actual.getNamespace().getId());
+        assertEquals(2222, actual.getNamespace().getParentId());
+
+    }
+
+    @Test
+    void testCreateProjectStructureForCustomerNameChangeCustomerHasMultipleProjects() {
+
+        // given
+        String customerName = "customer1";
+        String projectName = "project1";
+
+        Group cGroup = Group.builder().name(customerName).path(GitLabPathUtils.generateValidPath(customerName)).id(2222)
+                .parentId(2).build();
+        Group pGroup = Group.builder().name(projectName).path(GitLabPathUtils.generateValidPath(projectName))
+                .parentId(2222).id(3333).build();
+        Group anotherGroup = Group.builder().name(projectName).path(GitLabPathUtils.generateValidPath("anotherGroup"))
+                .parentId(2222).id(5555).build();
+        Project project = Project.builder().id(4444).name("iac").visibility("private")
+                .namespace(Namespace.builder().id(3333).parentId(2222).build()).build();
+        Group newCustomerGroup = Group.builder().name("newCustomer1")
+                .path(GitLabPathUtils.generateValidPath("newCustomer1")).id(6666).parentId(2).build();
+
+        given(gitLabService.getProjectById(Mockito.anyString())).willReturn(project);
+        given(gitLabService.getGroupByIdOrPath(Mockito.anyString())).willReturn(pGroup, cGroup);
+        given(gitLabService.getSubGroups(Mockito.anyInt(), Mockito.eq(100), Mockito.eq(1)))
+                .willReturn(Response.ok(Lists.newArrayList(pGroup, anotherGroup)).header("X-Total-Pages", 1).build());
+        given(gitLabService.updateGroup(Mockito.anyInt(), Mockito.any())).willReturn(newCustomerGroup);
+        given(gitLabService.createGroup(Mockito.any(Group.class))).willReturn(newCustomerGroup);
+        given(gitLabService.transferProject(Mockito.anyInt(), Mockito.any())).willReturn(Optional.of(project));
+
+        Engagement engagement = Engagement.builder().customerName("newCustomer1").projectName(projectName).build();
+
+        // when
+        Project actual = psService.createOrUpdateProjectStructure(engagement, "http://some-path/engagements");
+
+        // then
+        assertNotNull(project);
+        assertEquals("iac", actual.getName());
+        assertEquals("private", actual.getVisibility());
 
     }
 
