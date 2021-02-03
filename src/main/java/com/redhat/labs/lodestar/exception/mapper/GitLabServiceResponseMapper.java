@@ -25,8 +25,7 @@ public class GitLabServiceResponseMapper implements
       ByteArrayInputStream is = (ByteArrayInputStream) response.getEntity();
       byte[] bytes = new byte[is.available()];
       is.read(bytes,0,is.available());
-      String body = new String(bytes);
-      return body;
+      return new String(bytes);
     }
 
 }

@@ -33,7 +33,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 
 @QuarkusTest
-public class EngagementServiceTest {
+class EngagementServiceTest {
 
     @Inject
     EngagementService engagementService;

@@ -47,7 +47,7 @@ public class Action {
 
     }
 
-    public void decodeActionAttributes() throws UnsupportedEncodingException {
+    public void decodeActionAttributes() {
 
         // decode contents
         if (null != content) {

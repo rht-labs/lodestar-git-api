@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.google.common.collect.Lists;
 
 import lombok.Setter;
 
@@ -27,7 +28,7 @@ import lombok.Setter;
  */
 @ApplicationScoped
 public class JsonMarshaller {
-    public static Logger LOGGER = LoggerFactory.getLogger(JsonMarshaller.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(JsonMarshaller.class);
 
     @Inject
     @Setter
@@ -58,7 +59,7 @@ public class JsonMarshaller {
             }
         } 
         
-        return null;
+        return Lists.newArrayList();
     }
     
     public <T> List<T> fromYaml(String yamlContent, Class<T> clazz) {
@@ -70,7 +71,7 @@ public class JsonMarshaller {
             LOGGER.error(String.format("Found but unable to map file %s", yamlContent), e);
         }
         
-        return null;
+        return Lists.newArrayList();
     }
     
     

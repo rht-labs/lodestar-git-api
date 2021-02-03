@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
-public class VersionResourceTest {
+class VersionResourceTest {
 
     @Test
-    public void testValidResourceVersion() {
+    void testValidResourceVersion() {
         given()
         .when()
             .get("/api/v1/version")

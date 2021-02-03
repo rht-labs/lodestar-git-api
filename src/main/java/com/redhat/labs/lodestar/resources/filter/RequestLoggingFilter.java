@@ -15,11 +15,11 @@ import java.io.IOException;
 @Provider
 public class RequestLoggingFilter implements ContainerRequestFilter {
 
-    public static Logger logger = LoggerFactory.getLogger(RequestLoggingFilter.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(RequestLoggingFilter.class);
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        logger.info("URI {}", requestContext.getUriInfo());
+        LOGGER.info("URI {}", requestContext.getUriInfo());
 
     }
 }

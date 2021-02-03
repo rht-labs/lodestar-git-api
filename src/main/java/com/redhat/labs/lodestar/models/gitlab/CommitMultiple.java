@@ -55,15 +55,7 @@ public class CommitMultiple {
     }
 
     public void decodeActions() {
-
-        this.actions.stream().forEach(action -> {
-            try {
-                action.decodeActionAttributes();
-            } catch (UnsupportedEncodingException e) {
-                throw new EncodingException("failed to decode action attributes. " + action, e);
-            }
-        });
-
+        this.actions.stream().forEach(action -> action.decodeActionAttributes());
     }
 
 }

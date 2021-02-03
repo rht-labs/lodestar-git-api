@@ -2,7 +2,6 @@ package com.redhat.labs.lodestar.config;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -16,13 +15,13 @@ import com.redhat.labs.lodestar.models.gitlab.HookConfig;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
-public class JsonMarshallerTest {
+class JsonMarshallerTest {
     
     @Inject
     JsonMarshaller marshaller;
     
     @Test
-    public void testHookConfigLoad() {
+    void testHookConfigLoad() {
         List<HookConfig> config = marshaller.fromYamlFile("src/test/resources/webhooks.yaml", HookConfig.class);
         
         assertNotNull(config);
@@ -37,9 +36,10 @@ public class JsonMarshallerTest {
     }
     
     @Test
-    public void testInvalidYamlNullReturn() {
+    void testInvalidYamlNullReturn() {
         List<HookConfig> hookList = marshaller.fromYamlFile("src/test/resources/meta.dat", HookConfig.class);
-        assertNull(hookList);
+        assertNotNull(hookList);
+        assertTrue(hookList.isEmpty());
     }
 
 }

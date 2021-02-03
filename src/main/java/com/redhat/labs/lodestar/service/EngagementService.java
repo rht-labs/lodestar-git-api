@@ -128,7 +128,7 @@ public class EngagementService {
         }
 
         // create hooks if new engagement, should already exist if updating
-        if(project.isFirst()) {
+        if (project.isFirst()) {
             configService.createWebhooksForEnagement(engagement);
         }
 
@@ -170,9 +170,8 @@ public class EngagementService {
     public void deleteHooks() {
 
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
-        projects.stream().filter(project -> project.getName().equals(IAC)).forEach(project -> {
-            hookService.deleteProjectHooks(project.getId());
-        });
+        projects.stream().filter(project -> project.getName().equals(IAC))
+                .forEach(project -> hookService.deleteProjectHooks(project.getId()));
 
     }
 
@@ -206,11 +205,8 @@ public class EngagementService {
 
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
 
-        return projects.parallelStream().map(project -> {
-            return getEngagement(project, true);
-        }).filter(optional -> optional.isPresent()).map(optional -> {
-            return optional.get();
-        }).collect(Collectors.toList());
+        return projects.parallelStream().map(project -> getEngagement(project, true))
+                .filter(optional -> optional.isPresent()).map(optional -> optional.get()).collect(Collectors.toList());
 
     }
 
@@ -281,14 +277,11 @@ public class EngagementService {
             return Lists.newArrayList();
         }
 
-        return engagement.getEngagementUsers().stream().filter(user -> user.isReset())
-                .filter(user -> fileService
-                        .getFileAllow404(engagement.getProjectId(), getUserManagementFileName(user.getUuid()))
-                        .isEmpty())
-                .map(user -> {
-                    return File.builder().content(json.toJson(user)).filePath(getUserManagementFileName(user.getUuid()))
-                            .build();
-                }).collect(Collectors.toList());
+        return engagement.getEngagementUsers().stream().filter(user -> user.isReset()).filter(user -> fileService
+                .getFileAllow404(engagement.getProjectId(), getUserManagementFileName(user.getUuid())).isEmpty())
+                .map(user -> File.builder().content(json.toJson(user))
+                        .filePath(getUserManagementFileName(user.getUuid())).build())
+                .collect(Collectors.toList());
 
     }
 
@@ -348,7 +341,7 @@ public class EngagementService {
 
         int bearCodePoint = bear.codePointAt(bear.offsetByCodePoints(0, 0));
         int mysteryAnimalCodePoint = bearCodePoint + new SecureRandom().nextInt(144);
-        char mysteryEmoji[] = { Character.highSurrogate(mysteryAnimalCodePoint),
+        char[] mysteryEmoji = { Character.highSurrogate(mysteryAnimalCodePoint),
                 Character.lowSurrogate(mysteryAnimalCodePoint) };
 
         return String.valueOf(mysteryEmoji);
@@ -364,8 +357,8 @@ public class EngagementService {
         if (null != engagement && null == engagement.getLaunch()) {
 
             // create and send delete event
-            eventBus.sendAndForget(EventType.DELETE_PROJECT_EVENT, DeleteProjectEvent.builder()
-                    .engagement(engagement).engagementPathPrefix(engagementPathPrefix).build());
+            eventBus.sendAndForget(EventType.DELETE_PROJECT_EVENT, DeleteProjectEvent.builder().engagement(engagement)
+                    .engagementPathPrefix(engagementPathPrefix).build());
 
         }
 

@@ -30,7 +30,7 @@ import io.vertx.mutiny.core.eventbus.EventBus;
 @ApplicationScoped
 public class ProjectStructureService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectStructure.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectStructureService.class);
 
     private static final String ENGAGEMENT_PROJECT_NAME = "iac";
 
@@ -78,7 +78,6 @@ public class ProjectStructureService {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("create or update project structure took {} ms",
                     Duration.between(begin, Instant.now()).toMillis());
-            ;
         }
 
         return project
@@ -109,14 +108,16 @@ public class ProjectStructureService {
 
         // get project group
         Namespace namespace = project.filter(p -> null != p.getNamespace()).map(p -> p.getNamespace()).orElse(null);
+        Integer pgId = (null == namespace) ? null : namespace.getId();
 
-        Optional<Integer> projectGroupId = Optional.ofNullable(namespace.getId());
+        Optional<Integer> projectGroupId = Optional.ofNullable(pgId);
         builder.projectGroupId(projectGroupId);
         if (projectGroupId.isPresent()) {
             builder.projectGroup(groupService.getGitLabGroupByById(projectGroupId.get()));
         }
 
-        Optional<Integer> customerGroupId = Optional.ofNullable(namespace.getParentId());
+        Integer pId = (null == namespace) ? null : namespace.getParentId();
+        Optional<Integer> customerGroupId = Optional.ofNullable(pId);
         builder.customerGroupId(customerGroupId);
         if (customerGroupId.isPresent()) {
 
@@ -227,15 +228,21 @@ public class ProjectStructureService {
     void cleanupGroups(ProjectStructure existingProjectStructure) {
 
         // do nothing if project missing or has not been moved
-        if (existingProjectStructure.getProject().isEmpty()
-                || !existingProjectStructure.getProject().get().isMovedOrDeleted()) {
+        Optional<Project> project = existingProjectStructure.getProject();
+        if (project.isEmpty() || !project.get().isMovedOrDeleted()) {
             return;
         }
 
         // remove project group
-        removeGroupIfEmpty(existingProjectStructure.getProjectGroupId().get());
+        Optional<Integer> projectGroupId = existingProjectStructure.getProjectGroupId();
+        if (projectGroupId.isPresent()) {
+            removeGroupIfEmpty(projectGroupId.get());
+        }
         // remove customer group
-        removeGroupIfEmpty(existingProjectStructure.getCustomerGroupId().get());
+        Optional<Integer> customerGroupId = existingProjectStructure.getCustomerGroupId();
+        if (customerGroupId.isPresent()) {
+            removeGroupIfEmpty(customerGroupId.get());
+        }
 
     }
 
@@ -256,12 +263,7 @@ public class ProjectStructureService {
     }
 
     void removeProjectIfExists(Integer projectId) {
-
-        removeIfEmpty(5, () -> {
-            // remove project if it exists
-            projectService.deleteProject(projectId);
-        });
-
+        removeIfEmpty(5, () -> projectService.deleteProject(projectId));
     }
 
     void removeIfEmpty(int retryCount, Runnable runnable) {
@@ -282,7 +284,7 @@ public class ProjectStructureService {
 
             count += 1;
             try {
-                TimeUnit.SECONDS.sleep(count * 1);
+                TimeUnit.SECONDS.sleep(count * 2L);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }

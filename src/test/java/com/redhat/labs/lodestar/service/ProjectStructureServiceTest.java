@@ -24,7 +24,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 
 @QuarkusTest
-public class ProjectStructureServiceTest {
+class ProjectStructureServiceTest {
 
     @Inject
     ProjectStructureService psService;

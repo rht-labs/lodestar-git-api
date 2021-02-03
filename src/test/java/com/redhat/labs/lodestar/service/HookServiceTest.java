@@ -15,13 +15,13 @@ import com.redhat.labs.lodestar.models.gitlab.Hook;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
-public class HookServiceTest {
+class HookServiceTest {
 
     @Inject
     HookService hookService;
     
     @Test
-    public void testGetProjectHooks() {
+    void testGetProjectHooks() {
         List<Hook> hookList = hookService.getProjectHooks(99);
         
         assertNotNull(hookList);
@@ -30,7 +30,7 @@ public class HookServiceTest {
     }
     
     @Test
-    public void testNewProjectHook() {
+    void testNewProjectHook() {
         Hook hook = Hook.builder().projectId(66).pushEvents(true).pushEventsBranchFilter("master").url("http://banana/hook")
                 .token("token").build();
         Response response = hookService.createOrUpdateProjectHook(66, hook);
@@ -38,7 +38,7 @@ public class HookServiceTest {
     }
     
     @Test
-    public void testUpdateProjectHook() {
+    void testUpdateProjectHook() {
         Hook hook = Hook.builder().projectId(99).pushEvents(true).pushEventsBranchFilter("master").url("http://webhook.edu/hook")
                 .token("token").build();
         Response response = hookService.createOrUpdateProjectHook(hook.getProjectId(), hook);
