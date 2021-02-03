@@ -55,7 +55,7 @@ public class CommitMultiple {
     }
 
     public void decodeActions() {
-        this.actions.stream().forEach(action -> action.decodeActionAttributes());
+        this.actions.stream().forEach(Action::decodeActionAttributes);
     }
 
 }
