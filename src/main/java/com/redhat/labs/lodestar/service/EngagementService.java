@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.redhat.labs.lodestar.config.JsonMarshaller;
 import com.redhat.labs.lodestar.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.lodestar.models.Engagement;
+import com.redhat.labs.lodestar.models.EngagementUser;
 import com.redhat.labs.lodestar.models.Status;
 import com.redhat.labs.lodestar.models.events.DeleteEngagementEvent;
 import com.redhat.labs.lodestar.models.events.DeleteProjectEvent;
@@ -206,7 +207,7 @@ public class EngagementService {
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
 
         return projects.parallelStream().map(project -> getEngagement(project, true))
-                .filter(optional -> optional.isPresent()).map(optional -> optional.get()).collect(Collectors.toList());
+                .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 
     }
 
@@ -277,7 +278,7 @@ public class EngagementService {
             return Lists.newArrayList();
         }
 
-        return engagement.getEngagementUsers().stream().filter(user -> user.isReset()).filter(user -> fileService
+        return engagement.getEngagementUsers().stream().filter(EngagementUser::isReset).filter(user -> fileService
                 .getFileAllow404(engagement.getProjectId(), getUserManagementFileName(user.getUuid())).isEmpty())
                 .map(user -> File.builder().content(json.toJson(user))
                         .filePath(getUserManagementFileName(user.getUuid())).build())
@@ -319,7 +320,7 @@ public class EngagementService {
     }
 
     private Action createAction(File file, boolean isNew) {
-        FileAction action = isNew ? FileAction.create : FileAction.update;
+        FileAction action = isNew ? FileAction.CREATE : FileAction.UPDATE;
 
         return Action.builder().action(action).filePath(stripPrefix(file.getFilePath())).content(file.getContent())
                 .encoding("base64").build();
