@@ -7,11 +7,13 @@ import java.util.Optional;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 
+import com.google.common.collect.Lists;
 import com.redhat.labs.lodestar.config.JsonMarshaller;
 import com.redhat.labs.lodestar.models.gitlab.Commit;
 import com.redhat.labs.lodestar.models.gitlab.CommitMultiple;
@@ -61,12 +63,13 @@ public class MockUtils {
     // get projects by group
     public static void setGetProjectsByGroupMock(GitLabService gitLabService, Integer projectId, List<Project> projects,
             boolean hasProject) {
-        Response r = Response.ok(projects).header("X-Total-Pages", 1).build();
+        ResponseBuilder r = Response.ok(projects).header("X-Total-Pages", 1);
         if (hasProject) {
-            BDDMockito.given(gitLabService.getProjectsbyGroup(2, true, 100, 1)).willReturn(r);
+            r.entity(Lists.newArrayList(mockIacProject()));
+            BDDMockito.given(gitLabService.getProjectsbyGroup(2, true, 100, 1)).willReturn(r.build());
         } else {
             BDDMockito.given(gitLabService.getProjectsbyGroup(Mockito.anyInt(), Mockito.anyBoolean(), Mockito.eq(100),
-                    Mockito.eq(1))).willReturn(r);
+                    Mockito.eq(1))).willReturn(r.build());
         }
     }
 
@@ -203,7 +206,7 @@ public class MockUtils {
         BDDMockito.given(gitLabService.createProjectHook(Mockito.eq(projectId), Mockito.any(Hook.class)))
                 .willReturn(Response.status(Status.CREATED).build());
     }
-
+    
     public static void setDeleteGroupById(GitLabService gitLabService) {
         BDDMockito.doThrow(new WebApplicationException(404)).when(gitLabService).deleteGroupById(Mockito.anyInt());
     }
