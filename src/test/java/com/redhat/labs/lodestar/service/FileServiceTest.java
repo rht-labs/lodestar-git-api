@@ -7,9 +7,9 @@ import javax.ws.rs.WebApplicationException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.wildfly.common.Assert;
 
 import com.redhat.labs.lodestar.models.gitlab.File;
+import com.redhat.labs.lodestar.models.gitlab.FileAction;
 
 import io.quarkus.test.junit.QuarkusTest;
 
@@ -20,18 +20,27 @@ class FileServiceTest {
     FileService fileService;
     
     
+    
+    @Test
+    void testFileAction() {
+        Assertions.assertEquals("create", FileAction.CREATE.toString());
+        Assertions.assertEquals("delete", FileAction.DELETE.toString());
+        Assertions.assertEquals("update", FileAction.UPDATE.toString());
+    }
+    
+    
     @Test
     void testGetFile404() {
         Optional<File> fileNotFound = fileService.getFileAllow404(7, "404.error");
         
-        Assert.assertFalse(fileNotFound.isPresent());
+        Assertions.assertFalse(fileNotFound.isPresent());
     }
     
     @Test
     void testGetFile() {
         Optional<File> fileNotFound = fileService.getFile(7, "404.error");
         
-        Assert.assertFalse(fileNotFound.isPresent());
+        Assertions.assertFalse(fileNotFound.isPresent());
     }
     
     @Test
@@ -44,37 +53,37 @@ class FileServiceTest {
     @Test
     void deleteFile() {
         Optional<File> deletedFile = fileService.deleteFile(7, "engagement.json");
-        Assert.assertTrue(deletedFile.isPresent());
+        Assertions.assertTrue(deletedFile.isPresent());
     }
     
     @Test
     void deleteFileNotExist() {
         Optional<File> deletedFile = fileService.deleteFile(7, "nonexistent.rht");
-        Assert.assertFalse(deletedFile.isPresent());
+        Assertions.assertFalse(deletedFile.isPresent());
     }
     
     @Test
     void updateFile() {
         Optional<File> updatedFile = fileService.updateFile(7, "update.file", File.builder().filePath("update.file").content("hi").build());
-        Assert.assertTrue(updatedFile.isPresent());
+        Assertions.assertTrue(updatedFile.isPresent());
     }
     
     @Test
     void updateFileNotExist() {
         Optional<File> updatedFile = fileService.updateFile(7, "nonexistent.rht", File.builder().filePath("update.file").content("hi").build());
-        Assert.assertFalse(updatedFile.isPresent());
+        Assertions.assertFalse(updatedFile.isPresent());
     }
     
     @Test
     void createFile() {
         Optional<File> updatedFile = fileService.createFile(7, "create.file", File.builder().filePath("create.file").content("hi").build());
-        Assert.assertTrue(updatedFile.isPresent());
+        Assertions.assertTrue(updatedFile.isPresent());
     }
     
     @Test
     void createFileNotExist() {
         Optional<File> updatedFile = fileService.createFile(7, "nonexistent.rht", File.builder().filePath("update.file").content("hi").build());
-        Assert.assertFalse(updatedFile.isPresent());
+        Assertions.assertFalse(updatedFile.isPresent());
     }
 
 }
