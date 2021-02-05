@@ -5,6 +5,10 @@ public enum FileAction {
 
     CREATE,
     UPDATE,
-    DELETE
+    DELETE;
+    
+    @Override public String toString() {
+        return name().toLowerCase();
+    }
 
 }
