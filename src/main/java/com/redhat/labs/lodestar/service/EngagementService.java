@@ -2,6 +2,7 @@ package com.redhat.labs.lodestar.service;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -206,7 +207,7 @@ public class EngagementService {
 
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
 
-        return projects.parallelStream().map(project -> getEngagement(project, true))
+        return projects.parallelStream().map(project -> getEngagement(project, true, true))
                 .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 
     }
@@ -217,7 +218,7 @@ public class EngagementService {
         Optional<Project> project = projectService.getProjectByIdOrPath(namespaceOrId);
 
         if (project.isPresent()) {
-            engagement = getEngagement(project.get(), includeStatus).orElse(null);
+            engagement = getEngagement(project.get(), includeStatus, true).orElse(null);
         }
 
         return engagement;
@@ -229,21 +230,23 @@ public class EngagementService {
         Optional<Project> project = getProject(customerName, engagementName);
 
         if (project.isPresent()) {
-            engagement = getEngagement(project.get(), includeStatus).orElse(null);
+            engagement = getEngagement(project.get(), includeStatus, true).orElse(null);
         }
 
         return engagement;
     }
 
-    public Optional<Engagement> getEngagement(Project project, boolean includeStatus) {
+    public Optional<Engagement> getEngagement(Project project, boolean includeStatus, boolean includeCommits) {
         Engagement engagement = null;
 
         Optional<File> engagementFile = fileService.getFileAllow404(project.getId(), ENGAGEMENT_FILE);
         if (engagementFile.isPresent()) {
             engagement = json.fromJson(engagementFile.get().getContent(), Engagement.class);
 
-            List<Commit> commits = projectService.getCommitLog(String.valueOf(engagement.getProjectId()));
-            engagement.setCommits(commits);
+            if (includeCommits) {
+                List<Commit> commits = projectService.getCommitLog(String.valueOf(engagement.getProjectId()));
+                engagement.setCommits(commits);
+            }
         }
 
         if (includeStatus && engagement != null) {
@@ -307,7 +310,7 @@ public class EngagementService {
                 .collect(Collectors.toList());
 
         // merge the actions
-        List<Action> actions = Stream.of(userManagementFiles, otherFiles).flatMap(x -> x.stream())
+        List<Action> actions = Stream.of(userManagementFiles, otherFiles).flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
         // use message if provided. otherwise, defaults
@@ -320,7 +323,7 @@ public class EngagementService {
     }
 
     private Action createAction(File file, boolean isNew) {
-        FileAction action = isNew ? FileAction.CREATE : FileAction.UPDATE;
+        FileAction action = isNew ? FileAction.create : FileAction.update;
 
         return Action.builder().action(action).filePath(stripPrefix(file.getFilePath())).content(file.getContent())
                 .encoding("base64").build();
