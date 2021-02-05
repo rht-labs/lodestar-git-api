@@ -156,7 +156,7 @@ public class ConfigService {
      */
     boolean engagementIsArchived(Project project) {
 
-        Optional<Engagement> engagement = engagementService.getEngagement(project, false);
+        Optional<Engagement> engagement = engagementService.getEngagement(project, false, false);
         if (engagement.isPresent() && null != engagement.get().getArchiveDate()) {
 
             Engagement e = engagement.get();
