@@ -23,9 +23,9 @@ class FileServiceTest {
     
     @Test
     void testFileAction() {
-        Assertions.assertEquals("create", FileAction.CREATE.toString());
-        Assertions.assertEquals("delete", FileAction.DELETE.toString());
-        Assertions.assertEquals("update", FileAction.UPDATE.toString());
+        Assertions.assertEquals("create", FileAction.create.name());
+        Assertions.assertEquals("delete", FileAction.delete.name());
+        Assertions.assertEquals("update", FileAction.update.name());
     }
     
     
