@@ -26,5 +26,11 @@ public class HookConfig {
     
     @JsonbProperty("token")
     private String token;
+    
+    /**
+     * Should the webhook be enabled after an engagement is archived
+     */
+    @JsonbProperty("enabledAfterArchive")
+    private boolean enabledAfterArchive;
 
 }

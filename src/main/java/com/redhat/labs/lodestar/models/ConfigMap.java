@@ -8,6 +8,9 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ConfigMap {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigMap.class);
 
     private Path path;
     private String filePath;
@@ -43,6 +47,7 @@ public class ConfigMap {
                 content = Optional.of(new String(Files.readAllBytes(path), StandardCharsets.UTF_8));
                 return true;
             } catch (IOException e) {
+                LOGGER.error("Error updating mounted file %{} {} {} ", lastModifiedTime, path, filePath);
                 content = Optional.empty();
             }
 
@@ -68,6 +73,7 @@ public class ConfigMap {
                 return true;
             }
         } catch (IOException e) {
+            LOGGER.error("Error calculating isModified %{} {}", lastModifiedTime, path);
             return false;
         }
 

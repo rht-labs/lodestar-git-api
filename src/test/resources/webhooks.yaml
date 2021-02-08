@@ -9,3 +9,4 @@
   pushEvent: true
   pushEventsBranchFilter: master
   token: def
+  enabledAfterArchive: true

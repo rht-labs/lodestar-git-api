@@ -294,7 +294,7 @@ public class MockGitLabService implements GitLabService {
             return Response.status(Status.CREATED).build();
         }
         
-        return null;
+        return Response.status(Status.INTERNAL_SERVER_ERROR).build();
     }
 
     @Override
