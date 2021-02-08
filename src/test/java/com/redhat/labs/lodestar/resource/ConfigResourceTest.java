@@ -122,6 +122,7 @@ class ConfigResourceTest {
             .body(is("\n[\n" + 
                     "    {\n" + 
                     "        \"baseUrl\": \"https://labs.com/webhooks/\",\n" + 
+                    "        \"enabledAfterArchive\": false,\n" +
                     "        \"name\": \"labs\",\n" + 
                     "        \"pushEvent\": true,\n" + 
                     "        \"pushEventsBranchFilter\": \"master\",\n" + 
@@ -129,6 +130,7 @@ class ConfigResourceTest {
                     "    },\n" + 
                     "    {\n" + 
                     "        \"baseUrl\": \"https://rht.com/hooks/\",\n" + 
+                    "        \"enabledAfterArchive\": true,\n" +
                     "        \"name\": \"rht\",\n" + 
                     "        \"pushEvent\": true,\n" + 
                     "        \"pushEventsBranchFilter\": \"master\",\n" + 

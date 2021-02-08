@@ -122,7 +122,7 @@ public class ConfigService {
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
         LOGGER.debug("number of projects found: {}", projects.size());
         projects.stream().filter(project -> project.getName().equals(IAC))
-                .filter(project -> !engagementIsArchived(project)).forEach(project -> {
+                .forEach(project -> {
 
                     Integer projectId = project.getId();
 
@@ -131,9 +131,12 @@ public class ConfigService {
 
                     // remove existing webhooks for project
                     hookService.deleteProjectHooks(projectId);
+                    
+                    boolean isArchived = isEngagementArchived(project);
 
                     // create hooks from configuration
-                    hookConfigs.stream().forEach(hookC -> {
+                    hookConfigs.stream().filter(config -> config.isEnabledAfterArchive() || !isArchived)
+                        .forEach(hookC -> {
                         Hook hook = Hook.builder().projectId(projectId).pushEvents(true).url(hookC.getBaseUrl())
                                 .token(hookC.getToken()).build();
                         LOGGER.debug("\tcreating webhook {}", hook.getUrl());
@@ -154,7 +157,7 @@ public class ConfigService {
      * @param project
      * @return
      */
-    boolean engagementIsArchived(Project project) {
+    boolean isEngagementArchived(Project project) {
 
         Optional<Engagement> engagement = engagementService.getEngagement(project, false, false);
         if (engagement.isPresent() && null != engagement.get().getArchiveDate()) {
