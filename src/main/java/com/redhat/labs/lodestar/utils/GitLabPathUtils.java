@@ -50,4 +50,12 @@ public class GitLabPathUtils {
                 .append("/iac").toString();
     }
 
+    public static String getValidPath(String engagementPathPrefix, String customerName, String engagementName) {
+
+        String customerPath = GitLabPathUtils.generateValidPath(customerName);
+        String projectPath = GitLabPathUtils.generateValidPath(engagementName);
+        return GitLabPathUtils.getPath(engagementPathPrefix, customerPath, projectPath);
+
+    }
+
 }

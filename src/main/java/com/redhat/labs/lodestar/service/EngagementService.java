@@ -189,7 +189,7 @@ public class EngagementService {
     }
 
     public Optional<Project> getProject(String customerName, String engagementName) {
-        String fullPath = GitLabPathUtils.getPath(engagementPathPrefix, customerName, engagementName);
+        String fullPath = GitLabPathUtils.getValidPath(engagementPathPrefix, customerName, engagementName);
 
         LOGGER.debug("Full path {}", fullPath);
         return projectService.getProjectByIdOrPath(fullPath);
