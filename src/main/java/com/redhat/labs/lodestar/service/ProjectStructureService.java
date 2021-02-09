@@ -295,10 +295,7 @@ public class ProjectStructureService {
 
     Optional<Project> findProjectByPath(String engagementPathPrefix, String customerName, String projectName) {
 
-        String customerPath = GitLabPathUtils.generateValidPath(customerName);
-        String projectPath = GitLabPathUtils.generateValidPath(projectName);
-        String fullPath = GitLabPathUtils.getPath(engagementPathPrefix, customerPath, projectPath);
-
+        String fullPath = GitLabPathUtils.getValidPath(engagementPathPrefix, customerName, projectName);
         return projectService.getProjectByIdOrPath(fullPath);
 
     }
