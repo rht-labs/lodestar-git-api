@@ -25,32 +25,41 @@ import com.redhat.labs.lodestar.rest.client.GitLabService;
 
 @ApplicationScoped
 public class ProjectService {
+
     public static final Logger LOGGER = LoggerFactory.getLogger(ProjectService.class);
+
+    private static final String DEPLOYMENT_KEY_PREFIX = "LodeStar DK";
+    private static final String DEPLOYMENT_KEY_POSTFIX = "DK";
 
     @Inject
     @RestClient
     GitLabService gitLabService;
 
+    @ConfigProperty(name = "environment.id")
+    String environmentId;
+
     @ConfigProperty(name = "engagements.do.not.delete")
     boolean doNotDelete;
-    
+
     @ConfigProperty(name = "commit.page.size")
     int commitPageSize;
-    
+
     @ConfigProperty(name = "commit.filter.list")
     List<String> commitFilteredEmails;
 
-    // get a project - this could be a replaced by a direct call to the project via the path
+    // get a project - this could be a replaced by a direct call to the project via
+    // the path
     // but must consider changes to the path for special characters
     public Optional<Project> getProjectByName(Integer namespaceId, String name) {
 
         Optional<Project> optional = Optional.empty();
-        
+
         PagedResults<ProjectSearchResults> page = new PagedResults<>();
-        
-        while(page.hasMore()) {
+
+        while (page.hasMore()) {
             Response response = gitLabService.getProjectByName(name, commitPageSize, page.getNumber());
-            page.update(response, new GenericType<List<ProjectSearchResults>>() {});
+            page.update(response, new GenericType<List<ProjectSearchResults>>() {
+            });
         }
 
         // look for a project with name that matches the namespace id and the path
@@ -64,34 +73,36 @@ public class ProjectService {
         return optional;
 
     }
-    
+
     public List<Project> getProjectsByGroup(int groupId, Boolean includeSubgroups) {
-        
+
         PagedResults<Project> page = new PagedResults<>();
-        while(page.hasMore()) {
-            Response response = gitLabService.getProjectsbyGroup(groupId, includeSubgroups, commitPageSize, page.getNumber());
-            page.update(response, new GenericType<List<Project>>() {});
+        while (page.hasMore()) {
+            Response response = gitLabService.getProjectsbyGroup(groupId, includeSubgroups, commitPageSize,
+                    page.getNumber());
+            page.update(response, new GenericType<List<Project>>() {
+            });
         }
-        
-        if(LOGGER.isDebugEnabled()) {
+
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("project count group id ({}) {}", groupId, page.size());
             page.getResults().stream().forEach(project -> LOGGER.debug("Project {}", project.getPathWithNamespace()));
         }
-        
+
         return page.getResults();
     }
 
     public Optional<Project> getProjectById(Integer projectId) {
         return getProjectByIdOrPath(String.valueOf(projectId));
     }
-        
+
     public Optional<Project> getProjectByIdOrPath(String idOrPath) {
 
         try {
             return Optional.ofNullable(gitLabService.getProjectById(idOrPath));
-        } catch(WebApplicationException wae) {
+        } catch (WebApplicationException wae) {
 
-            if(wae.getResponse().getStatus() == 404) {
+            if (wae.getResponse().getStatus() == 404) {
                 return Optional.empty();
             }
 
@@ -100,13 +111,13 @@ public class ProjectService {
         }
 
     }
-    
+
     // create a project
     public Optional<Project> createProject(Project project) {
 
         Optional<Project> optional = Optional.empty();
 
-        if(doNotDelete) {
+        if (doNotDelete) {
             project.preserve();
         }
 
@@ -143,30 +154,39 @@ public class ProjectService {
         gitLabService.deleteProjectById(projectId);
     }
 
-    // enable deployment key - by default it's ready only but we need to write so let's 2-step
+    // enable deployment key - by default it's ready only but we need to write so
+    // let's 2-step
     public void enableDeploymentKeyOnProject(Integer projectId, Integer deployKey) {
-        
+
         gitLabService.enableDeployKey(projectId, deployKey);
-        gitLabService.updateDeployKey(projectId, deployKey, DeployKey.builder().title("LodeStar DK").canPush(true).build());
+        gitLabService
+                .updateDeployKey(projectId, deployKey,
+                        DeployKey
+                                .builder().title(new StringBuilder(DEPLOYMENT_KEY_PREFIX).append(" ")
+                                        .append(environmentId).append(" ").append(DEPLOYMENT_KEY_POSTFIX).toString())
+                                .canPush(true).build());
     }
-    
+
     public List<Commit> getCommitLog(String projectId) {
         PagedResults<Commit> page = new PagedResults<>(commitPageSize);
-        
-        while(page.hasMore()) {
+
+        while (page.hasMore()) {
             Response response = gitLabService.getCommitLog(projectId, commitPageSize, page.getNumber());
-            page.update(response, new GenericType<List<Commit>>() {});
+            page.update(response, new GenericType<List<Commit>>() {
+            });
         }
-        
+
         LOGGER.debug("total commits for project {} {}", projectId, page.size());
-          
-        return page.getResults().stream().filter(e -> !commitFilteredEmails.contains(e.getAuthorEmail())).collect(Collectors.toList());
+
+        return page.getResults().stream().filter(e -> !commitFilteredEmails.contains(e.getAuthorEmail()))
+                .collect(Collectors.toList());
 
     }
 
     public Optional<Project> transferProject(Integer projectId, Integer newGroupId) {
 
-        return gitLabService.transferProject(projectId, ProjectTransfer.builder().id(projectId).namespace(newGroupId).build());
+        return gitLabService.transferProject(projectId,
+                ProjectTransfer.builder().id(projectId).namespace(newGroupId).build());
 
     }
 
