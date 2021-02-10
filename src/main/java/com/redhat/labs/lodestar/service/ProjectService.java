@@ -28,7 +28,7 @@ public class ProjectService {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(ProjectService.class);
 
-    private static final String DEPLOYMENT_KEY_PREFIX = "LodeStar DK";
+    private static final String DEPLOYMENT_KEY_PREFIX = "LodeStar";
     private static final String DEPLOYMENT_KEY_POSTFIX = "DK";
 
     @Inject
