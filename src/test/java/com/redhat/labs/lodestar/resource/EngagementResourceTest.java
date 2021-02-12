@@ -139,7 +139,8 @@ class EngagementResourceTest {
                 "            ]\n" + 
                 "        },\n" + 
                 "        \"technical_lead_email\": \"wendel17@leafs.com\",\n" + 
-                "        \"technical_lead_name\": \"Wendel Clark\"\n" + 
+                "        \"technical_lead_name\": \"Wendel Clark\",\n" + 
+                "        \"timezone\": \"America/Denver\"\n" + 
                 "    }\n" + 
                 "]"));
 
@@ -177,7 +178,8 @@ class EngagementResourceTest {
                         "    \"public_reference\": false,\n" + 
                         "    \"start_date\": \"20200202\",\n" + 
                         "    \"technical_lead_email\": \"wendel17@leafs.com\",\n" + 
-                        "    \"technical_lead_name\": \"Wendel Clark\"\n" + 
+                        "    \"technical_lead_name\": \"Wendel Clark\",\n" + 
+                        "    \"timezone\": \"America/Denver\"\n" + 
                         "}"));
     }
 
@@ -466,7 +468,8 @@ class EngagementResourceTest {
                         "        ]\n" + 
                         "    },\n" + 
                         "    \"technical_lead_email\": \"wendel17@leafs.com\",\n" + 
-                        "    \"technical_lead_name\": \"Wendel Clark\"\n" + 
+                        "    \"technical_lead_name\": \"Wendel Clark\",\n" + 
+                        "    \"timezone\": \"America/Denver\"\n" + 
                         "}"));
     }
 
