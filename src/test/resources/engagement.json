@@ -19,5 +19,6 @@
     "public_reference": false,
     "start_date": "20200202",
     "technical_lead_email": "wendel17@leafs.com",
-    "technical_lead_name": "Wendel Clark"
+    "technical_lead_name": "Wendel Clark",
+    "timezone": "America/Denver"
 }
