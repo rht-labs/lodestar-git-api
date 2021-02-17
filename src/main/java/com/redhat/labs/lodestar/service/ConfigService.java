@@ -121,32 +121,30 @@ public class ConfigService {
         List<HookConfig> hookConfigs = getHookConfig();
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
         LOGGER.debug("number of projects found: {}", projects.size());
-        projects.stream().filter(project -> project.getName().equals(IAC))
-                .forEach(project -> {
+        projects.stream().filter(project -> project.getName().equals(IAC)).forEach(project -> {
 
-                    Integer projectId = project.getId();
+            Integer projectId = project.getId();
 
-                    LOGGER.debug("updating project: {}",
-                            (null != project.getNamespace()) ? project.getNamespace().getFullPath() : projectId);
+            LOGGER.debug("updating project: {}",
+                    (null != project.getNamespace()) ? project.getNamespace().getFullPath() : projectId);
 
-                    // remove existing webhooks for project
-                    hookService.deleteProjectHooks(projectId);
-                    
-                    boolean isArchived = isEngagementArchived(project);
+            // remove existing webhooks for project
+            hookService.deleteProjectHooks(projectId);
 
-                    // create hooks from configuration
-                    hookConfigs.stream().filter(config -> config.isEnabledAfterArchive() || !isArchived)
-                        .forEach(hookC -> {
-                        Hook hook = Hook.builder().projectId(projectId).pushEvents(true).url(hookC.getBaseUrl())
-                                .token(hookC.getToken()).build();
-                        LOGGER.debug("\tcreating webhook {}", hook.getUrl());
-                        Response response = hookService.createProjectHook(projectId, hook);
-                        LOGGER.debug("\t\tservice response code: {}", response.getStatus());
-                        response.close();
+            boolean isArchived = isEngagementArchived(project);
 
-                    });
+            // create hooks from configuration
+            hookConfigs.stream().filter(config -> config.isEnabledAfterArchive() || !isArchived).forEach(hookC -> {
+                Hook hook = Hook.builder().projectId(projectId).pushEvents(true).url(hookC.getBaseUrl())
+                        .token(hookC.getToken()).build();
+                LOGGER.debug("\tcreating webhook {}", hook.getUrl());
+                Response response = hookService.createProjectHook(projectId, hook);
+                LOGGER.debug("\t\tservice response code: {}", response.getStatus());
+                response.close();
 
-                });
+            });
+
+        });
 
     }
 
@@ -193,11 +191,15 @@ public class ConfigService {
      */
     public void createWebhooksForEnagement(Engagement engagement) {
 
+        LOGGER.debug("creating webhooks for engagement {}:{}:{}", engagement.getCustomerName(),
+                engagement.getProjectName(), engagement.getProjectId());
         List<HookConfig> hookConfigs = getHookConfig();
+        LOGGER.debug("\tconfigured hooks {}", hookConfigs);
         hookConfigs.stream().forEach(hookC -> {
             Hook hook = Hook.builder().projectId(engagement.getProjectId()).pushEvents(true).url(hookC.getBaseUrl())
                     .token(hookC.getToken()).build();
-                hookService.createProjectHook(engagement.getProjectId(), hook);
+            LOGGER.debug("\t\tadding webhook {} to project {}", hook.getUrl(), engagement.getProjectId());
+            hookService.createProjectHook(engagement.getProjectId(), hook);
         });
 
     }
@@ -217,8 +219,7 @@ public class ConfigService {
         // create file
         Optional<String> content = configurationConfigMap.getContent();
         if (content.isPresent()) {
-            configuration = File.builder().filePath(configFile).content(content.get())
-                    .build();
+            configuration = File.builder().filePath(configFile).content(content.get()).build();
         }
 
     }

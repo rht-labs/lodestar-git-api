@@ -162,6 +162,7 @@ public class ProjectStructureService {
                             .build();
 
                     // udpate group in Git
+                    LOGGER.debug("updating name and path of existing group to {}", modified);
                     return groupService.updateGitLabGroup(existingGroup.getId(), modified).orElseThrow(
                             () -> new WebApplicationException("failed to update group name/path for " + group, 500));
 
@@ -177,7 +178,7 @@ public class ProjectStructureService {
     }
 
     Group createGroup(String name, Integer parentId) {
-
+        LOGGER.debug("creating new group {} for parent {}", name, parentId);
         return groupService
                 .createGitLabGroup(Group.builder().name(name).path(GitLabPathUtils.generateValidPath(name))
                         .parentId(parentId).build())
@@ -198,6 +199,7 @@ public class ProjectStructureService {
             Integer parentId) {
 
         if (project.isEmpty()) {
+            LOGGER.debug("creating new project for parent id {}", parentId);
             return createProject(parentId);
         }
 
@@ -214,12 +216,13 @@ public class ProjectStructureService {
         toMove.setMovedOrDeleted(true);
 
         // move project to new parent/group id
+        LOGGER.debug("moving project {} to group id {}", toMove.getNamespace(), newParentId);
         return projectService.transferProject(projectId, newParentId);
 
     }
 
     Optional<Project> createProject(Integer parentId) {
-
+        LOGGER.debug("debug creating project for parent id {}", parentId);
         return projectService.createProject(
                 Project.builder().name(ENGAGEMENT_PROJECT_NAME).visibility("private").namespaceId(parentId).build());
 
