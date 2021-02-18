@@ -10,7 +10,6 @@ import static org.mockito.BDDMockito.given;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
