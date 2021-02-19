@@ -44,11 +44,6 @@ public interface GitLabService {
     @Path("/groups/{id}/projects")
     Response getProjectsbyGroup(@PathParam("id") @Encoded Integer groupId, @QueryParam("include_subgroups") @Encoded Boolean includeSubgroups, @QueryParam("per_page") int perPage, @QueryParam("page") int page);
 
-    // curl --request GET --header "PRIVATE-TOKEN: <your_access_token>" "https://gitlab.example.com/api/v4/projects?pagination=keyset&per_page=50&order_by=id&sort=asc"
-    @GET
-    @Path("/groups/{id}/projects")
-    Response getProjectsbyGroup(@PathParam("id") @Encoded Integer groupId, @QueryParam("include_subgroups") @Encoded Boolean includeSubgroups, @QueryParam("per_page") int perPage, @QueryParam("pagination") String pagination, @QueryParam("order_by") String orderBy, @QueryParam("sort") String sort);
-
     //reference: https://docs.gitlab.com/ee/api/groups.html#list-a-groups-subgroups
     @GET
     @Path("/groups/{id}/subgroups")
