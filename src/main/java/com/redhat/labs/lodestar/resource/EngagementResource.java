@@ -1,6 +1,7 @@
 package com.redhat.labs.lodestar.resource;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
@@ -14,6 +15,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -29,6 +31,7 @@ import com.redhat.labs.lodestar.models.Status;
 import com.redhat.labs.lodestar.models.gitlab.Commit;
 import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.Project;
+import com.redhat.labs.lodestar.models.pagination.Page;
 import com.redhat.labs.lodestar.service.EngagementService;
 
 @Path("/api/v1/engagements")
@@ -58,10 +61,27 @@ public class EngagementResource {
     @GET
     @Counted(name = "get-all-engagement", description = "Count of get all engagements")
     @Timed(name = "performedEngagementGetAll", description = "Time to get all engagements", unit = MetricUnits.MILLISECONDS)
-    public Response findAllEngagements() {
+    public Response findAllEngagements(@Context UriInfo uriInfo, @QueryParam("pagination") Optional<Boolean> pagination,
+            @QueryParam("page") Optional<Integer> page, @QueryParam("per_page") Optional<Integer> perPage,
+            @QueryParam("includeStatus") Optional<Boolean> includeStatus,
+            @QueryParam("commitStatus") Optional<Boolean> includeCommits) {
 
-        List<Engagement> engagements = engagementService.getAllEngagements();
-        return Response.ok().entity(engagements).build();
+        ResponseBuilder builder = Response.ok();
+
+        if (pagination.isPresent() && Boolean.TRUE.equals(pagination.get())) {
+
+            Page ePage = engagementService.getEngagementPaginated(page, perPage, includeStatus,
+                    includeCommits);
+            builder.entity(ePage.getEngagements());
+            builder.links(ePage.getLinks(uriInfo.getAbsolutePathBuilder()));
+            ePage.getHeaders().entrySet().stream().forEach(e -> builder.header(e.getKey(), e.getValue()));
+
+        } else {
+            builder.entity(engagementService.getAllEngagements(includeStatus, includeCommits));
+        }
+
+        return builder.build();
+
     }
 
     @GET
@@ -90,9 +110,10 @@ public class EngagementResource {
     @Path("/customer/{customer}/{engagement}")
     @Counted(name = "delete-engagement", description = "Count of delete engagement")
     @Timed(name = "performedEngagementDelete", description = "Time to delete an engagement", unit = MetricUnits.MILLISECONDS)
-    public Response deleteEngagement(@PathParam("customer") String customer, @PathParam("engagement") String engagement) {
+    public Response deleteEngagement(@PathParam("customer") String customer,
+            @PathParam("engagement") String engagement) {
 
-        engagementService.deleteEngagement(customer,engagement);
+        engagementService.deleteEngagement(customer, engagement);
         return Response.accepted().build();
 
     }
@@ -104,7 +125,7 @@ public class EngagementResource {
     public Response createProjectHook(Hook hook, @PathParam("customer") String customer,
             @PathParam("engagement") String engagement) {
 
-        return  engagementService.createHook(customer, engagement, hook);
+        return engagementService.createHook(customer, engagement, hook);
 
     }
 

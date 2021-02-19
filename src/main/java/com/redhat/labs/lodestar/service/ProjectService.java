@@ -1,5 +1,6 @@
 package com.redhat.labs.lodestar.service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import com.redhat.labs.lodestar.models.gitlab.DeployKey;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.models.gitlab.ProjectSearchResults;
 import com.redhat.labs.lodestar.models.gitlab.ProjectTransfer;
+import com.redhat.labs.lodestar.models.pagination.Page;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 
 @ApplicationScoped
@@ -187,6 +189,35 @@ public class ProjectService {
 
         return gitLabService.transferProject(projectId,
                 ProjectTransfer.builder().id(projectId).namespace(newGroupId).build());
+
+    }
+
+    public Page getProjectsByGroupPaginated(Integer groupId, boolean includeSubgroups,
+            Optional<Integer> page, Optional<Integer> perPage) {
+
+        Page projectPage = new Page();
+
+        Integer p = page.orElse(1);
+        projectPage.setPage(p);
+        Integer pp = perPage.orElse(commitPageSize);
+        projectPage.setPerPage(pp);
+
+        Response r = gitLabService.getProjectsbyGroup(groupId, includeSubgroups, pp, p);
+
+        // set link header from gitlab
+        String linkHeader = r.getHeaderString("Link");
+        projectPage.setGitLabLinkHeader(linkHeader);
+
+        // set headers for response
+        projectPage.setHeadersFromGitLabHeader();
+
+        // get projects from response
+        projectPage.setResults(Arrays.asList(r.readEntity(Project[].class)));
+
+        // close response after using
+        r.close();
+
+        return projectPage;
 
     }
 

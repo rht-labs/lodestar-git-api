@@ -35,6 +35,7 @@ import com.redhat.labs.lodestar.models.gitlab.FileAction;
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.Project;
+import com.redhat.labs.lodestar.models.pagination.Page;
 import com.redhat.labs.lodestar.utils.GitLabPathUtils;
 
 import io.quarkus.vertx.ConsumeEvent;
@@ -203,12 +204,31 @@ public class EngagementService {
      * 
      * @return A list or engagements
      */
-    public List<Engagement> getAllEngagements() {
+    public List<Engagement> getAllEngagements(Optional<Boolean> includeStatus, Optional<Boolean> includeCommits) {
 
         List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
+        return getEngagementsFromProject(projects, includeStatus, includeCommits);
 
-        return projects.parallelStream().map(project -> getEngagement(project, true, true))
-                .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+    }
+
+    public Page getEngagementPaginated(Optional<Integer> page, Optional<Integer> perPage,
+            Optional<Boolean> includeStatus, Optional<Boolean> includeCommits) {
+
+        Page ePage = projectService.getProjectsByGroupPaginated(engagementRepositoryId, true, page, perPage);
+        ePage.setEngagements(getEngagementsFromProject(ePage.getResults(), includeStatus, includeCommits));
+        return ePage;
+
+    }
+
+    private List<Engagement> getEngagementsFromProject(List<Project> projects, Optional<Boolean> includeStatus,
+            Optional<Boolean> includeCommits) {
+
+        boolean status = includeStatus.orElse(false);
+        boolean commits = includeCommits.orElse(false);
+
+        return projects.parallelStream().filter(p -> IAC.equals(p.getName()))
+                .map(project -> getEngagement(project, status, commits)).filter(Optional::isPresent).map(Optional::get)
+                .collect(Collectors.toList());
 
     }
 
