@@ -193,16 +193,15 @@ public class ProjectService {
     }
 
     public Page getProjectsByGroupPaginated(Integer groupId, boolean includeSubgroups,
-            Optional<Integer> page, Optional<Integer> perPage) {
+            Optional<Integer> pageOptional, Optional<Integer> perPageOptional) {
 
         Page projectPage = new Page();
 
-        Integer p = page.orElse(1);
-        projectPage.setPage(p);
-        Integer pp = perPage.orElse(commitPageSize);
-        projectPage.setPerPage(pp);
+        Integer page = pageOptional.orElse(1);
+        Integer perPage = perPageOptional.orElse(commitPageSize);
+        projectPage.setPerPage(perPage);
 
-        Response r = gitLabService.getProjectsbyGroup(groupId, includeSubgroups, pp, p);
+        Response r = gitLabService.getProjectsbyGroup(groupId, includeSubgroups, perPage, page);
 
         // set link header from gitlab
         String linkHeader = r.getHeaderString("Link");

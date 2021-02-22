@@ -107,7 +107,7 @@ public class ProjectStructureService {
         builder.project(project);
 
         // get project group
-        Namespace namespace = project.filter(p -> null != p.getNamespace()).map(p -> p.getNamespace()).orElse(null);
+        Namespace namespace = project.filter(p -> null != p.getNamespace()).map(Project::getNamespace).orElse(null);
         Integer pgId = (null == namespace) ? null : namespace.getId();
 
         Optional<Integer> projectGroupId = Optional.ofNullable(pgId);

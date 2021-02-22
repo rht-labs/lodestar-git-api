@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Page {
 
-    private static final String PAGE = "page";
+    private static final String CURRENT_PAGE = "page";
     private static final String PER_PAGE = "per_page";
     private static final String PAGE_HEADER_FORMAT = "x-%s-page";
     private static final String PER_PAGE_HEADER = "x-per-page";
@@ -38,9 +38,6 @@ public class Page {
     private static final String LAST_PAGE_HEADER = String.format(PAGE_HEADER_FORMAT, LAST);
 
     private static final String REGEX = ".*&page=(\\d+)&.*";
-
-    @Builder.Default
-    Integer page = 1;
 
     @Builder.Default
     Integer perPage = 20;
@@ -107,7 +104,7 @@ public class Page {
             }
 
             headers.put(pageHeader, pageValue);
-            linkHeaders.get(rel).put(PAGE, pageValue);
+            linkHeaders.get(rel).put(CURRENT_PAGE, pageValue);
             linkHeaders.get(rel).put(PER_PAGE, perPage);
 
         }
