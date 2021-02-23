@@ -22,6 +22,7 @@ import com.redhat.labs.lodestar.models.gitlab.DeployKey;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.models.gitlab.ProjectSearchResults;
 import com.redhat.labs.lodestar.models.gitlab.ProjectTransfer;
+import com.redhat.labs.lodestar.models.gitlab.ProjectTreeNode;
 import com.redhat.labs.lodestar.models.pagination.Page;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 
@@ -190,6 +191,24 @@ public class ProjectService {
         return gitLabService.transferProject(projectId,
                 ProjectTransfer.builder().id(projectId).namespace(newGroupId).build());
 
+    }
+
+    public List<ProjectTreeNode> getProjectTree(String projectId) {
+        
+        Response response = null;
+        PagedResults<ProjectTreeNode> page = new PagedResults<>(commitPageSize);
+
+        while (page.hasMore()) {
+            response = gitLabService.getProjectTree(projectId, true);
+            page.update(response, new GenericType<List<ProjectTreeNode>>() {});
+        }
+
+        if(null != response) {
+            response.close();
+        }
+
+        return page.getResults();
+        
     }
 
     public Page getProjectsByGroupPaginated(Integer groupId, boolean includeSubgroups,

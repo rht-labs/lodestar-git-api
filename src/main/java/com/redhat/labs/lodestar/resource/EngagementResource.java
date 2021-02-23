@@ -159,6 +159,7 @@ public class EngagementResource {
 
         Status status = engagementService.getProjectStatus(customer, engagement);
         return Response.ok().entity(status).build();
+
     }
 
     @DELETE

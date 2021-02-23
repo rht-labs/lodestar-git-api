@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -35,6 +36,7 @@ import com.redhat.labs.lodestar.models.gitlab.FileAction;
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.Project;
+import com.redhat.labs.lodestar.models.gitlab.ProjectTreeNode;
 import com.redhat.labs.lodestar.models.pagination.Page;
 import com.redhat.labs.lodestar.utils.GitLabPathUtils;
 
@@ -140,7 +142,7 @@ public class EngagementService {
     }
 
     public List<Commit> getCommitLog(String customerName, String engagementName) {
-        String projectPath = GitLabPathUtils.getPath(engagementPathPrefix, customerName, engagementName);
+        String projectPath = GitLabPathUtils.getValidPath(engagementPathPrefix, customerName, engagementName);
         return projectService.getCommitLog(projectPath);
     }
 
@@ -178,15 +180,32 @@ public class EngagementService {
 
     }
 
-    public Status getProjectStatus(String customerName, String engagementName) {
+    private Status getProjectStatusFile(String customerName, String engagementName) {
         Status status = null;
         Optional<File> file = fileService
-                .getFile(GitLabPathUtils.getPath(engagementPathPrefix, customerName, engagementName), STATUS_FILE);
+                .getFile(GitLabPathUtils.getValidPath(engagementPathPrefix, customerName, engagementName), STATUS_FILE);
         if (file.isPresent()) {
             status = json.fromJson(file.get().getContent(), Status.class);
         }
 
         return status;
+    }
+
+    public Status getProjectStatus(String customerName, String engagementName) {
+
+        List<ProjectTreeNode> nodes = projectService
+                .getProjectTree(GitLabPathUtils.getValidPath(engagementPathPrefix, customerName, engagementName));
+
+        // find status file node or throw 404
+        List<ProjectTreeNode> status = nodes.stream().filter(node -> STATUS_FILE.equals(node.getName()))
+                .collect(Collectors.toList());
+        if (status.isEmpty()) {
+            throw new WebApplicationException("failed to find status.json", 404);
+        }
+
+        // get status
+        return getProjectStatusFile(customerName, engagementName);
+
     }
 
     public Optional<Project> getProject(String customerName, String engagementName) {
@@ -223,8 +242,8 @@ public class EngagementService {
     private List<Engagement> getEngagementsFromProject(List<Project> projects, Optional<Boolean> includeStatus,
             Optional<Boolean> includeCommits) {
 
-        boolean status = includeStatus.orElse(false);
-        boolean commits = includeCommits.orElse(false);
+        boolean status = includeStatus.orElse(true);
+        boolean commits = includeCommits.orElse(true);
 
         return projects.parallelStream().filter(p -> IAC.equals(p.getName()))
                 .map(project -> getEngagement(project, status, commits)).filter(Optional::isPresent).map(Optional::get)

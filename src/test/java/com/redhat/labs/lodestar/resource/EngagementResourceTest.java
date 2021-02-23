@@ -46,8 +46,11 @@ class EngagementResourceTest {
 
         // get engagements by group
         List<Project> projects = new ArrayList<>();
-        projects.add(Project.builder().id(20).name("Project " + (20)).build());
+        projects.add(Project.builder().id(20).name("iac").build());
         MockUtils.setGetProjectsByGroupMock(gitLabService, 20, projects, false);
+
+        // get status file
+        MockUtils.setProjectTreeNodeList(gitLabService, "status.json");
 
         // get engagement file
         MockUtils.setGetFileForEngagementJsonMock(gitLabService, 20, true);
@@ -309,6 +312,7 @@ class EngagementResourceTest {
     @Test
     void testGetStatusSuccess() {
 
+        MockUtils.setProjectTreeNodeList(gitLabService, "status.json");
         MockUtils.setGetFileForStatusJsonMock(gitLabService, "top/dog/jello/lemon/iac", true);
 
         given().when().contentType(ContentType.JSON).get("/api/v1/engagements/customer/jello/lemon/status").then()

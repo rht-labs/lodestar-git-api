@@ -22,6 +22,7 @@ import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.Namespace;
 import com.redhat.labs.lodestar.models.gitlab.Project;
+import com.redhat.labs.lodestar.models.gitlab.ProjectTreeNode;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 
 public class MockUtils {
@@ -58,6 +59,10 @@ public class MockUtils {
 
     public static Namespace mockNamespace(Integer id, Integer parentId) {
         return Namespace.builder().id(id).parentId(parentId).build();
+    }
+
+    public static ProjectTreeNode mockProjectTreeNode(String name) {
+        return ProjectTreeNode.builder().name(name).build();
     }
 
     // get projects by group
@@ -213,6 +218,15 @@ public class MockUtils {
 
     public static void setDeleteProjectById(GitLabService gitLabService) {
         BDDMockito.doThrow(new WebApplicationException(404)).when(gitLabService).deleteProjectById(Mockito.anyInt());
+    }
+
+    public static void setProjectTreeNodeList(GitLabService gitLabService, String fileName) {
+
+        ProjectTreeNode node1 = mockProjectTreeNode("another");
+        ProjectTreeNode node2 = mockProjectTreeNode(fileName);
+        Response response = Response.ok(Lists.newArrayList(node1, node2)).build();
+        BDDMockito.given(gitLabService.getProjectTree(Mockito.anyString(), Mockito.anyBoolean())).willReturn(response);
+
     }
 
 }
