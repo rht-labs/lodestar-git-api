@@ -83,8 +83,6 @@ public class MockUtils {
     public static void setGetProjectsByGrouPagedpMock(GitLabService gitLabService, Integer projectId,
             List<Project> projects, boolean hasProject) {
 
-//        Response error = Response.serverError().build();
-
         String linkHeader = "<https://gitlab..com/api/v4/groups/20/projects?id=20&include_subgroups=true&order_by=created_at&owned=false&page=2&per_page=1&simple=false&sort=desc&starred=false&with_custom_attributes=false&with_issues_enabled=false&with_merge_requests_enabled=false&with_shared=true>; rel=\"next\", <https://gitlab..com/api/v4/groups/20/projects?id=20&include_subgroups=true&order_by=created_at&owned=false&page=1&per_page=1&simple=false&sort=desc&starred=false&with_custom_attributes=false&with_issues_enabled=false&with_merge_requests_enabled=false&with_shared=true>; rel=\"first\", <https://gitlab.com/api/v4/groups/20/projects?id=20&include_subgroups=true&order_by=created_at&owned=false&page=9&per_page=1&simple=false&sort=desc&starred=false&with_custom_attributes=false&with_issues_enabled=false&with_merge_requests_enabled=false&with_shared=true>; rel=\"last\"";
         List<Project> projectList = Lists.newArrayList(mockIacProject());
 
@@ -92,9 +90,6 @@ public class MockUtils {
         BDDMockito.when(response.readEntity(Project[].class))
                 .thenReturn(projectList.toArray(new Project[projectList.size()]));
         BDDMockito.when(response.getHeaderString("Link")).thenReturn(linkHeader);
-//            Response response = r.build();
-//            Response mockResponse = BDDMockito.spy(response);
-//            BDDMockito.doReturn(projectList.toArray()).when(mockResponse).readEntity(Project[].class);
         BDDMockito.given(gitLabService.getProjectsbyGroup(Mockito.anyInt(), Mockito.anyBoolean(), Mockito.anyInt(),
                 Mockito.anyInt())).willReturn(response);
 
