@@ -64,7 +64,7 @@ public class EngagementResource {
     public Response findAllEngagements(@Context UriInfo uriInfo, @QueryParam("pagination") Optional<Boolean> pagination,
             @QueryParam("page") Optional<Integer> page, @QueryParam("per_page") Optional<Integer> perPage,
             @QueryParam("includeStatus") Optional<Boolean> includeStatus,
-            @QueryParam("commitStatus") Optional<Boolean> includeCommits) {
+            @QueryParam("includeCommits") Optional<Boolean> includeCommits) {
 
         ResponseBuilder builder = Response.ok();
 
