@@ -10,6 +10,7 @@ import static org.mockito.BDDMockito.given;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
@@ -23,6 +24,7 @@ import org.mockito.Mockito;
 
 import com.redhat.labs.lodestar.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.lodestar.models.Engagement;
+import com.redhat.labs.lodestar.models.Status;
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.Project;
@@ -191,12 +193,9 @@ class EngagementServiceTest {
         given(gitLabService.getProjectTree(Mockito.anyString(), Mockito.anyBoolean())).willReturn(r);
         given(gitLabService.getFile(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).willReturn(null);
 
-        WebApplicationException exception = assertThrows(WebApplicationException.class, () -> {
-            engagementService.getProjectStatus("nope", "nada");
-        });
+        Optional<Status> status = engagementService.getProjectStatus("nope", "nada");
 
-        assertEquals(404, exception.getResponse().getStatus());
-        assertEquals("failed to find status.json", exception.getMessage());
+        assertTrue(status.isEmpty());
 
     }
 

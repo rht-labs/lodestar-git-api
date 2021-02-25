@@ -157,8 +157,11 @@ public class EngagementResource {
     @Timed(name = "performedStatusGet", description = "Time to get status", unit = MetricUnits.MILLISECONDS)
     public Response getStatus(@PathParam("customer") String customer, @PathParam("engagement") String engagement) {
 
-        Status status = engagementService.getProjectStatus(customer, engagement);
-        return Response.ok().entity(status).build();
+        Optional<Status> status = engagementService.getProjectStatus(customer, engagement);
+        if(status.isPresent()) {
+            return Response.ok().entity(status).build(); 
+        }
+        return Response.status(404).build();
 
     }
 

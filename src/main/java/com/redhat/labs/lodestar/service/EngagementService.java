@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -191,7 +190,7 @@ public class EngagementService {
         return status;
     }
 
-    public Status getProjectStatus(String customerName, String engagementName) {
+    public Optional<Status> getProjectStatus(String customerName, String engagementName) {
 
         List<ProjectTreeNode> nodes = projectService
                 .getProjectTree(GitLabPathUtils.getValidPath(engagementPathPrefix, customerName, engagementName));
@@ -200,11 +199,11 @@ public class EngagementService {
         List<ProjectTreeNode> status = nodes.stream().filter(node -> STATUS_FILE.equals(node.getName()))
                 .collect(Collectors.toList());
         if (status.isEmpty()) {
-            throw new WebApplicationException("failed to find status.json", 404);
+            return Optional.empty();
         }
 
         // get status
-        return getProjectStatusFile(customerName, engagementName);
+        return Optional.of(getProjectStatusFile(customerName, engagementName));
 
     }
 
