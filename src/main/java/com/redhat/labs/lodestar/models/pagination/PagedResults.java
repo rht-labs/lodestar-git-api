@@ -1,4 +1,4 @@
-package com.redhat.labs.lodestar.models;
+package com.redhat.labs.lodestar.models.pagination;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class PagedResults<T> {
             
             if(totalPageString == null) {
                 total = UNDEFINED_PAGE_COUNT; //Should not be able to get this high
-                LOGGER.debug("X-Total-Pages header is missing");
+                LOGGER.trace("X-Total-Pages header is missing");
             } else {
                 total = Integer.valueOf(totalPageString);
             }

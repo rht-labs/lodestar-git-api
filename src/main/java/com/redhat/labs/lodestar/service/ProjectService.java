@@ -16,7 +16,6 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.labs.lodestar.models.PagedResults;
 import com.redhat.labs.lodestar.models.gitlab.Commit;
 import com.redhat.labs.lodestar.models.gitlab.DeployKey;
 import com.redhat.labs.lodestar.models.gitlab.Project;
@@ -24,6 +23,7 @@ import com.redhat.labs.lodestar.models.gitlab.ProjectSearchResults;
 import com.redhat.labs.lodestar.models.gitlab.ProjectTransfer;
 import com.redhat.labs.lodestar.models.gitlab.ProjectTreeNode;
 import com.redhat.labs.lodestar.models.pagination.Page;
+import com.redhat.labs.lodestar.models.pagination.PagedResults;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 
 @ApplicationScoped
