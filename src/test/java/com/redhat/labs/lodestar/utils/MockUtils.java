@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response.Status;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.redhat.labs.lodestar.config.JsonMarshaller;
 import com.redhat.labs.lodestar.models.gitlab.Commit;
@@ -22,6 +23,7 @@ import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.Namespace;
 import com.redhat.labs.lodestar.models.gitlab.Project;
+import com.redhat.labs.lodestar.models.gitlab.ProjectTreeNode;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 
 public class MockUtils {
@@ -30,6 +32,7 @@ public class MockUtils {
     public static Integer CUSTOMER_GROUP_ID = 2222;
     public static Integer PROJECT_GROUP_ID = 3333;
     public static Integer PROJECT_ID = 4444;
+    public static ObjectMapper mapper = new ObjectMapper();
 
     public static Group mockRepositoryGroup() {
         return Group.builder().fullPath("top/dog").build();
@@ -60,6 +63,10 @@ public class MockUtils {
         return Namespace.builder().id(id).parentId(parentId).build();
     }
 
+    public static ProjectTreeNode mockProjectTreeNode(String name) {
+        return ProjectTreeNode.builder().name(name).build();
+    }
+
     // get projects by group
     public static void setGetProjectsByGroupMock(GitLabService gitLabService, Integer projectId, List<Project> projects,
             boolean hasProject) {
@@ -71,6 +78,21 @@ public class MockUtils {
             BDDMockito.given(gitLabService.getProjectsbyGroup(Mockito.anyInt(), Mockito.anyBoolean(), Mockito.eq(100),
                     Mockito.eq(1))).willReturn(r.build());
         }
+    }
+
+    public static void setGetProjectsByGrouPagedpMock(GitLabService gitLabService, Integer projectId,
+            List<Project> projects, boolean hasProject) {
+
+        String linkHeader = "<https://gitlab..com/api/v4/groups/20/projects?id=20&include_subgroups=true&order_by=created_at&owned=false&page=2&per_page=1&simple=false&sort=desc&starred=false&with_custom_attributes=false&with_issues_enabled=false&with_merge_requests_enabled=false&with_shared=true>; rel=\"next\", <https://gitlab..com/api/v4/groups/20/projects?id=20&include_subgroups=true&order_by=created_at&owned=false&page=1&per_page=1&simple=false&sort=desc&starred=false&with_custom_attributes=false&with_issues_enabled=false&with_merge_requests_enabled=false&with_shared=true>; rel=\"first\", <https://gitlab.com/api/v4/groups/20/projects?id=20&include_subgroups=true&order_by=created_at&owned=false&page=9&per_page=1&simple=false&sort=desc&starred=false&with_custom_attributes=false&with_issues_enabled=false&with_merge_requests_enabled=false&with_shared=true>; rel=\"last\"";
+        List<Project> projectList = Lists.newArrayList(mockIacProject());
+
+        Response response = BDDMockito.mock(Response.class);
+        BDDMockito.when(response.readEntity(Project[].class))
+                .thenReturn(projectList.toArray(new Project[projectList.size()]));
+        BDDMockito.when(response.getHeaderString("Link")).thenReturn(linkHeader);
+        BDDMockito.given(gitLabService.getProjectsbyGroup(Mockito.anyInt(), Mockito.anyBoolean(), Mockito.anyInt(),
+                Mockito.anyInt())).willReturn(response);
+
     }
 
     // get projects by id/path
@@ -206,13 +228,22 @@ public class MockUtils {
         BDDMockito.given(gitLabService.createProjectHook(Mockito.eq(projectId), Mockito.any(Hook.class)))
                 .willReturn(Response.status(Status.CREATED).build());
     }
-    
+
     public static void setDeleteGroupById(GitLabService gitLabService) {
         BDDMockito.doThrow(new WebApplicationException(404)).when(gitLabService).deleteGroupById(Mockito.anyInt());
     }
 
     public static void setDeleteProjectById(GitLabService gitLabService) {
         BDDMockito.doThrow(new WebApplicationException(404)).when(gitLabService).deleteProjectById(Mockito.anyInt());
+    }
+
+    public static void setProjectTreeNodeList(GitLabService gitLabService, String fileName) {
+
+        ProjectTreeNode node1 = mockProjectTreeNode("another");
+        ProjectTreeNode node2 = mockProjectTreeNode(fileName);
+        Response response = Response.ok(Lists.newArrayList(node1, node2)).build();
+        BDDMockito.given(gitLabService.getProjectTree(Mockito.anyString(), Mockito.anyBoolean())).willReturn(response);
+
     }
 
 }

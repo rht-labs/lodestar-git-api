@@ -42,12 +42,15 @@ public interface GitLabService {
     // reference: https://docs.gitlab.com/ee/api/groups.html#list-a-groups-projects
     @GET
     @Path("/groups/{id}/projects")
-    Response getProjectsbyGroup(@PathParam("id") @Encoded Integer groupId, @QueryParam("include_subgroups") @Encoded Boolean includeSubgroups, @QueryParam("per_page") int perPage, @QueryParam("page") int page);
+    Response getProjectsbyGroup(@PathParam("id") @Encoded Integer groupId,
+            @QueryParam("include_subgroups") @Encoded Boolean includeSubgroups, @QueryParam("per_page") int perPage,
+            @QueryParam("page") int page);
 
-    //reference: https://docs.gitlab.com/ee/api/groups.html#list-a-groups-subgroups
+    // reference: https://docs.gitlab.com/ee/api/groups.html#list-a-groups-subgroups
     @GET
     @Path("/groups/{id}/subgroups")
-    Response getSubGroups(@PathParam("id") @Encoded Integer groupId, @QueryParam("per_page") Integer perPage, @QueryParam("page") Integer page); 
+    Response getSubGroups(@PathParam("id") @Encoded Integer groupId, @QueryParam("per_page") Integer perPage,
+            @QueryParam("page") Integer page);
 
     // reference: https://docs.gitlab.com/ee/api/groups.html#new-group
     @POST
@@ -68,8 +71,9 @@ public interface GitLabService {
     @Logged
     @Path("/groups")
     @Produces("application/json")
-    Response getGroupByName(@QueryParam("search") @Encoded String name, @QueryParam("per_page") int perPage, @QueryParam("page") int page);
-    
+    Response getGroupByName(@QueryParam("search") @Encoded String name, @QueryParam("per_page") int perPage,
+            @QueryParam("page") int page);
+
     @GET
     @Logged
     @Path("/groups/{idOrPath}")
@@ -83,6 +87,13 @@ public interface GitLabService {
 
     // PROJECTS
 
+    // GET /projects/:id/repository/tree
+    @GET
+    @Logged
+    @Path("/projects/{idOrPath}/repository/tree")
+    Response getProjectTree(@PathParam("idOrPath") @Encoded String idOrPath,
+            @QueryParam("recursive") boolean recursive);
+
     // reference: https://docs.gitlab.com/ee/api/projects.html#list-all-projects
     @GET
     @Logged
@@ -94,7 +105,8 @@ public interface GitLabService {
     @Logged
     @Path("/projects")
     @Produces("application/json")
-    Response getProjectByName(@QueryParam("search") @Encoded String name, @QueryParam("per_page") int perPage, @QueryParam("page") int page);
+    Response getProjectByName(@QueryParam("search") @Encoded String name, @QueryParam("per_page") int perPage,
+            @QueryParam("page") int page);
 
     @GET
     @Logged
@@ -119,18 +131,19 @@ public interface GitLabService {
     @Logged
     @Path("/projects/{id}")
     void deleteProjectById(@PathParam("id") @Encoded Integer projectId);
-    
+
     @POST
     @Logged
     @Path("/projects/{id}/hooks")
     @Produces("application/json")
     Response createProjectHook(@PathParam("id") @Encoded Integer projectId, Hook hook);
-    
+
     @PUT
     @Logged
     @Path("/projects/{id}/hooks/{hookId}")
     @Produces("application/json")
-    Response updateProjectHook(@PathParam("id") @Encoded Integer projectId, @PathParam("hookId") @Encoded Integer hookId, Hook hook);
+    Response updateProjectHook(@PathParam("id") @Encoded Integer projectId,
+            @PathParam("hookId") @Encoded Integer hookId, Hook hook);
 
     @DELETE
     @Logged
@@ -163,8 +176,8 @@ public interface GitLabService {
     @Logged
     @Path("/projects/{id}/repository/files/{file_path}")
     @Produces("application/json")
-    Response getFileWithResponse(@PathParam("id") @Encoded Integer projectId, @PathParam("file_path") @Encoded String filePath,
-            @QueryParam("ref") @Encoded String ref);
+    Response getFileWithResponse(@PathParam("id") @Encoded Integer projectId,
+            @PathParam("file_path") @Encoded String filePath, @QueryParam("ref") @Encoded String ref);
 
     @POST
     @Logged
@@ -183,7 +196,8 @@ public interface GitLabService {
     @DELETE
     @Logged
     @Path("/projects/{id}/repository/files/{file_path}")
-    void deleteFile(@PathParam("id") @Encoded Integer projectId, @PathParam("file_path") @Encoded String filePath, File file);
+    void deleteFile(@PathParam("id") @Encoded Integer projectId, @PathParam("file_path") @Encoded String filePath,
+            File file);
 
     // COMMITS
 
@@ -192,12 +206,13 @@ public interface GitLabService {
     @Path("/projects/{id}/repository/commits")
     @Produces("application/json")
     Response commitMultipleFiles(@PathParam("id") @Encoded Integer projectId, CommitMultiple commit);
-    
+
     @GET
     @Logged
     @Path("/projects/{id}/repository/commits")
     @Produces("application/json")
-    Response getCommitLog(@PathParam("id") @Encoded String projectId, @QueryParam("per_page") int perPage, @QueryParam("page") int page);
+    Response getCommitLog(@PathParam("id") @Encoded String projectId, @QueryParam("per_page") int perPage,
+            @QueryParam("page") int page);
 
     // Deploy Keys
 
@@ -207,12 +222,14 @@ public interface GitLabService {
     @Logged
     @Path("/projects/{id}/deploy_keys/{deploy_key}/enable")
     @Produces("application/json")
-    Response enableDeployKey(@PathParam("id") @Encoded Integer projectId, @PathParam("deploy_key") @Encoded Integer deployKey);
-    
+    Response enableDeployKey(@PathParam("id") @Encoded Integer projectId,
+            @PathParam("deploy_key") @Encoded Integer deployKey);
+
     @PUT
     @Logged
     @Path("/projects/{id}/deploy_keys/{deploy_key_id}")
     @Produces("application/json")
-    Response updateDeployKey(@PathParam("id") @Encoded Integer projectId, @PathParam("deploy_key_id") @Encoded Integer deployKeyId, DeployKey deployKey);
+    Response updateDeployKey(@PathParam("id") @Encoded Integer projectId,
+            @PathParam("deploy_key_id") @Encoded Integer deployKeyId, DeployKey deployKey);
 
 }

@@ -16,21 +16,84 @@ The JSON REST APIs consist of the following resources:
 
 ### Config Resource
 
-The config resource exposes an API that allows clients to retrieve a configured `Config` file from GitLab.
+The config resource exposes an API that allows clients to retrieve a configuration files from GitLab.
+
+#### LodeStar Runtime Configuration File
 
 ```
 GET  /api/v1/config
+GET  /api/v2/config
 ```
+
+Version 1 of the API returns the file in YAML and version 2 of the API returns the file in JSON.
+
+#### Webhooks Configuration File
+
+```
+GET  /api/v2/config/webhooks
+```
+
+Returns a JSON representation of the configured webhooks.
 
 ### Engagement Resource
 
 The engagement resource exposes an API that allows clients to create or update and engagement resource in GitLab.
 
 ```
-POST /api/v1/engagements
+POST ​  /api​/v1​/engagements
 ```
+Used to create or update an engagement.  This endpoint will create the expected group/project structure in GitLab.  Then, will update the `engagement.json` file if it already exists or create it if it does not.
+```
+POST   ​/api​/v1​/engagements​/customer​/{customer}​/{engagement}​/hooks
+```
+Used to create a webhook in GitLab for the project associated to the customer and engagement name combination.
+```
+GET ​   /api​/v1​/engagements
+```
+Optional query parameters:
 
-This endpoint will create the expected group/project structure in GitLab.  Then, will update the `engagement.json` file if it already exists or create it if it does not.
+- `includeCommits` - adds commit data to engagement if set to `true`
+- `includeStatus`  - adds status data to engagement if set to `true`
+- `pagination` - returns a single page of engagements if true.  all if false
+- `page` - page number to retrieve from GitLab
+- `per_page` - number of engagements to return per page
+
+Pagination Headers Returned:
+- `Link` - contains links for rel `first`, `last`, and `next`.  `next` omitted if last page is requested
+- `x-first-page` number of first page
+- `x-next-page`  number of next page (omitted if last page)
+- `x-last-page` number of last page
+
+```
+```
+GET  ​  /api​/v1​/engagements​/customer​/{customer}​/{engagement}
+```
+Returns the engagement associated with the customer and engagement name combination.
+```
+```
+GET    ​/api​/v1​/engagements​/customer​/{customer}​/{engagement}​/commits
+```
+Returns a list of commits associated with the customer and engagement name combination.
+```
+GET    ​/api​/v1​/engagements​/customer​/{customer}​/{engagement}​/hooks
+```
+Returns the webhooks for the engagement associated with the customer and engagement name combination.
+```
+GET    ​/api​/v1​/engagements​/customer​/{customer}​/{engagement}​/status
+```
+Returns the status data for the engagement associated with the customer and engagement name combination.
+```
+GET    ​/api​/v1​/engagements​/namespace​/{namespace}
+```
+Returns the engagement associated with the provided namespace.
+```
+DELETE ​/api​/v1​/engagements​/customer​/{customer}​/{engagement}
+```
+Deletes the engagement associated with the customer and engagement name combination.  Will only delete if engagement has not been lost.
+```
+DELETE ​/api​/v1​/engagements​/hooks
+```
+Deletes all webhooks in all configured engagement projects.
 
 ### Version Resource
 
@@ -75,6 +138,7 @@ Deployment template will read from the above secret and inject following env var
 | CONFIG_FILE | my-config.yml | True |
 | CONFIG_GITLAB_REF | master | False |
 | WEBHOOK_FILE | webhooks.yml | False |
+| CONFIG_RELOAD | true | False |
 
 ### Engagements Resource
 
@@ -82,6 +146,7 @@ Deployment template will read from the above secret and inject following env var
 |------|---------------|----------|
 | ENGAGEMENTS_REPOSITORY_ID | 2 | True |
 | WEBHOOK_DEFAULT_TOKEN | tolkien | False | 
+| ENGAGEMENTS_PRESERVE | true | False |
 
 ### Version Resource
 
@@ -89,6 +154,13 @@ Deployment template will read from the above secret and inject following env var
 |------|---------------|----------|
 | GIT_API_GIT_COMMIT | a2adfk | False |
 | GIT_API_GIT_TAG | v1.2 | False |
+
+### Other
+
+| Name | Example Value | Required |
+|------|---------------|----------|
+| ENV_ID | TEST | False |
+
 
 ## Development
 

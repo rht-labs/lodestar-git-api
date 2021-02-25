@@ -1,5 +1,6 @@
 package com.redhat.labs.lodestar.service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,12 +16,14 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.labs.lodestar.models.PagedResults;
 import com.redhat.labs.lodestar.models.gitlab.Commit;
 import com.redhat.labs.lodestar.models.gitlab.DeployKey;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.models.gitlab.ProjectSearchResults;
 import com.redhat.labs.lodestar.models.gitlab.ProjectTransfer;
+import com.redhat.labs.lodestar.models.gitlab.ProjectTreeNode;
+import com.redhat.labs.lodestar.models.pagination.Page;
+import com.redhat.labs.lodestar.models.pagination.PagedResults;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 
 @ApplicationScoped
@@ -187,6 +190,52 @@ public class ProjectService {
 
         return gitLabService.transferProject(projectId,
                 ProjectTransfer.builder().id(projectId).namespace(newGroupId).build());
+
+    }
+
+    public List<ProjectTreeNode> getProjectTree(String projectId) {
+        
+        Response response = null;
+        PagedResults<ProjectTreeNode> page = new PagedResults<>(commitPageSize);
+
+        while (page.hasMore()) {
+            response = gitLabService.getProjectTree(projectId, true);
+            page.update(response, new GenericType<List<ProjectTreeNode>>() {});
+        }
+
+        if(null != response) {
+            response.close();
+        }
+
+        return page.getResults();
+        
+    }
+
+    public Page getProjectsByGroupPaginated(Integer groupId, boolean includeSubgroups,
+            Optional<Integer> pageOptional, Optional<Integer> perPageOptional) {
+
+        Page projectPage = new Page();
+
+        Integer page = pageOptional.orElse(1);
+        Integer perPage = perPageOptional.orElse(commitPageSize);
+        projectPage.setPerPage(perPage);
+
+        Response r = gitLabService.getProjectsbyGroup(groupId, includeSubgroups, perPage, page);
+
+        // set link header from gitlab
+        String linkHeader = r.getHeaderString("Link");
+        projectPage.setGitLabLinkHeader(linkHeader);
+
+        // set headers for response
+        projectPage.setHeadersFromGitLabHeader();
+
+        // get projects from response
+        projectPage.setResults(Arrays.asList(r.readEntity(Project[].class)));
+
+        // close response after using
+        r.close();
+
+        return projectPage;
 
     }
 

@@ -14,8 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.lodestar.exception.UnexpectedGitLabResponseException;
-import com.redhat.labs.lodestar.models.PagedResults;
 import com.redhat.labs.lodestar.models.gitlab.Group;
+import com.redhat.labs.lodestar.models.pagination.PagedResults;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
 
 @ApplicationScoped

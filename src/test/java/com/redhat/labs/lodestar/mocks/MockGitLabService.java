@@ -362,4 +362,10 @@ public class MockGitLabService implements GitLabService {
         
     }
 
+    @Override
+    public Response getProjectTree(String idOrPath, boolean recursive) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

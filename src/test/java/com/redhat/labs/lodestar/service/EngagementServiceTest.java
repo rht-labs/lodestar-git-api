@@ -16,13 +16,13 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import org.gradle.internal.impldep.com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.redhat.labs.lodestar.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.lodestar.models.Engagement;
-import com.redhat.labs.lodestar.models.Status;
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Hook;
 import com.redhat.labs.lodestar.models.gitlab.Project;
@@ -186,10 +186,18 @@ class EngagementServiceTest {
 
     @Test void tesetNoStatus() {
 
+        Response r = Response.ok(Lists.newArrayList()).build();
+        
+        given(gitLabService.getProjectTree(Mockito.anyString(), Mockito.anyBoolean())).willReturn(r);
         given(gitLabService.getFile(Mockito.anyString(), Mockito.anyString(), Mockito.anyString())).willReturn(null);
 
-        Status status = engagementService.getProjectStatus("nope", "nada");
-        assertNull(status);
+        WebApplicationException exception = assertThrows(WebApplicationException.class, () -> {
+            engagementService.getProjectStatus("nope", "nada");
+        });
+
+        assertEquals(404, exception.getResponse().getStatus());
+        assertEquals("failed to find status.json", exception.getMessage());
+
     }
 
 }
