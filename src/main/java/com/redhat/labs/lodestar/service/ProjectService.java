@@ -47,6 +47,9 @@ public class ProjectService {
     @ConfigProperty(name = "commit.page.size")
     int commitPageSize;
 
+    @ConfigProperty(name = "commit.msg.filter.list")
+    List<String> commitFilteredMessages;
+
     @ConfigProperty(name = "commit.filter.list")
     List<String> commitFilteredEmails;
 
@@ -182,7 +185,7 @@ public class ProjectService {
         LOGGER.debug("total commits for project {} {}", projectId, page.size());
 
         return page.getResults().stream().filter(e -> !commitFilteredEmails.contains(e.getAuthorEmail()))
-                .filter(e -> !"manual_refresh".equals(e.getMessage())).collect(Collectors.toList());
+                .filter(e -> !commitFilteredMessages.contains(e.getMessage())).collect(Collectors.toList());
 
     }
 

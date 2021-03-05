@@ -111,4 +111,11 @@ class ProjectServiceTest {
         assertNotNull(commits);
         assertEquals(3, commits.size());
     }
+
+    @Test void getCommitsMessageFilter() {
+        List<Commit> commits = projectService.getCommitLog("multi/page/filtered");
+        assertNotNull(commits);
+        assertEquals(3, commits.size());
+
+    }
 }
