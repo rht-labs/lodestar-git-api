@@ -129,6 +129,7 @@ Deployment template will read from the above secret and inject following env var
 | Name | Example Value | Required |
 |------|---------------|----------|
 | COMMIT_FILTERED_EMAIL_LIST | bot@bot.com,tob@tob.com | False |
+| COMMIT_FILTERED_MESSAGE_LIST | manual_refresh,another-message | False |
 
 ### Config Resource 
 
