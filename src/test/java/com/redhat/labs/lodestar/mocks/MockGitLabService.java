@@ -348,8 +348,10 @@ public class MockGitLabService implements GitLabService {
         }
 
         if("multi/page/filtered".equals(projectId)) {
-            Commit c = Commit.builder().message("manual_refresh").build();
-            commitList.add(c);
+            Commit c1 = Commit.builder().message("manual_refresh").build();
+            commitList.add(c1);
+            Commit c2 = Commit.builder().message("manual_refresh some other text").build();
+            commitList.add(c2);
             return Response.ok(commitList).build();
         }
         
