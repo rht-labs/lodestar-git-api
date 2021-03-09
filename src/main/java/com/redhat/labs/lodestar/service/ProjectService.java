@@ -184,8 +184,17 @@ public class ProjectService {
 
         LOGGER.debug("total commits for project {} {}", projectId, page.size());
 
-        return page.getResults().stream().filter(e -> !commitFilteredEmails.contains(e.getAuthorEmail()))
-                .filter(e -> !commitFilteredMessages.contains(e.getMessage())).collect(Collectors.toList());
+        return page.getResults().stream().filter(e -> !commitFilteredEmails.contains(e.getAuthorEmail())).map(e -> {
+
+            Optional<String> match = commitFilteredMessages.stream().filter(m -> e.getMessage().startsWith(m))
+                    .findFirst();
+            if (match.isPresent()) {
+                String updated = e.getMessage().replaceFirst(match.get(), "").trim();
+                e.setMessage(updated);
+            }
+            return e;
+
+        }).filter(e -> !e.getMessage().isBlank()).collect(Collectors.toList());
 
     }
 
@@ -197,25 +206,26 @@ public class ProjectService {
     }
 
     public List<ProjectTreeNode> getProjectTree(String projectId) {
-        
+
         Response response = null;
         PagedResults<ProjectTreeNode> page = new PagedResults<>(commitPageSize);
 
         while (page.hasMore()) {
             response = gitLabService.getProjectTree(projectId, true);
-            page.update(response, new GenericType<List<ProjectTreeNode>>() {});
+            page.update(response, new GenericType<List<ProjectTreeNode>>() {
+            });
         }
 
-        if(null != response) {
+        if (null != response) {
             response.close();
         }
 
         return page.getResults();
-        
+
     }
 
-    public Page getProjectsByGroupPaginated(Integer groupId, boolean includeSubgroups,
-            Optional<Integer> pageOptional, Optional<Integer> perPageOptional) {
+    public Page getProjectsByGroupPaginated(Integer groupId, boolean includeSubgroups, Optional<Integer> pageOptional,
+            Optional<Integer> perPageOptional) {
 
         Page projectPage = new Page();
 

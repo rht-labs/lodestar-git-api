@@ -11,6 +11,8 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import com.redhat.labs.lodestar.mocks.MockGitLabService;
 import com.redhat.labs.lodestar.models.gitlab.Commit;
@@ -97,25 +99,15 @@ class ProjectServiceTest {
         projectService.deleteProject(45);
         assertNotNull(projectService);
     }
-    
-    @Test void getCommitsMultiPage() {
-        List<Commit> commits = projectService.getCommitLog("multi/page/iac");
-        assertNotNull(commits);
-        assertEquals(6, commits.size());
-        
-    }
 
-    //Will only get first page since the page size will be larger
-    @Test void getCommitsMultiPageMissingHeader() {
-        List<Commit> commits = projectService.getCommitLog("multi/page/missingheader");
-        assertNotNull(commits);
-        assertEquals(3, commits.size());
-    }
+    @ParameterizedTest
+    @CsvSource({"multi/page/iac,6", "multi/page/missingheader,3", "multi/page/filtered,4"})
+    void getCommitLog(String project, Integer expectedCommitSize) {
 
-    @Test void getCommitsMessageFilter() {
-        List<Commit> commits = projectService.getCommitLog("multi/page/filtered");
+        List<Commit> commits = projectService.getCommitLog(project);
         assertNotNull(commits);
-        assertEquals(3, commits.size());
+        assertEquals(expectedCommitSize, commits.size());
 
     }
+
 }
