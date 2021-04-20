@@ -1,7 +1,6 @@
 package com.redhat.labs.lodestar.models;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.json.bind.annotation.JsonbProperty;
 
@@ -55,6 +54,6 @@ public class Engagement {
     private List<Artifact> artifacts;
     private String commitMessage;
     private List<UseCase> useCases;
-    private Map<String, Double> scores;
+    private List<Score> scores;
 
 }

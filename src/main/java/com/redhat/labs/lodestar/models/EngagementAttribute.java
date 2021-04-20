@@ -2,7 +2,6 @@ package com.redhat.labs.lodestar.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -10,11 +9,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class UseCase extends EngagementAttribute {
+public class EngagementAttribute {
 
-    private String title;
-    private String description;
-    private Integer order;
+    private String uuid;
+    private String created;
+    private String updated;
+    private String engagementUuid;
 
 }
