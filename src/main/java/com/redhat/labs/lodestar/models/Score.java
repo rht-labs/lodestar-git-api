@@ -11,10 +11,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UseCase extends EngagementAttribute {
+public class Score extends EngagementAttribute {
 
-    private String title;
-    private String description;
-    private Integer order;
+    private String name;
+    private Double value;
 
 }
