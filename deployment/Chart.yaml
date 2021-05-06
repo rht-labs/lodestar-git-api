@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: v2
 name: git-api
 description: A Helm chart to deploy the Git API of Lodestar
 
