@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.lodestar.config.JsonMarshaller;
-import com.redhat.labs.lodestar.exception.FileNotFoundException;
 import com.redhat.labs.lodestar.models.ConfigMap;
 import com.redhat.labs.lodestar.models.Engagement;
 import com.redhat.labs.lodestar.models.gitlab.File;
@@ -31,9 +30,6 @@ public class ConfigService {
     public static final Logger LOGGER = LoggerFactory.getLogger(ConfigService.class);
 
     private static final String IAC = "iac";
-
-    @ConfigProperty(name = "config.file")
-    String configFile;
 
     @ConfigProperty(name = "webhook.file")
     String webHooksFile;
@@ -79,7 +75,6 @@ public class ConfigService {
     void reloadConfigMapData() {
         if (reloadConfig) {
             loadWebHookData();
-            loadConfigurationData();
         }
     }
 
@@ -202,49 +197,6 @@ public class ConfigService {
             hookService.createProjectHook(engagement.getProjectId(), hook);
         });
 
-    }
-
-    /**
-     * Loads the configuration data from the configured file if it has been
-     * modified.
-     */
-    void loadConfigurationData() {
-
-        // create config map
-        if (null == configurationConfigMap) {
-            configurationConfigMap = ConfigMap.builder().filePath(configFile).build();
-        }
-        // load initial content
-        configurationConfigMap.updateMountedFile();
-        // create file
-        Optional<String> content = configurationConfigMap.getContent();
-        if (content.isPresent()) {
-            configuration = File.builder().filePath(configFile).content(content.get()).build();
-        }
-
-    }
-
-    /**
-     * Returns a {@link File} containging the configuration data from the configured
-     * file. If the configured file is not available, the data is loaded from
-     * GitLab.
-     * 
-     * @return
-     */
-    public File getConfigFile() {
-
-        if (null != configuration) {
-            return configuration;
-        }
-
-        String gitLabConfigFile = configFile.charAt(0) == '/' ? configFile.substring(1) : configFile;
-        Optional<File> optional = fileService.getFile(configRepositoryId, gitLabConfigFile, gitRef);
-
-        if (!optional.isPresent()) {
-            throw new FileNotFoundException("the configured file was not found in the gitlab repository.");
-        }
-
-        return optional.get();
     }
 
     /**
