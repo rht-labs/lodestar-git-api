@@ -30,7 +30,4 @@ config:
     - name: hook2
       baseUrl: http://localhost/hook2
       token: anunoby
-  configFile:
-    path: /runtime
-    name: lodestar-runtime-config.yaml
 
