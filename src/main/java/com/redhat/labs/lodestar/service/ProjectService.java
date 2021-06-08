@@ -205,13 +205,13 @@ public class ProjectService {
 
     }
 
-    public List<ProjectTreeNode> getProjectTree(String projectId) {
+    public List<ProjectTreeNode> getProjectTree(String projectId, boolean recursive) {
 
         Response response = null;
         PagedResults<ProjectTreeNode> page = new PagedResults<>(commitPageSize);
 
         while (page.hasMore()) {
-            response = gitLabService.getProjectTree(projectId, true);
+            response = gitLabService.getProjectTree(projectId, recursive);
             page.update(response, new GenericType<List<ProjectTreeNode>>() {
             });
         }

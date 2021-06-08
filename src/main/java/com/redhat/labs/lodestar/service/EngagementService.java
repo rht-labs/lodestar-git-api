@@ -193,7 +193,7 @@ public class EngagementService {
     public Optional<Status> getProjectStatus(String customerName, String engagementName) {
 
         List<ProjectTreeNode> nodes = projectService
-                .getProjectTree(GitLabPathUtils.getValidPath(engagementPathPrefix, customerName, engagementName));
+                .getProjectTree(GitLabPathUtils.getValidPath(engagementPathPrefix, customerName, engagementName), false);
 
         // find status file node or throw 404
         List<ProjectTreeNode> status = nodes.stream().filter(node -> STATUS_FILE.equals(node.getName()))
