@@ -56,4 +56,7 @@ public class Engagement {
     private List<UseCase> useCases;
     private List<Score> scores;
 
+    @JsonbProperty("billing_codes")
+    private List<BillingCodes> billingCodes;
+
 }
