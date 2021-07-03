@@ -105,7 +105,7 @@ public class FileService {
             // set branch
             file.setBranch(ref);
             // add commit message
-            file.setCommitMessage("git api deleted file.");
+            file.setCommitMessage(String.format("git api deleted file. {}", filePath));
 
             gitLabService.deleteFile(projectId, filePath, file);
         }
@@ -147,11 +147,10 @@ public class FileService {
                 optional = Optional.of(file);
             }
         } catch(WebApplicationException wae) {
+            
             if(wae.getResponse().getStatus() != 404) {
                 LOGGER.error("Get file {} for project {} failed with code {}", filePath, projectIdOrPath, wae.getResponse().getStatus());
                 throw wae;
-            } else if(LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Get file {} for project {} failed with code {}", filePath, projectIdOrPath, wae.getResponse().getStatus());
             }
         }
 

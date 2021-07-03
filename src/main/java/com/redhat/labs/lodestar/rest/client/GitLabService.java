@@ -73,6 +73,11 @@ public interface GitLabService {
     @Produces("application/json")
     Response getGroupByName(@QueryParam("search") @Encoded String name, @QueryParam("per_page") int perPage,
             @QueryParam("page") int page);
+    
+    @GET
+    @Path("/groups/{id}/search")
+    List<Project> findProjectByEngagementId(@PathParam("id") @Encoded Integer groupId,
+            @QueryParam("scope") String scope, @QueryParam("search") String search);
 
     @GET
     @Logged

@@ -2,6 +2,7 @@ package com.redhat.labs.lodestar.resource;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -543,6 +544,15 @@ class EngagementResourceTest {
                         + "        \"timezone\": \"America/Denver\"\n"
                         + "    }\n]"));
 
+    }
+    
+    @Test
+    void testGetProjectByUuid() {
+
+        MockUtils.setFindProjectByEngagementId(gitLabService, 2, "abcd", Project.builder().id(1).build());
+        given().when().get("/api/v1/engagements/project/abcd").then().statusCode(200).body("id", equalTo(1));
+        
+        given().when().get("/api/v1/engagements/project/eeee").then().statusCode(404);
     }
 
 }

@@ -150,6 +150,14 @@ public class MockUtils {
                 .willReturn(Response.ok(commitList).header("X-Total-Pages", expectedPagesReturned).build());
 
     }
+    
+    public static void setFindProjectByEngagementId(GitLabService gitLabService, Integer groupId, String uuid, Project expectedProject) {
+        List<Project> projects = new ArrayList<>();
+        projects.add(expectedProject);
+        
+        BDDMockito.given(gitLabService.findProjectByEngagementId(groupId, "projects", uuid))
+            .willReturn(projects);
+    }
 
     // get status file
     public static void setGetFileForStatusJsonMock(GitLabService gitLabService, Integer projectId, boolean exists) {

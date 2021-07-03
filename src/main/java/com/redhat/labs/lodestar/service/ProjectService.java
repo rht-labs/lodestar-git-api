@@ -33,6 +33,7 @@ public class ProjectService {
 
     private static final String DEPLOYMENT_KEY_PREFIX = "LodeStar";
     private static final String DEPLOYMENT_KEY_POSTFIX = "DK";
+    private static final String PROJECTS = "projects";
 
     @Inject
     @RestClient
@@ -78,6 +79,20 @@ public class ProjectService {
 
         return optional;
 
+    }
+    
+    public Optional<Project> getProjectByEngagementUuid(int rootGroupId, String uuid) {
+        List<Project> projects = gitLabService.findProjectByEngagementId(rootGroupId, PROJECTS, uuid);
+        
+        if(projects.size() == 0) {
+            return Optional.empty();
+        } 
+        
+        if(projects.size() > 1) {
+            throw new WebApplicationException(String.format("Too many results for uuid %s (%d)", uuid, projects.size()), 500);
+        }
+        
+        return Optional.of(projects.get(0));
     }
 
     public List<Project> getProjectsByGroup(int groupId, Boolean includeSubgroups) {
@@ -141,12 +156,12 @@ public class ProjectService {
     }
 
     // update a project
-    public Optional<Project> updateProject(Integer projectId, Project project) {
+    public Optional<Project> updateProject(Project project) {
 
         Optional<Project> optional = Optional.empty();
 
         // try to update the project
-        Project updatedProject = gitLabService.updateProject(projectId, project);
+        Project updatedProject = gitLabService.updateProject(project.getId(), project);
         if (null != updatedProject) {
             optional = Optional.of(updatedProject);
         }

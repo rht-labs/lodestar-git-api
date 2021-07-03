@@ -3,12 +3,14 @@ package com.redhat.labs.lodestar.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -86,12 +88,14 @@ class ProjectServiceTest {
     }
     
     @Test void updateProjectValid() {
-        Optional<Project> updated = projectService.updateProject(45, new Project());
+        Project p = Project.builder().id(45).build();
+        Optional<Project> updated = projectService.updateProject(p);
         assertTrue(updated.isPresent());
     }
     
     @Test void updateProjectInvalid() {
-        Optional<Project> updated = projectService.updateProject(46, new Project());
+        Project p = Project.builder().id(46).build();
+        Optional<Project> updated = projectService.updateProject(p);
         assertFalse(updated.isPresent());
     }
     
@@ -108,6 +112,27 @@ class ProjectServiceTest {
         assertNotNull(commits);
         assertEquals(expectedCommitSize, commits.size());
 
+    }
+    
+    @Test void getProjectByEngagementUuid() {
+        Optional<Project> p = projectService.getProjectByEngagementUuid(1, "a");
+        
+        assertFalse(p.isEmpty());
+        assertEquals(1, p.get().getId());
+    }
+    
+    @Test void getProjectByEngagementUuidNotFound() {
+        Optional<Project> p = projectService.getProjectByEngagementUuid(7, "a");
+        
+        assertTrue(p.isEmpty());
+    }
+    
+    @Test void getProjectByEngagementUuidNotFoundException() {
+        WebApplicationException ex = assertThrows(WebApplicationException.class, () -> {
+            projectService.getProjectByEngagementUuid(8, "a");
+        });
+        
+        assertEquals(500, ex.getResponse().getStatus());
     }
 
 }
