@@ -1,11 +1,11 @@
 package com.redhat.labs.lodestar.resource;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.is;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +48,7 @@ class EngagementResourceTest {
         // get engagements by group
         List<Project> projects = new ArrayList<>();
         projects.add(Project.builder().id(20).name("iac").build());
-        MockUtils.setGetProjectsByGroupMock(gitLabService, 20, projects, false);
+        MockUtils.setGetProjectsByGroupMock(gitLabService, projects);
 
         // get status file
         MockUtils.setProjectTreeNodeList(gitLabService, "status.json");
@@ -227,7 +227,7 @@ class EngagementResourceTest {
     @Test
     void testDeleteHooksNoProjects() {
 
-        MockUtils.setGetProjectsByGroupMock(gitLabService, 2, Lists.newArrayList(), false);
+        MockUtils.setGetProjectsByGroupMock(gitLabService);
 
         given().when().contentType(ContentType.JSON).delete("/api/v1/engagements/hooks").then().statusCode(200);
 
@@ -236,7 +236,7 @@ class EngagementResourceTest {
     @Test
     void testDeleteHooksHasProjectNoHooks() {
 
-        MockUtils.setGetProjectsByGroupMock(gitLabService, 2, Lists.newArrayList(), true);
+        MockUtils.setGetProjectsByGroupMock(gitLabService);
         MockUtils.setGetProjectHookMock(gitLabService, 4444);
 
         given().when().contentType(ContentType.JSON).delete("/api/v1/engagements/hooks").then().statusCode(200);
@@ -246,7 +246,7 @@ class EngagementResourceTest {
     @Test
     void testDeleteHooksHasProjectAndHooks() {
 
-        MockUtils.setGetProjectsByGroupMock(gitLabService, 2, Lists.newArrayList(), true);
+        MockUtils.setGetProjectsByGroupMock(gitLabService);
 
         given().when().contentType(ContentType.JSON).delete("/api/v1/engagements/hooks").then().statusCode(200);
 
@@ -392,7 +392,7 @@ class EngagementResourceTest {
         MockUtils.setGetSubgroupsMock(gitLabService, Optional.empty(), false);
         MockUtils.setGetGroupByIdOrPathMock(gitLabService, "customer1", "project1");
 
-        MockUtils.setGetProjectsByGroupMock(gitLabService, project.getId(), Arrays.asList(), false);
+        MockUtils.setGetProjectsByGroupMock(gitLabService);
         MockUtils.setDeleteGroupById(gitLabService);
         MockUtils.setDeleteProjectById(gitLabService);
 
@@ -550,9 +550,19 @@ class EngagementResourceTest {
     void testGetProjectByUuid() {
 
         MockUtils.setFindProjectByEngagementId(gitLabService, 2, "abcd", Project.builder().id(1).build());
-        given().when().get("/api/v1/engagements/project/abcd").then().statusCode(200).body("id", equalTo(1));
+        given().when().get("/api/v1/engagements/projects/abcd").then().statusCode(200).body("id", equalTo(1));
         
-        given().when().get("/api/v1/engagements/project/eeee").then().statusCode(404);
+        given().when().get("/api/v1/engagements/projects/eeee").then().statusCode(404);
+    }
+    
+    @Test
+    void testGetEngagementUuidProjectId() {
+        List<Project> projects = new ArrayList<>();
+        projects.add(Project.builder().id(99).name("iac").description("engagement UUID: 99uuid").build());
+        MockUtils.setGetProjectsByGroupMock(gitLabService, projects);
+        
+        given().when().get("/api/v1/engagements/projects").then().statusCode(200).body("size()", is(1)).body("project_id", hasItem(99))
+            .body("uuid", hasItem("99uuid"));
     }
 
 }

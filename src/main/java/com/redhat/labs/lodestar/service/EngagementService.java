@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.redhat.labs.lodestar.config.JsonMarshaller;
 import com.redhat.labs.lodestar.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.lodestar.models.Engagement;
+import com.redhat.labs.lodestar.models.EngagementProject;
 import com.redhat.labs.lodestar.models.EngagementUser;
 import com.redhat.labs.lodestar.models.Status;
 import com.redhat.labs.lodestar.models.events.DeleteEngagementEvent;
@@ -223,6 +224,14 @@ public class EngagementService {
     
     public Optional<Project> getProjectByUuid(String engagementUuid) {
         return projectService.getProjectByEngagementUuid(engagementRepositoryId, engagementUuid);
+    }
+    
+    public List<EngagementProject> getEngagementProjectIdList() {
+        List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
+        List<EngagementProject> eprojects = new ArrayList<>();
+        projects.forEach(p -> eprojects.add(EngagementProject.builder().uuid(p.getDescription()).projectId(p.getId()).build()));
+        
+        return eprojects;
     }
 
     /**

@@ -68,11 +68,13 @@ public class MockUtils {
     }
 
     // get projects by group
-    public static void setGetProjectsByGroupMock(GitLabService gitLabService, Integer projectId, List<Project> projects,
-            boolean hasProject) {
+    public static void setGetProjectsByGroupMock(GitLabService gitLabService) {
+        setGetProjectsByGroupMock(gitLabService, Lists.newArrayList());
+    }
+    
+    public static void setGetProjectsByGroupMock(GitLabService gitLabService, List<Project> projects) {
         ResponseBuilder r = Response.ok(projects).header("X-Total-Pages", 1);
-        if (hasProject) {
-            r.entity(Lists.newArrayList(mockIacProject()));
+        if (!projects.isEmpty()) {
             BDDMockito.given(gitLabService.getProjectsbyGroup(2, true, 100, 1)).willReturn(r.build());
         } else {
             BDDMockito.given(gitLabService.getProjectsbyGroup(Mockito.anyInt(), Mockito.anyBoolean(), Mockito.eq(100),

@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.lodestar.models.Engagement;
+import com.redhat.labs.lodestar.models.EngagementProject;
 import com.redhat.labs.lodestar.models.Status;
 import com.redhat.labs.lodestar.models.gitlab.Commit;
 import com.redhat.labs.lodestar.models.gitlab.Hook;
@@ -182,7 +183,7 @@ public class EngagementResource {
     }
     
     @GET
-    @Path("project/{uuid}")
+    @Path("projects/{uuid}")
     @Counted(name = "project-by-uuid", description = "Count of project-by-uuid requests")
     @Timed(name = "performedProjectByUuidGet", description = "Time to get project", unit = MetricUnits.MILLISECONDS)
     @Tag(name = "Projects", description = "Project retrieval")
@@ -194,6 +195,17 @@ public class EngagementResource {
         }
         
         return Response.ok(p.get()).build();
+    }
+    
+    @GET
+    @Path("projects")
+    @Counted(name = "engagment-uuid-project-id", description = "Count of engagment-uuid-project-id requests")
+    @Timed(name = "performedEngagementUuidProjectPairsGet", description = "Time to get all projects engagement uuid", unit = MetricUnits.MILLISECONDS)
+    @Tag(name = "Projects", description = "Project retrieval")
+    public Response getEngagementUuidProjectPairs() {
+        List<EngagementProject> projects = engagementService.getEngagementProjectIdList();
+        
+        return Response.ok(projects).build();
     }
 
 }
