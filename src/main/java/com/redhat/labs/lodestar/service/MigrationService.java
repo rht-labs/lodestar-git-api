@@ -123,7 +123,6 @@ public class MigrationService {
      * @param engagement
      */
     private void addToMap(Engagement engagement) {
-        LOGGER.debug("mcanoy {}",engagement);
         allEngagements.put(engagement.getProjectId(), engagement);
     }
     
