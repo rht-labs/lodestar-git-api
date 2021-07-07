@@ -64,12 +64,12 @@ Pagination Headers Returned:
 - `x-next-page`  number of next page (omitted if last page)
 - `x-last-page` number of last page
 
-```
+
 ```
 GET  ​  /api​/v1​/engagements​/customer​/{customer}​/{engagement}
 ```
 Returns the engagement associated with the customer and engagement name combination.
-```
+
 ```
 GET    ​/api​/v1​/engagements​/customer​/{customer}​/{engagement}​/commits
 ```
@@ -94,6 +94,22 @@ Deletes the engagement associated with the customer and engagement name combinat
 DELETE ​/api​/v1​/engagements​/hooks
 ```
 Deletes all webhooks in all configured engagement projects.
+
+### Engagement / Project Mapping
+
+This resource exposes APIs that relates engagement uuids to project ids
+
+```
+GET  /api/v1/engagements/projects
+```
+
+Returns a full list of projects and associated engagement uuid. (uuid is null if not set although it should always be set)
+
+```
+GET  /api/v1/engagements/projects/{uuid}
+```
+
+Returns project information including project id for the uuid specified.
 
 ### Version Resource
 

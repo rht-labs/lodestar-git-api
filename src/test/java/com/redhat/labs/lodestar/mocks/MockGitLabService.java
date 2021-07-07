@@ -2,6 +2,7 @@ package com.redhat.labs.lodestar.mocks;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -374,6 +375,23 @@ public class MockGitLabService implements GitLabService {
     public Response getProjectTree(String idOrPath, boolean recursive) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public List<Project> findProjectByEngagementId(Integer groupId, String scope, String search) {
+        if(groupId == 7) {
+            return Collections.emptyList();
+        }
+        
+        List<Project> projects = new ArrayList<>();
+        projects.add(Project.builder().id(1).build());
+        
+        if(groupId == 1) {
+            return projects;
+        }
+        
+        projects.add(Project.builder().id(2).build());
+        return projects;
     }
 
 }

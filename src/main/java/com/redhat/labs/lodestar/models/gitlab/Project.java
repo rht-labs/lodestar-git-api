@@ -36,15 +36,15 @@ public class Project {
     @JsonbProperty("description")
     private String description;
     @JsonbProperty("issues_enabled")
-    private Boolean issuesEnabled;
+    private boolean issuesEnabled;
     @JsonbProperty("merge_requests_enabled")
-    private Boolean mergeRequestsEnabled;
+    private boolean mergeRequestsEnabled;
     @JsonbProperty("jobs_enabled")
-    private Boolean jobsEnabled;
+    private boolean jobsEnabled;
     @JsonbProperty("wiki_enabled")
-    private Boolean wikiEnabled;
+    private boolean wikiEnabled;
     @JsonbProperty("snippets_enabled")
-    private Boolean snippetsEnabled;
+    private boolean snippetsEnabled;
     @JsonbProperty("issues_access_level")
     private String issuesAccessLevel;
     @JsonbProperty("repository_access_level")
@@ -66,11 +66,11 @@ public class Project {
     @JsonbProperty("resolve_outdated_diff_discussions")
     private Boolean resolveOutdatedDiffDiscussions;
     @JsonbProperty("container_registry_enabled")
-    private Boolean containerRegistryEnabled;
+    private boolean containerRegistryEnabled;
     @JsonbProperty("container_expiration_policy_attributes")
     private Map<String, String> containerExpirationPolicyAttributes;
     @JsonbProperty("shared_runners_enabled")
-    private Boolean sharedRunnersEnabled;
+    private boolean sharedRunnersEnabled;
     @JsonbProperty("visibility")
     private String visibility;
     @JsonbProperty("import_url")
@@ -106,7 +106,7 @@ public class Project {
     @JsonbProperty("ci_config_path")
     private String ciConfigPath;
     @JsonbProperty("auto_devops_enabled")
-    private Boolean autoDevopsEnabled;
+    private boolean autoDevopsEnabled;
     @JsonbProperty("auto_devops_deploy_strategy")
     private String autoDevopsDeployStrategy;
     @JsonbProperty("repository_storage")

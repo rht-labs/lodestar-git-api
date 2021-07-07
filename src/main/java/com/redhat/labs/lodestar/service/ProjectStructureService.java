@@ -33,6 +33,7 @@ public class ProjectStructureService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectStructureService.class);
 
     private static final String ENGAGEMENT_PROJECT_NAME = "iac";
+    public static final String ENGAGEMENT_PROJECT_DESCRIPTION = "engagement UUID: %s";
 
     @ConfigProperty(name = "engagements.repository.id")
     Integer engagementRepositoryId;
@@ -65,7 +66,7 @@ public class ProjectStructureService {
                 existingProjectStructure.getProjectGroup(), false);
 
         Optional<Project> project = createOrUpdateProject(existingProjectStructure.getProject(),
-                existingProjectStructure.getProjectGroupId(), projectGroup.getId());
+                existingProjectStructure.getProjectGroupId(), projectGroup.getId(), engagement.getUuid());
 
         // enable deployment key on project
         if (project.isPresent()) {
@@ -196,11 +197,11 @@ public class ProjectStructureService {
     }
 
     Optional<Project> createOrUpdateProject(Optional<Project> project, Optional<Integer> existingParentIdOptional,
-            Integer parentId) {
+            Integer parentId, String engagementUuid) {
 
         if (project.isEmpty()) {
             LOGGER.debug("creating new project for parent id {}", parentId);
-            return createProject(parentId);
+            return createProject(parentId, engagementUuid);
         }
 
         Integer newParentId = (null == parentId) ? -1 : parentId;
@@ -221,10 +222,11 @@ public class ProjectStructureService {
 
     }
 
-    Optional<Project> createProject(Integer parentId) {
+    Optional<Project> createProject(Integer parentId, String engagementUuid) {
         LOGGER.debug("debug creating project for parent id {}", parentId);
         return projectService.createProject(
-                Project.builder().name(ENGAGEMENT_PROJECT_NAME).visibility("private").namespaceId(parentId).build());
+                Project.builder().name(ENGAGEMENT_PROJECT_NAME).visibility("private").namespaceId(parentId)
+                .description(String.format(ENGAGEMENT_PROJECT_DESCRIPTION, engagementUuid)).build());
 
     }
 

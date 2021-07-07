@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.redhat.labs.lodestar.config.JsonMarshaller;
 import com.redhat.labs.lodestar.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.lodestar.models.Engagement;
+import com.redhat.labs.lodestar.models.EngagementProject;
 import com.redhat.labs.lodestar.models.EngagementUser;
 import com.redhat.labs.lodestar.models.Status;
 import com.redhat.labs.lodestar.models.events.DeleteEngagementEvent;
@@ -64,6 +65,9 @@ public class EngagementService {
 
     @ConfigProperty(name = "orchestration.queue.directory", defaultValue = "queue")
     String orchestrationQueueDirectory;
+    
+    @ConfigProperty(name = "seed.file.list", defaultValue = "queue")
+    List<String> seedFileList;
 
     @Inject
     ProjectService projectService;
@@ -117,6 +121,10 @@ public class EngagementService {
 
         // create user reset file(s) if required
         repoFiles.addAll(createUserManagementFiles(engagement));
+        
+        if(project.isFirst()) {
+            repoFiles.addAll(createMicroFiles(project));
+        }
 
         // create actions for multiple commit
         CommitMultiple commit = createCommitMultiple(repoFiles, project.getId(), DEFAULT_BRANCH, author, authorEmail,
@@ -212,6 +220,18 @@ public class EngagementService {
 
         LOGGER.debug("Full path {}", fullPath);
         return projectService.getProjectByIdOrPath(fullPath);
+    }
+    
+    public Optional<Project> getProjectByUuid(String engagementUuid) {
+        return projectService.getProjectByEngagementUuid(engagementRepositoryId, engagementUuid);
+    }
+    
+    public List<EngagementProject> getEngagementProjectIdList() {
+        List<Project> projects = projectService.getProjectsByGroup(engagementRepositoryId, true);
+        List<EngagementProject> eprojects = new ArrayList<>();
+        projects.forEach(p -> eprojects.add(EngagementProject.builder().uuid(p.getDescription()).projectId(p.getId()).build()));
+        
+        return eprojects;
     }
 
     /**
@@ -311,6 +331,19 @@ public class EngagementService {
 
         String fileContent = json.toJson(engagement);
         return File.builder().content(fileContent).filePath(ENGAGEMENT_FILE).build();
+    }
+    
+    /**
+     * Creates seed files for other services. Never updates.
+     * @return
+     */
+    private List<File> createMicroFiles(Project project) {
+        List<File> files = new ArrayList<>();
+        if(project.isFirst()) {
+            seedFileList.forEach(f -> files.add(File.builder().content("[]").filePath(f).build()));
+        }
+        
+        return files;
     }
 
     private List<File> createUserManagementFiles(Engagement engagement) {

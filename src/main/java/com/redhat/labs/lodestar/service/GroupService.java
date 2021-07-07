@@ -13,7 +13,6 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.labs.lodestar.exception.UnexpectedGitLabResponseException;
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.pagination.PagedResults;
 import com.redhat.labs.lodestar.rest.client.GitLabService;
@@ -28,30 +27,6 @@ public class GroupService {
     
     @ConfigProperty(name = "commit.page.size")
     int commitPageSize;
-
-    // get a group
-    public Optional<Group> getGitLabGroupByName(String name, Integer parentId)
-            throws UnexpectedGitLabResponseException {
-
-        Optional<Group> optional = Optional.empty();
-        
-        PagedResults<Group> page = new PagedResults<>();
-                
-        while(page.hasMore()) {
-            Response response = gitLabService.getGroupByName(name, commitPageSize, page.getNumber());
-            page.update(response, new GenericType<List<Group>>() {});
-        }
-
-        // look for a match between returned name and provided path
-        for (Group group : page.getResults()) {
-            if (name.equals(group.getName()) && parentId.equals(group.getParentId())) {
-                return Optional.of(group);
-            }
-        }
-
-        return optional;
-
-    }
 
     public List<Group> getSubgroups(Integer groupId) {
 

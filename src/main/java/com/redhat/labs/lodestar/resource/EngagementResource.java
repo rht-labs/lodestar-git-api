@@ -10,6 +10,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -22,11 +23,12 @@ import javax.ws.rs.core.UriInfo;
 import org.eclipse.microprofile.metrics.MetricUnits;
 import org.eclipse.microprofile.metrics.annotation.Counted;
 import org.eclipse.microprofile.metrics.annotation.Timed;
-import org.jboss.resteasy.annotations.jaxrs.PathParam;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.lodestar.models.Engagement;
+import com.redhat.labs.lodestar.models.EngagementProject;
 import com.redhat.labs.lodestar.models.Status;
 import com.redhat.labs.lodestar.models.gitlab.Commit;
 import com.redhat.labs.lodestar.models.gitlab.Hook;
@@ -37,6 +39,7 @@ import com.redhat.labs.lodestar.service.EngagementService;
 @Path("/api/v1/engagements")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
+@Tag(name = "Engagements", description = "Engagement data")
 public class EngagementResource {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(EngagementResource.class);
@@ -122,6 +125,7 @@ public class EngagementResource {
     @Path("customer/{customer}/{engagement}/hooks")
     @Counted(name = "create-engagement-hook", description = "Count of create-hook requestst")
     @Timed(name = "performedHookCreate", description = "Time to create hook", unit = MetricUnits.MILLISECONDS)
+    @Tag(name = "Hooks")
     public Response createProjectHook(Hook hook, @PathParam("customer") String customer,
             @PathParam("engagement") String engagement) {
 
@@ -144,6 +148,7 @@ public class EngagementResource {
     @Path("customer/{customer}/{engagement}/hooks")
     @Counted(name = "get-hook", description = "Count of get-hook requests")
     @Timed(name = "performedHookGetAll", description = "Time to get all hooks", unit = MetricUnits.MILLISECONDS)
+    @Tag(name = "Hooks")
     public Response findAllProjectHooks(@PathParam("customer") String customer,
             @PathParam("engagement") String engagement) {
 
@@ -167,6 +172,7 @@ public class EngagementResource {
 
     @DELETE
     @Path("/hooks")
+    @Tag(name = "Hooks")
     @Counted(name = "delete-hooks", description = "Count of delete-hooks requests")
     @Timed(name = "performedHooksDelete", description = "Time to delete hooks", unit = MetricUnits.MILLISECONDS)
     public Response deleteAllHooks() {
@@ -174,6 +180,32 @@ public class EngagementResource {
         engagementService.deleteHooks();
         return Response.ok().build();
 
+    }
+    
+    @GET
+    @Path("projects/{uuid}")
+    @Counted(name = "project-by-uuid", description = "Count of project-by-uuid requests")
+    @Timed(name = "performedProjectByUuidGet", description = "Time to get project", unit = MetricUnits.MILLISECONDS)
+    @Tag(name = "Projects", description = "Project retrieval")
+    public Response getProjectByUuid(@PathParam("uuid") String uuid) {
+        Optional<Project> p = engagementService.getProjectByUuid(uuid);
+        
+        if(p.isEmpty()) {
+            return Response.status(404).build();
+        }
+        
+        return Response.ok(p.get()).build();
+    }
+    
+    @GET
+    @Path("projects")
+    @Counted(name = "engagment-uuid-project-id", description = "Count of engagment-uuid-project-id requests")
+    @Timed(name = "performedEngagementUuidProjectPairsGet", description = "Time to get all projects engagement uuid", unit = MetricUnits.MILLISECONDS)
+    @Tag(name = "Projects", description = "Project retrieval")
+    public Response getEngagementUuidProjectPairs() {
+        List<EngagementProject> projects = engagementService.getEngagementProjectIdList();
+        
+        return Response.ok(projects).build();
     }
 
 }
