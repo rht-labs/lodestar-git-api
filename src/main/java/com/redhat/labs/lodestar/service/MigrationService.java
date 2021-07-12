@@ -120,7 +120,7 @@ public class MigrationService {
     
     private void migrateArtifactsToGitlab(Engagement engagement) {
         List<Artifact> artifacts = engagement.getArtifacts() == null ? Collections.emptyList() : engagement.getArtifacts();
-        String content = json.toJson(engagement.getArtifacts());
+        String content = json.toJson(artifacts);
         migrateToGitlab(engagement, content, ARTIFACT_JSON, artifacts.size());
         
     }
