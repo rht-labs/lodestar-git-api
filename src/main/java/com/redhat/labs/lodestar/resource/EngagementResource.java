@@ -187,11 +187,17 @@ public class EngagementResource {
     @Counted(name = "project-by-uuid", description = "Count of project-by-uuid requests")
     @Timed(name = "performedProjectByUuidGet", description = "Time to get project", unit = MetricUnits.MILLISECONDS)
     @Tag(name = "Projects", description = "Project retrieval")
-    public Response getProjectByUuid(@PathParam("uuid") String uuid) {
+    public Response getProjectByUuid(@PathParam("uuid") String uuid, @QueryParam("mini") boolean mini) {
         Optional<Project> p = engagementService.getProjectByUuid(uuid);
         
         if(p.isEmpty()) {
             return Response.status(404).build();
+        }
+        
+        if(mini) {
+            Project project = p.get();
+            EngagementProject ep = EngagementProject.builder().projectId(project.getId()).uuid(project.getDescription()).build();
+            return Response.ok(ep).build();
         }
         
         return Response.ok(p.get()).build();

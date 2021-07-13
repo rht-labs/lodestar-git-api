@@ -16,7 +16,6 @@ import com.redhat.labs.lodestar.models.EngagementUser;
 import com.redhat.labs.lodestar.models.gitlab.File;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 
-import io.quarkus.runtime.StartupEvent;
 import io.quarkus.test.junit.QuarkusMock;
 import io.quarkus.test.junit.QuarkusTest;
 

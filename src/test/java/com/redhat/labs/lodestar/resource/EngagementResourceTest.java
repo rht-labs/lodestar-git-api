@@ -556,6 +556,14 @@ class EngagementResourceTest {
     }
     
     @Test
+    void testGetProjectByUuidMini() {
+
+        MockUtils.setFindProjectByEngagementId(gitLabService, 2, "abcd", Project.builder().id(1).build());
+        given().when().get("/api/v1/engagements/projects/abcd?mini=true").then().statusCode(200).body("project_id", equalTo(1));
+        
+    }
+    
+    @Test
     void testGetEngagementUuidProjectId() {
         List<Project> projects = new ArrayList<>();
         projects.add(Project.builder().id(99).name("iac").description("engagement UUID: 99uuid").build());
