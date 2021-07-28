@@ -32,6 +32,7 @@ public class EngagementUser {
     private String role;
 
     private boolean reset;
+    private String region;
 
     @JsonbTransient
     public boolean isReset() {

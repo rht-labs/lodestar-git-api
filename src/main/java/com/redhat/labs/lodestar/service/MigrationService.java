@@ -168,12 +168,14 @@ public class MigrationService {
     private void migrateParticipantsToGitlab(Engagement engagement) {
         
         List<EngagementUser> participants = engagement.getEngagementUsers() == null ? Collections.emptyList() : engagement.getEngagementUsers();
+        participants.forEach(p -> p.setRegion(engagement.getRegion()));
         String content = json.toJson(participants);
         migrateToGitlab(engagement, content, PARTICIPANT_JSON, participants.size());
     }
     
     private void migrateHostingToGitlab(Engagement engagement) {
         List<HostingEnvironment> hosting = engagement.getHostingEnvironments() == null ? Collections.emptyList() : engagement.getHostingEnvironments();
+        hosting.forEach(h -> h.setRegion(engagement.getRegion()));
         String content = json.toJson(hosting);
         migrateToGitlab(engagement, content, HOSTING_JSON, hosting.size());
     }

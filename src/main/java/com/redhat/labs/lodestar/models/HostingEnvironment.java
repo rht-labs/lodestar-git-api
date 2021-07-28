@@ -28,4 +28,6 @@ public class HostingEnvironment extends EngagementAttribute {
     private String environmentName;
 
     private String ocpClusterSize;
+    
+    private String region;
 }
