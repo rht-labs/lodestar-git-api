@@ -25,9 +25,9 @@ public class MigrationResource {
     @Timed(name = "performedMigration", description = "How much time it takes to migrate", unit = MetricUnits.MILLISECONDS)
     public Response migrate(@QueryParam(value = "participants") boolean migrateParticipants,
             @QueryParam(value = "artifacts") boolean migrateArtifacts,
-            @QueryParam(value = "uuids") boolean migrateUuids) {
+            @QueryParam(value = "uuids") boolean migrateUuids, @QueryParam(value = "hosting") boolean migrateHosting) {
         
-        migrationService.migrate(migrateUuids, migrateParticipants, migrateArtifacts);
+        migrationService.migrate(migrateUuids, migrateParticipants, migrateArtifacts, migrateHosting);
         
         return Response.ok().build();
 
