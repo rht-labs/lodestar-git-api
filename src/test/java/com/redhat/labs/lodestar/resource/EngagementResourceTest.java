@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import com.google.common.collect.Lists;
 import com.redhat.labs.lodestar.models.gitlab.Group;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 import com.redhat.labs.lodestar.rest.client.GitLabService;

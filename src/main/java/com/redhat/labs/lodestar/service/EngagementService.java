@@ -66,7 +66,10 @@ public class EngagementService {
     @ConfigProperty(name = "orchestration.queue.directory", defaultValue = "queue")
     String orchestrationQueueDirectory;
     
-    @ConfigProperty(name = "seed.file.list", defaultValue = "queue")
+    @ConfigProperty(name = "seed.dir")
+    String seedDir;
+    
+    @ConfigProperty(name = "seed.file.list")
     List<String> seedFileList;
 
     @Inject
@@ -340,7 +343,7 @@ public class EngagementService {
     private List<File> createMicroFiles(Project project) {
         List<File> files = new ArrayList<>();
         if(project.isFirst()) {
-            seedFileList.forEach(f -> files.add(File.builder().content("[]").filePath(f).build()));
+            seedFileList.forEach(f -> files.add(File.builder().content("[]").filePath(seedDir + f).build()));
         }
         
         return files;
