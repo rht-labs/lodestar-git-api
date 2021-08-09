@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -18,17 +17,18 @@ import com.redhat.labs.lodestar.config.JsonMarshaller;
 import com.redhat.labs.lodestar.models.Artifact;
 import com.redhat.labs.lodestar.models.Engagement;
 import com.redhat.labs.lodestar.models.EngagementUser;
+import com.redhat.labs.lodestar.models.HostingEnvironment;
 import com.redhat.labs.lodestar.models.gitlab.File;
 import com.redhat.labs.lodestar.models.gitlab.Project;
-
-import io.quarkus.runtime.StartupEvent;
 
 @ApplicationScoped
 public class MigrationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MigrationService.class);
     
-    private static final String PARTICIPANT_JSON = "participants.json";
-    private static final String ARTIFACT_JSON = "artifacts.json";
+    private static final String ENGAGEMENT_DIR = "engagement/";
+    private static final String PARTICIPANT_JSON = ENGAGEMENT_DIR + "participants.json";
+    private static final String ARTIFACT_JSON = ENGAGEMENT_DIR + "artifacts.json";
+    private static final String HOSTING_JSON = ENGAGEMENT_DIR + "hosting.json";
     
     @Inject
     EngagementService engagementService;
@@ -60,7 +60,7 @@ public class MigrationService {
      * The migration is idempotent so no harm in rerunning. It will only update
      * engagements that haven't been migrated. 
      */
-    public void migrate(boolean migrateUuids, boolean migrateParticipants, boolean migrateArtifacts) {
+    public void migrate(boolean migrateUuids, boolean migrateParticipants, boolean migrateArtifacts, boolean migrateHosting) {
         if(migrateUuids) {
             LOGGER.info("Start Migrate uuids: {}", migrateUuids);
             migrateUuids();
@@ -77,6 +77,12 @@ public class MigrationService {
             LOGGER.info("Start Migrate artifacts");
             migrateArtifacts();
             LOGGER.info("End Migrate artifacts");
+        }
+        
+        if(migrateHosting) {
+            LOGGER.info("Start Migrate hosting");
+            migrateHosting();
+            LOGGER.info("End Migrate hosting");
         }
     }
     
@@ -120,9 +126,15 @@ public class MigrationService {
     
     private void migrateArtifactsToGitlab(Engagement engagement) {
         List<Artifact> artifacts = engagement.getArtifacts() == null ? Collections.emptyList() : engagement.getArtifacts();
+        artifacts.forEach(a -> a.setRegion(engagement.getRegion()));
         String content = json.toJson(artifacts);
+        LOGGER.debug(content);
         migrateToGitlab(engagement, content, ARTIFACT_JSON, artifacts.size());
         
+    }
+    
+    private void migrateHosting() {
+        getAllEngagements().values().parallelStream().forEach(this::migrateHostingToGitlab);
     }
     
     /**
@@ -156,8 +168,16 @@ public class MigrationService {
     private void migrateParticipantsToGitlab(Engagement engagement) {
         
         List<EngagementUser> participants = engagement.getEngagementUsers() == null ? Collections.emptyList() : engagement.getEngagementUsers();
+        participants.forEach(p -> p.setRegion(engagement.getRegion()));
         String content = json.toJson(participants);
         migrateToGitlab(engagement, content, PARTICIPANT_JSON, participants.size());
+    }
+    
+    private void migrateHostingToGitlab(Engagement engagement) {
+        List<HostingEnvironment> hosting = engagement.getHostingEnvironments() == null ? Collections.emptyList() : engagement.getHostingEnvironments();
+        hosting.forEach(h -> h.setRegion(engagement.getRegion()));
+        String content = json.toJson(hosting);
+        migrateToGitlab(engagement, content, HOSTING_JSON, hosting.size());
     }
     
     /**

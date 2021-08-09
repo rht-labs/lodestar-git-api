@@ -25,7 +25,7 @@ public class MigrationServiceTest {
     @Inject
     MigrationService migrationService;
 
-    static ProjectService mockPS;
+    static ProjectService projectServiceMock;
     
     static FileService fileServiceMock;
 
@@ -60,12 +60,13 @@ public class MigrationServiceTest {
         e = Engagement.builder().uuid("d4").projectId(4).engagementUsers(engagementUsers).artifacts(artifacts).build();
         allEngagements.add(e);
 
-        mockPS = Mockito.mock(ProjectService.class);
-        Mockito.when(mockPS.getProjectsByGroup(2, true)).thenReturn(projects);
-        QuarkusMock.installMockForType(mockPS, ProjectService.class);
+        projectServiceMock = Mockito.mock(ProjectService.class);
+        Mockito.when(projectServiceMock.getProjectsByGroup(2, true)).thenReturn(projects);
+        QuarkusMock.installMockForType(projectServiceMock, ProjectService.class);
         
         fileServiceMock = Mockito.mock(FileService.class);
-        Mockito.when(fileServiceMock.getFile(4, "participants.json")).thenReturn(Optional.of(File.builder().build()));
+        Mockito.when(fileServiceMock.getFile(4, "engagement/participants.json")).thenReturn(Optional.of(File.builder().build()));
+        Mockito.when(fileServiceMock.getFile(4, "engagement/hosting.json")).thenReturn(Optional.of(File.builder().build()));
         QuarkusMock.installMockForType(fileServiceMock, FileService.class);
 
         EngagementService mockES = Mockito.mock(EngagementService.class);
@@ -75,15 +76,16 @@ public class MigrationServiceTest {
     
     @Test 
     void migrate() {
-        migrationService.migrate(false, false, false);
+        migrationService.migrate(false, false, false, false);
         
-        Mockito.verify(mockPS, Mockito.never()).updateProject(Mockito.any());
-        Mockito.verify(fileServiceMock, Mockito.never()).createFile(Mockito.anyInt(), Mockito.eq("participants.json"), Mockito.any(File.class));
+        Mockito.verify(projectServiceMock, Mockito.never()).updateProject(Mockito.any());
+        Mockito.verify(fileServiceMock, Mockito.never()).createFile(Mockito.anyInt(), Mockito.eq("engagement/participants.json"), Mockito.any(File.class));
 
-        migrationService.migrate(true, true, true);
+        migrationService.migrate(true, true, true, true);
 
-        Mockito.verify(mockPS, Mockito.times(2)).updateProject(Mockito.any());
-        Mockito.verify(fileServiceMock, Mockito.times(2)).createFile(Mockito.anyInt(), Mockito.eq("participants.json"), Mockito.any(File.class));
+        Mockito.verify(projectServiceMock, Mockito.times(2)).updateProject(Mockito.any());
+        Mockito.verify(fileServiceMock, Mockito.times(2)).createFile(Mockito.anyInt(), Mockito.eq("engagement/hosting.json"), Mockito.any(File.class));
+        Mockito.verify(fileServiceMock, Mockito.times(2)).createFile(Mockito.anyInt(), Mockito.eq("engagement/participants.json"), Mockito.any(File.class));
     }
     
     

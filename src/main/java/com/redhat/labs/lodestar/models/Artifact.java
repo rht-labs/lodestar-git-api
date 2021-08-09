@@ -17,5 +17,6 @@ public class Artifact extends EngagementAttribute {
     private String description;
     private String type;
     private String linkAddress;
+    private String region; //migration support - not available in v1
 
 }

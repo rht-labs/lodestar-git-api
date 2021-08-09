@@ -12,7 +12,7 @@ public class MigrationResourceTest {
     void testGetHookFileSuccess() {
 
         given().when().put("/api/migrate").then().statusCode(200);
-        given().queryParam("participants", true).queryParam("uuid", true).queryParam("artifacts", true).when()
-                .put("/api/migrate").then().statusCode(200);
+        given().queryParam("participants", true).queryParam("uuid", true).queryParam("artifacts", true)
+                .queryParam("hosting", true).when().put("/api/migrate").then().statusCode(200);
     }
 }
