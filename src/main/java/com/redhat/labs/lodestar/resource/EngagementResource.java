@@ -60,6 +60,17 @@ public class EngagementResource {
         return Response.created(builder.build()).build();
 
     }
+    
+    @GET
+    @Path("uuid/{uuid}") 
+    public Response getEngagementByUuid(@PathParam("uuid") String uuid) {
+        Optional<Engagement> engagement = Optional.ofNullable(engagementService.getEnagementByUuid(uuid));
+        
+        if(engagement.isPresent()) {
+            return Response.ok(engagement).build();
+        }
+        return Response.noContent().status(404).entity(String.format("{ \"message\": \"Unable to find engagement for uuid %s in git-api\"}", uuid)).build();
+    }
 
     @GET
     @Counted(name = "get-all-engagement", description = "Count of get all engagements")
@@ -191,7 +202,7 @@ public class EngagementResource {
         Optional<Project> p = engagementService.getProjectByUuid(uuid);
         
         if(p.isEmpty()) {
-            return Response.status(404).build();
+            return Response.status(404).entity("{ \"message\": \"Unable to get project by uuid\" }").build();
         }
         
         if(mini) {
