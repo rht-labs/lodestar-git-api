@@ -108,9 +108,26 @@ class EngagementResourceTest {
                 + "    }\n" + "]"));
 
     }
+    
+    @Test
+    void testGetEngagementByUuid() {
+        MockUtils.setFindProjectByEngagementId(gitLabService, 2, "abcd", Project.builder().id(1).build());
+        MockUtils.setGetFileForEngagementJsonMock(gitLabService, 2, true);
+        
+        String engagementUuid = "k";
+
+        // Not found
+        given().pathParam("engagementUuid", engagementUuid).when().contentType(ContentType.JSON)
+                .get("/api/v1/engagements/uuid/{engagementUuid}").then().statusCode(404).body("message", is("Unable to find engagement for uuid k in git-api"));
+
+        engagementUuid = "abcd";
+        // Found
+        given().pathParam("engagementUuid", engagementUuid).when().contentType(ContentType.JSON)
+                .get("/api/v1/engagements/uuid/{engagementUuid}").then().statusCode(404);
+    }
 
     @Test
-    void tesetGetEngagementByNamespace() {
+    void testGetEngagementByNamespace() {
 
         // get projects by id
         Integer projectId = MockUtils.setGetProjectByPathMock(gitLabService, "top/dog/jello/tutti-frutti/iac", true,

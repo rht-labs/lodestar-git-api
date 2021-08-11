@@ -272,6 +272,16 @@ public class EngagementService {
                 .collect(Collectors.toList());
 
     }
+    
+    public Engagement getEnagementByUuid(String uuid) {
+        Engagement engagement = null;
+        Optional<Project> project = getProjectByUuid(uuid);
+        if(project.isPresent()) {
+            engagement = getEngagement(project.get(), false, false).orElse(null);
+        }
+        
+        return engagement;
+    }
 
     public Engagement getEngagement(String namespaceOrId, boolean includeStatus) {
         Engagement engagement = null;
