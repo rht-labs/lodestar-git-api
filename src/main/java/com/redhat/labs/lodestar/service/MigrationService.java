@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -164,11 +165,21 @@ public class MigrationService {
                 try {
                     use.setCreated(convertDateTime(use.getCreated()));
                     use.setUpdated(convertDateTime(use.getUpdated()));
-                } catch(Exception ex) {
+                } catch(RuntimeException ex) {
                     LOGGER.error ("dtf exception {}", use.getCreated(), ex);
                 }
             }));
         }
+
+        if(copy.getLaunch() != null) {
+            try {
+                Instant.parse(copy.getLaunch().getLaunchedDateTime());
+            } catch (DateTimeParseException ex) {
+                LOGGER.error("No standard launch date {}", copy.getLaunch().getLaunchedDateTime());
+                copy.getLaunch().setLaunchedDateTime(convertDateTime(copy.getLaunch().getLaunchedDateTime()));
+            }
+        }
+
 
         copy.setHostingEnvironments(null);
         copy.setEngagementUsers(null);
@@ -183,8 +194,31 @@ public class MigrationService {
     }
 
     private String convertDateTime(String oldDateTime) {
+        String[] patterns = {"yyyy-MM-dd'T'HH:mm:ss.SSSSSS", "yyyy-MM-dd'T'HH:mm:ss.SSS"};
+
+        String date = null;
+
+        for(int i=0; i<patterns.length; i++) {
+            try {
+                date = convertDateTime(oldDateTime, patterns[i]);
+                break;
+            } catch (DateTimeParseException ex) {
+                LOGGER.error("No standard date {}, pattern {}", oldDateTime, patterns[i]);
+            }
+        }
+
+        if(date == null) {
+            throw new RuntimeException("Unable to parse date " + oldDateTime);
+        }
+
+        LOGGER.trace("date converted={}", date);
+        return date;
+    }
+
+    private String convertDateTime(String oldDateTime, String pattern) {
         LOGGER.trace("Date In {}", oldDateTime);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         LocalDateTime expected = LocalDateTime.parse(oldDateTime, formatter);
         Instant instant = expected.toInstant(ZoneOffset.UTC);
         LOGGER.trace("Date Out {}", instant);
