@@ -58,9 +58,9 @@ public class MigrationService {
      * engagements that haven't been migrated. 
      */
     public void migrate(boolean migrateUuids, boolean migrateParticipants, boolean migrateArtifacts, boolean migrateHosting,
-                        boolean migrateEngagements, boolean overwrite, String uuid) {
+                        boolean migrateEngagements, boolean overwrite, List<String> uuids) {
         LOGGER.debug("uuids {} participants {} artifacts {} hosting {} engagements {} overwrite {} uuid {}", migrateUuids,
-                migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements, overwrite, uuid);
+                migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements, overwrite, uuids.size());
 
         getAllEngagements(); //hydrate before stream
 
@@ -71,16 +71,20 @@ public class MigrationService {
         }
 
         LOGGER.info("Start Migrate content");
-        migrateAll(migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements, overwrite, uuid);
+        migrateAll(migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements, overwrite, uuids);
         LOGGER.info("End Migrate content");
 
     }
 
     private void migrateAll(boolean migrateParticipants, boolean migrateArtifacts, boolean migrateHosting,
-                            boolean migrateEngagements, boolean overwrite, String uuid ) {
-        getAllEngagements().values().forEach(e -> {
-            LOGGER.debug("Migrating {}", e.getUuid());
-            if(uuid == null || e.getUuid().equals(uuid)) {
+                            boolean migrateEngagements, boolean overwrite, List<String> uuids ) {
+        int counter = 0;
+        for(Engagement e : getAllEngagements().values()) {
+
+            if(uuids.isEmpty() || uuids.contains(e.getUuid())) {
+                counter++;
+                LOGGER.debug("Migrating ({}) {}", counter, e.getUuid());
+                
                 List<Action> actions = new ArrayList<>();
                 String content;
                 if(migrateEngagements) {
@@ -112,7 +116,7 @@ public class MigrationService {
                     fileService.createFiles(e.getProjectId(), commit);
                 }
             }
-        });
+        }
     }
 
     /**

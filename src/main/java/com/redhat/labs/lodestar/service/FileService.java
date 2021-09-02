@@ -52,13 +52,11 @@ public class FileService {
     // create multiple files
     public boolean createFiles(Integer projectId, CommitMultiple commit) {
 
-        Response response = null;
-
         // encode actions in commit
         commit.encodeActions();
 
         // call gitlab api to commit
-        response = gitLabService.commitMultipleFiles(projectId, commit);
+        Response response = gitLabService.commitMultipleFiles(projectId, commit);
 
         // decode actions in commit
         commit.decodeActions();
@@ -105,7 +103,7 @@ public class FileService {
             // set branch
             file.setBranch(ref);
             // add commit message
-            file.setCommitMessage(String.format("git api deleted file. {}", filePath));
+            file.setCommitMessage(String.format("git api deleted file. %s", filePath));
 
             gitLabService.deleteFile(projectId, filePath, file);
         }
