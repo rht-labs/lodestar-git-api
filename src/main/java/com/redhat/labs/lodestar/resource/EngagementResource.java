@@ -88,7 +88,7 @@ public class EngagementResource {
                     includeCommits);
             builder.entity(ePage.getEngagements());
             builder.links(ePage.getLinks(uriInfo.getAbsolutePathBuilder()));
-            ePage.getHeaders().entrySet().stream().forEach(e -> builder.header(e.getKey(), e.getValue()));
+            ePage.getHeaders().entrySet().forEach(e -> builder.header(e.getKey(), e.getValue()));
 
         } else {
             builder.entity(engagementService.getAllEngagements(includeStatus, includeCommits));
