@@ -1,34 +1,31 @@
 package com.redhat.labs.lodestar.service;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import com.redhat.labs.lodestar.models.*;
+import com.redhat.labs.lodestar.models.gitlab.*;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.labs.lodestar.config.JsonMarshaller;
-import com.redhat.labs.lodestar.models.Artifact;
-import com.redhat.labs.lodestar.models.Engagement;
-import com.redhat.labs.lodestar.models.EngagementUser;
-import com.redhat.labs.lodestar.models.HostingEnvironment;
-import com.redhat.labs.lodestar.models.gitlab.File;
-import com.redhat.labs.lodestar.models.gitlab.Project;
 
 @ApplicationScoped
 public class MigrationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MigrationService.class);
-    
+
     private static final String ENGAGEMENT_DIR = "engagement/";
     private static final String PARTICIPANT_JSON = ENGAGEMENT_DIR + "participants.json";
     private static final String ARTIFACT_JSON = ENGAGEMENT_DIR + "artifacts.json";
     private static final String HOSTING_JSON = ENGAGEMENT_DIR + "hosting.json";
+    private static final String ENGAGEMENT_JSON = ENGAGEMENT_DIR + "engagement.json";
     
     @Inject
     EngagementService engagementService;
@@ -54,51 +51,145 @@ public class MigrationService {
     @ConfigProperty(name = "commit.default.branch")
     String commitBranch;
     
-    private Map<Integer, Engagement> allEngagements = new HashMap<>();
+    private final Map<Integer, Engagement> allEngagements = new HashMap<>();
     
     /**
      * The migration is idempotent so no harm in rerunning. It will only update
      * engagements that haven't been migrated. 
      */
-    public void migrate(boolean migrateUuids, boolean migrateParticipants, boolean migrateArtifacts, boolean migrateHosting) {
+    public void migrate(boolean migrateUuids, boolean migrateParticipants, boolean migrateArtifacts, boolean migrateHosting,
+                        boolean migrateEngagements, boolean overwrite, String uuid) {
+        LOGGER.debug("uuids {} participants {} artifacts {} hosting {} engagements {} overwrite {} uuid {}", migrateUuids,
+                migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements, overwrite, uuid);
+
+        getAllEngagements(); //hydrate before stream
+
         if(migrateUuids) {
-            LOGGER.info("Start Migrate uuids: {}", migrateUuids);
+            LOGGER.info("Start Migrate uuids");
             migrateUuids();
             LOGGER.info("End Migrate uuids");
-        } 
-        
-        if(migrateParticipants) {
-            LOGGER.info("Start Migrate participants: {}", migrateParticipants);
-            migrateParticipants();
-            LOGGER.info("End Migrate participants");
-        } 
-        
-        if(migrateArtifacts) {
-            LOGGER.info("Start Migrate artifacts");
-            migrateArtifacts();
-            LOGGER.info("End Migrate artifacts");
         }
-        
-        if(migrateHosting) {
-            LOGGER.info("Start Migrate hosting");
-            migrateHosting();
-            LOGGER.info("End Migrate hosting");
+
+        LOGGER.info("Start Migrate content");
+        migrateAll(migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements, overwrite, uuid);
+        LOGGER.info("End Migrate content");
+
+    }
+
+    private void migrateAll(boolean migrateParticipants, boolean migrateArtifacts, boolean migrateHosting,
+                            boolean migrateEngagements, boolean overwrite, String uuid ) {
+        getAllEngagements().values().forEach(e -> {
+            LOGGER.debug("Migrating {}", e.getUuid());
+            if(uuid == null || e.getUuid().equals(uuid)) {
+                List<Action> actions = new ArrayList<>();
+                String content;
+                if(migrateEngagements) {
+                    content = migrateEngagement(e);
+                    actions.add(createAction(content, ENGAGEMENT_JSON, overwrite, e.getProjectId()));
+                }
+
+                if(migrateParticipants) {
+                    content = migrateParticipantsToGitlab(e);
+                    actions.add(createAction(content, PARTICIPANT_JSON, overwrite, e.getProjectId()));
+                }
+
+                if(migrateHosting) {
+                    content = migrateHostingToGitlab(e);
+                    actions.add(createAction(content, HOSTING_JSON, overwrite, e.getProjectId()));
+                }
+
+                if(migrateArtifacts) {
+                    content = migrateArtifactsToGitlab(e);
+                    actions.add(createAction(content, ARTIFACT_JSON, overwrite, e.getProjectId()));
+                }
+
+                if(!actions.isEmpty()) {
+                    String commitMessage = "Migrating to v2";
+
+                    CommitMultiple commit = CommitMultiple.builder().id(e.getProjectId()).branch(commitBranch).commitMessage(commitMessage).actions(actions)
+                            .authorName(commitAuthor).authorEmail(commitEmail).build();
+
+                    fileService.createFiles(e.getProjectId(), commit);
+                }
+            }
+        });
+    }
+
+    /**
+     *
+     * @param content the new content to write
+     * @param filePath the file path to write to
+     * @param overwrite if true - will check for existence of file and overwrite if it exists
+     * @return the file to write to on commit
+     */
+    private Action createAction(String content, String filePath, boolean overwrite, int projectId) {
+        FileAction action = FileAction.create;
+        if(overwrite && fileService.getFile(projectId, filePath).isPresent()) {
+            action = FileAction.update;
+
         }
+        return Action.builder().action(action).filePath(filePath).content(content).encoding("base64").build();
     }
     
     /**
      * Get all projects and split for individual update. This will add a description to any 
-     * project that doesn't have one. The description will included the uuid of the engagement
+     * project that doesn't have one. The description will include the uuid of the engagement
      */
     private void migrateUuids() {
         List<Project> allProjects = projectService.getProjectsByGroup(engagementRepositoryId, true);
-        getAllEngagements(); //hydrate before stream
+
         allProjects.parallelStream().forEach(this::updateProjectWithUuid);
+    }
+
+    private String migrateEngagement(Engagement engagement) {
+        Engagement copy = clone(engagement, Engagement.class);
+
+        if(copy.getCategories() != null) {
+            copy.getCategories().forEach(cat -> {
+                try {
+                    cat.setCreated(convertDateTime(cat.getCreated()));
+                    cat.setUpdated(convertDateTime(cat.getUpdated()));
+                } catch(Exception ex) {
+                    LOGGER.error ("dtf exception {}", cat.getCreated(), ex);
+                }
+            });
+        }
+
+        if(copy.getUseCases() != null) {
+            copy.getUseCases().forEach((use -> {
+                try {
+                    use.setCreated(convertDateTime(use.getCreated()));
+                    use.setUpdated(convertDateTime(use.getUpdated()));
+                } catch(Exception ex) {
+                    LOGGER.error ("dtf exception {}", use.getCreated(), ex);
+                }
+            }));
+        }
+
+        copy.setHostingEnvironments(null);
+        copy.setEngagementUsers(null);
+        copy.setCommits(null);
+        copy.setArtifacts(null);
+
+        return json.toJson(copy);
+    }
+
+    private <T> T clone(T toClone, Class<T> clazz) {
+        return json.fromJson(json.toJson(toClone), clazz);
+    }
+
+    private String convertDateTime(String oldDateTime) {
+        LOGGER.trace("Date In {}", oldDateTime);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+        LocalDateTime expected = LocalDateTime.parse(oldDateTime, formatter);
+        Instant instant = expected.toInstant(ZoneOffset.UTC);
+        LOGGER.trace("Date Out {}", instant);
+        return instant.toString();
     }
     
     /**
      * Update a single project if the description is not already set and an engagement has been found
-     * @param project
+     * @param project the project to update
      */
     private void updateProjectWithUuid(Project project) {
         
@@ -112,34 +203,28 @@ public class MigrationService {
             LOGGER.info("Skipped uuid update because description is already set or the project {} is not in the engagement map", project.getId());
         }
     }
-
-    /**
-     * Get all engagements (engagement.json) and split for individual update
-     */
-    private void migrateParticipants() {     
-        getAllEngagements().values().parallelStream().forEach(this::migrateParticipantsToGitlab);   
-    }
     
-    private void migrateArtifacts() {
-        getAllEngagements().values().parallelStream().forEach(this::migrateArtifactsToGitlab);
-    }
-    
-    private void migrateArtifactsToGitlab(Engagement engagement) {
+    private String migrateArtifactsToGitlab(Engagement engagement) {
         List<Artifact> artifacts = engagement.getArtifacts() == null ? Collections.emptyList() : engagement.getArtifacts();
-        artifacts.forEach(a -> a.setRegion(engagement.getRegion()));
-        String content = json.toJson(artifacts);
-        LOGGER.debug(content);
-        migrateToGitlab(engagement, content, ARTIFACT_JSON, artifacts.size());
-        
-    }
-    
-    private void migrateHosting() {
-        getAllEngagements().values().parallelStream().forEach(this::migrateHostingToGitlab);
+        List<Artifact> copies = new ArrayList<>(artifacts.size());
+        artifacts.forEach(a -> {
+            Artifact copy = clone(a, Artifact.class);
+            copy.setRegion(copy.getRegion());
+            if(copy.getCreated() == null) {
+                copy.setCreated(engagement.getEndDate());
+            }
+
+            if(copy.getUpdated() == null) {
+                copy.setUpdated(engagement.getEndDate());
+            }
+            copies.add(copy);
+        });
+        return json.toJson(copies);
     }
     
     /**
      * Get All engagements. This is run by migrate users and uuids so only run once if both are active
-     * @return
+     * @return a map of engagements keyed by project id
      */
     private Map<Integer, Engagement> getAllEngagements() {
         LOGGER.debug("Engagement count (pre-fetch) {}", allEngagements.size());
@@ -154,7 +239,7 @@ public class MigrationService {
     
     /**
      * Do a quick project id to engagement mapping to easily find the engagement by project id
-     * @param engagement
+     * @param engagement map this
      */
     private void addToMap(Engagement engagement) {
         allEngagements.put(engagement.getProjectId(), engagement);
@@ -163,34 +248,19 @@ public class MigrationService {
     /**
      * This will write the user json to gitlab. Should you wish to rollback or redo you could add this code
      * fileService.deleteFile(engagement.getProjectId(), userJson);
-     * @param engagement
+     * @param engagement participants of this engagement
      */
-    private void migrateParticipantsToGitlab(Engagement engagement) {
+    private String migrateParticipantsToGitlab(Engagement engagement) {
         
         List<EngagementUser> participants = engagement.getEngagementUsers() == null ? Collections.emptyList() : engagement.getEngagementUsers();
         participants.forEach(p -> p.setRegion(engagement.getRegion()));
-        String content = json.toJson(participants);
-        migrateToGitlab(engagement, content, PARTICIPANT_JSON, participants.size());
+        return json.toJson(participants);
     }
     
-    private void migrateHostingToGitlab(Engagement engagement) {
+    private String migrateHostingToGitlab(Engagement engagement) {
         List<HostingEnvironment> hosting = engagement.getHostingEnvironments() == null ? Collections.emptyList() : engagement.getHostingEnvironments();
         hosting.forEach(h -> h.setRegion(engagement.getRegion()));
-        String content = json.toJson(hosting);
-        migrateToGitlab(engagement, content, HOSTING_JSON, hosting.size());
+        return json.toJson(hosting);
     }
-    
-    /**
-     * This will write the user json to gitlab. Should you wish to rollback or redo you could add this code
-     * fileService.deleteFile(engagement.getProjectId(), userJson);
-     * @param engagement
-     */
-    private void migrateToGitlab(Engagement engagement, String content, String fileName, int size) {
-        
-        if(fileService.getFile(engagement.getProjectId(), fileName).isEmpty()) {
-            File file = File.builder().content(content).authorEmail(commitEmail).authorName(commitAuthor).branch(commitBranch).commitMessage(String.format("migrating %s", fileName)).build();
-            fileService.createFile(engagement.getProjectId(), fileName, file);
-            LOGGER.info("Migrated {} {} for engagement {}", size, fileName, engagement.getUuid());
-        }
-    }
+
 }

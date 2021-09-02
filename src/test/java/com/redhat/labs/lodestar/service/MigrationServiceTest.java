@@ -1,18 +1,18 @@
 package com.redhat.labs.lodestar.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
 
+import com.redhat.labs.lodestar.models.*;
+import com.redhat.labs.lodestar.models.gitlab.CommitMultiple;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import com.redhat.labs.lodestar.models.Artifact;
-import com.redhat.labs.lodestar.models.Engagement;
-import com.redhat.labs.lodestar.models.EngagementUser;
 import com.redhat.labs.lodestar.models.gitlab.File;
 import com.redhat.labs.lodestar.models.gitlab.Project;
 
@@ -51,7 +51,17 @@ public class MigrationServiceTest {
 
         List<Engagement> allEngagements = new ArrayList<>();
 
-        Engagement e = Engagement.builder().uuid("a1").projectId(1).build();
+        List<Category> cats = new ArrayList<>();
+        cats.add(Category.builder().uuid("kittycat").name("As")
+                .created("2021-08-26T20:42:46.050483").updated("2021-08-26T20:42:46.050483").build());
+        cats.add(Category.builder().uuid("meow").name("Snowball").build());
+
+        List<UseCase> uses = new ArrayList<>();
+        uses.add(UseCase.builder().title("use case").created("2021-08-26T20:42:46.050483")
+                .updated("2021-08-26T20:42:46.050483").build());
+        uses.add(UseCase.builder().title("use case2").build());
+
+        Engagement e = Engagement.builder().uuid("a1").categories(cats).useCases(uses).projectId(1).build();
         allEngagements.add(e);
 
         e = Engagement.builder().uuid("c3").projectId(3).engagementUsers(engagementUsers).build();
@@ -76,16 +86,17 @@ public class MigrationServiceTest {
     
     @Test 
     void migrate() {
-        migrationService.migrate(false, false, false, false);
+        migrationService.migrate(false, false, false, false, false,
+                false, null);
         
         Mockito.verify(projectServiceMock, Mockito.never()).updateProject(Mockito.any());
         Mockito.verify(fileServiceMock, Mockito.never()).createFile(Mockito.anyInt(), Mockito.eq("engagement/participants.json"), Mockito.any(File.class));
 
-        migrationService.migrate(true, true, true, true);
+        migrationService.migrate(true, true, true, true, true, false, null);
 
         Mockito.verify(projectServiceMock, Mockito.times(2)).updateProject(Mockito.any());
-        Mockito.verify(fileServiceMock, Mockito.times(2)).createFile(Mockito.anyInt(), Mockito.eq("engagement/hosting.json"), Mockito.any(File.class));
-        Mockito.verify(fileServiceMock, Mockito.times(2)).createFile(Mockito.anyInt(), Mockito.eq("engagement/participants.json"), Mockito.any(File.class));
+        Mockito.verify(fileServiceMock, Mockito.times(3)).createFiles(Mockito.anyInt(), Mockito.any(CommitMultiple.class));
+        Mockito.verify(fileServiceMock, Mockito.never()).createFile(Mockito.anyInt(), Mockito.eq("engagement/participants.json"), Mockito.any(File.class));
     }
     
     
