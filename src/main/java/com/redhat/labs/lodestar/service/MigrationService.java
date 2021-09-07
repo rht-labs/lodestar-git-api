@@ -247,7 +247,7 @@ public class MigrationService {
         List<Artifact> copies = new ArrayList<>(artifacts.size());
         artifacts.forEach(a -> {
             Artifact copy = clone(a, Artifact.class);
-            copy.setRegion(copy.getRegion());
+            copy.setRegion(engagement.getRegion());
             if(copy.getCreated() == null) {
                 copy.setCreated(engagement.getEndDate());
             }
@@ -257,6 +257,7 @@ public class MigrationService {
             }
             copies.add(copy);
         });
+
         return json.toJson(copies);
     }
     
