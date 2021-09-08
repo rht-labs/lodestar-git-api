@@ -60,7 +60,8 @@ public class MigrationServiceTest {
         List<UseCase> uses = new ArrayList<>();
         uses.add(UseCase.builder().title("use case").created("2021-08-26T20:42:46.050483")
                 .updated("2021-08-26T20:42:46.050483").build());
-        uses.add(UseCase.builder().title("use case2").created("2021-08-26T20:42:46.050483").build());
+        uses.add(UseCase.builder().title("use case2").created("2021-08-26T20:42:46.050483")
+                .updated("2021-08-26T20:42:46.050483").build());
 
         Launch launch = Launch.builder().launchedBy("Alfredo").launchedByEmail("a@b.com").launchedDateTime("2021-08-26T20:42:46.050").build();
 
