@@ -15,5 +15,6 @@ public class Category extends EngagementAttribute {
 
     private String name;
     private Integer count;
+    private String region;
 
 }

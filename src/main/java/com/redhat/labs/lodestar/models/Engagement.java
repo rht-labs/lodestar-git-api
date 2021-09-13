@@ -1,6 +1,6 @@
 package com.redhat.labs.lodestar.models;
 
-import java.util.List;
+import java.util.*;
 
 import javax.json.bind.annotation.JsonbProperty;
 
@@ -58,5 +58,13 @@ public class Engagement {
 
     @JsonbProperty("billing_codes")
     private List<BillingCodes> billingCodes;
+
+    @JsonbProperty("region")
+    private String mapRegion;
+    @JsonbProperty("type")
+    private String mapType;
+    @JsonbProperty("categories")
+    private Set<String> mapCategories;
+    private String name;
 
 }

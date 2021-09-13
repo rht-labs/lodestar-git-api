@@ -1,5 +1,6 @@
 package com.redhat.labs.lodestar.service;
 
+import java.security.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -27,6 +28,7 @@ public class MigrationService {
     private static final String ARTIFACT_JSON = ENGAGEMENT_DIR + "artifacts.json";
     private static final String HOSTING_JSON = ENGAGEMENT_DIR + "hosting.json";
     private static final String ENGAGEMENT_JSON = ENGAGEMENT_DIR + "engagement.json";
+    private static final String CATEGORY_JSON = ENGAGEMENT_DIR + "category.json";
     
     @Inject
     EngagementService engagementService;
@@ -53,7 +55,7 @@ public class MigrationService {
     String commitBranch;
     
     private final Map<Integer, Engagement> allEngagements = new HashMap<>();
-    
+
     /**
      * The migration is idempotent so no harm in rerunning. It will only update
      * engagements that haven't been migrated. 
@@ -64,6 +66,10 @@ public class MigrationService {
                 migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements, overwrite, uuids.size());
 
         getAllEngagements(); //hydrate before stream
+
+        if(LOGGER.isDebugEnabled()) {
+            getAllEngagements().values().forEach(e -> LOGGER.debug("To Migrate {}", e.getUuid()));
+        }
 
         if(migrateUuids) {
             LOGGER.info("Start Migrate uuids");
@@ -80,6 +86,7 @@ public class MigrationService {
     private void migrateAll(boolean migrateParticipants, boolean migrateArtifacts, boolean migrateHosting,
                             boolean migrateEngagements, boolean overwrite, List<String> uuids ) {
         int counter = 0;
+        LOGGER.debug("Migration engagement count {}", getAllEngagements().size());
         for(Engagement e : getAllEngagements().values()) {
 
             if(uuids.isEmpty() || uuids.contains(e.getUuid())) {
@@ -91,6 +98,8 @@ public class MigrationService {
                 if(migrateEngagements) {
                     content = migrateEngagement(e);
                     actions.add(createAction(content, ENGAGEMENT_JSON, overwrite, e.getProjectId()));
+                    content = migrateCategories(e);
+                    actions.add(createAction(content, CATEGORY_JSON, overwrite, e.getProjectId()));
                 }
 
                 if(migrateParticipants) {
@@ -109,7 +118,7 @@ public class MigrationService {
                 }
 
                 if(!actions.isEmpty()) {
-                    String commitMessage = "Migrating to v2";
+                    String commitMessage = String.format("Migrating to v2 %s", getEmoji());
 
                     CommitMultiple commit = CommitMultiple.builder().id(e.getProjectId()).branch(commitBranch).commitMessage(commitMessage).actions(actions)
                             .authorName(commitAuthor).authorEmail(commitEmail).build();
@@ -142,34 +151,38 @@ public class MigrationService {
      */
     private void migrateUuids() {
         List<Project> allProjects = projectService.getProjectsByGroup(engagementRepositoryId, true);
-
         allProjects.parallelStream().forEach(this::updateProjectWithUuid);
     }
 
-    private String migrateEngagement(Engagement engagement) {
+    private String migrateCategories(Engagement engagement) {
         Engagement copy = clone(engagement, Engagement.class);
 
-        if(copy.getCategories() != null) {
+        if(copy.getCategories() == null) {
+            copy.setCategories(new ArrayList<>());
+        } else {
             copy.getCategories().forEach(cat -> {
                 try {
                     cat.setCreated(convertDateTime(cat.getCreated()));
-                    cat.setUpdated(convertDateTime(cat.getUpdated()));
+                    cat.setEngagementUuid(engagement.getUuid());
+                    cat.setRegion(engagement.getRegion());
                 } catch(Exception ex) {
                     LOGGER.error ("dtf exception {}", cat.getCreated(), ex);
                 }
             });
         }
 
-        if(copy.getUseCases() != null) {
-            copy.getUseCases().forEach((use -> {
-                try {
-                    use.setCreated(convertDateTime(use.getCreated()));
-                    use.setUpdated(convertDateTime(use.getUpdated()));
-                } catch(RuntimeException ex) {
-                    LOGGER.error ("dtf exception {}", use.getCreated(), ex);
-                }
-            }));
+        return json.toJson(copy.getCategories());
+    }
+
+    private String migrateEngagement(Engagement engagement) {
+        Engagement copy = clone(engagement, Engagement.class);
+        Set<String> cats = new TreeSet<>();
+
+        if(copy.getCategories() != null) {
+            copy.getCategories().forEach(cat -> cats.add(cat.getName()));
         }
+
+        copy.setMapCategories(cats);
 
         if(copy.getLaunch() != null) {
             try {
@@ -180,6 +193,31 @@ public class MigrationService {
             }
         }
 
+        if(copy.getUseCases() != null) {
+            for(UseCase use : copy.getUseCases()) {
+                try {
+                    Instant.parse(use.getCreated());
+                } catch (DateTimeParseException ex) {
+                    LOGGER.error("No standard use case create date {}", use.getCreated());
+                    use.setCreated(convertDateTime(use.getCreated()));
+                }
+
+                try {
+                    Instant.parse(use.getUpdated());
+                } catch (DateTimeParseException ex) {
+                    LOGGER.error("No standard use case update date {}", use.getUpdated());
+                    use.setUpdated(convertDateTime(use.getUpdated()));
+                }
+            }
+        }
+
+        copy.setMapRegion(copy.getRegion());
+        copy.setMapType(copy.getType());
+        copy.setName(copy.getProjectName());
+        copy.setCategories(null);
+        copy.setRegion(null);
+        copy.setType(null);
+        copy.setProjectName(null);
 
         copy.setHostingEnvironments(null);
         copy.setEngagementUsers(null);
@@ -198,12 +236,12 @@ public class MigrationService {
 
         String date = null;
 
-        for(int i=0; i<patterns.length; i++) {
+        for (String pattern : patterns) {
             try {
-                date = convertDateTime(oldDateTime, patterns[i]);
+                date = convertDateTime(oldDateTime, pattern);
                 break;
             } catch (DateTimeParseException ex) {
-                LOGGER.error("No standard date {}, pattern {}", oldDateTime, patterns[i]);
+                LOGGER.error("No standard date {}, pattern {}", oldDateTime, pattern);
             }
         }
 
@@ -302,4 +340,14 @@ public class MigrationService {
         return json.toJson(hosting);
     }
 
+    private String getEmoji() {
+        String bear = "\ud83d\udc3b";
+
+        int bearCodePoint = bear.codePointAt(bear.offsetByCodePoints(0, 0));
+        int mysteryAnimalCodePoint = bearCodePoint + new SecureRandom().nextInt(144);
+        char[] mysteryEmoji = { Character.highSurrogate(mysteryAnimalCodePoint),
+                Character.lowSurrogate(mysteryAnimalCodePoint) };
+
+        return String.valueOf(mysteryEmoji);
+    }
 }
