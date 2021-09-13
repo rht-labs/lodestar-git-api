@@ -213,9 +213,11 @@ public class MigrationService {
 
         copy.setMapRegion(copy.getRegion());
         copy.setMapType(copy.getType());
+        copy.setName(copy.getProjectName());
         copy.setCategories(null);
         copy.setRegion(null);
         copy.setType(null);
+        copy.setProjectName(null);
 
         copy.setHostingEnvironments(null);
         copy.setEngagementUsers(null);

@@ -65,5 +65,6 @@ public class Engagement {
     private String mapType;
     @JsonbProperty("categories")
     private Set<String> mapCategories;
+    private String name;
 
 }
