@@ -137,6 +137,7 @@ public class FileService {
         try {
 
             // get file
+            LOGGER.debug("File ({})-> {}", projectIdOrPath, filePath);
             File file = gitLabService.getFile(projectIdOrPath, filePath, ref);
 
             if (null != file) {
@@ -150,6 +151,8 @@ public class FileService {
                 LOGGER.error("Get file {} for project {} failed with code {}", filePath, projectIdOrPath, wae.getResponse().getStatus());
                 throw wae;
             }
+        } catch(Exception ex) {
+            LOGGER.error(String.format("Get file %s for project %s failed", filePath, projectIdOrPath), ex);
         }
 
         return optional;

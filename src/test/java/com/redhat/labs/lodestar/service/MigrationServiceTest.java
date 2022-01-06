@@ -92,12 +92,12 @@ public class MigrationServiceTest {
     @Test 
     void migrate() {
         migrationService.migrate(false, false, false, false, false,
-                false, Collections.emptyList());
+                false, false, Collections.emptyList());
         
         Mockito.verify(projectServiceMock, Mockito.never()).updateProject(Mockito.any());
         Mockito.verify(fileServiceMock, Mockito.never()).createFile(Mockito.anyInt(), Mockito.eq("engagement/participants.json"), Mockito.any(File.class));
 
-        migrationService.migrate(true, true, true, true, true, false, Collections.emptyList());
+        migrationService.migrate(true, true, true, true, true, false, false, Collections.emptyList());
 
         Mockito.verify(projectServiceMock, Mockito.times(2)).updateProject(Mockito.any());
         Mockito.verify(fileServiceMock, Mockito.times(3)).createFiles(Mockito.anyInt(), Mockito.any(CommitMultiple.class));
