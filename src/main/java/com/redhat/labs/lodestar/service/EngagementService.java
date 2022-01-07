@@ -302,6 +302,8 @@ public class EngagementService {
 
         if (project.isPresent()) {
             engagement = getEngagement(project.get(), includeStatus, true).orElse(null);
+        } else {
+            LOGGER.warn("Could not find project for {} {}", customerName, engagementName);
         }
 
         return engagement;
@@ -312,6 +314,7 @@ public class EngagementService {
 
         Optional<File> engagementFile = fileService.getFileAllow404(project.getId(), ENGAGEMENT_FILE);
         if (engagementFile.isPresent()) {
+            LOGGER.debug("Translating json from project {}", project.getId());
             engagement = json.fromJson(engagementFile.get().getContent(), Engagement.class);
 
             if (includeCommits) {

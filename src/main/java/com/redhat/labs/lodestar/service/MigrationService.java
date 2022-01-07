@@ -60,8 +60,8 @@ public class MigrationService {
      * The migration is idempotent so no harm in rerunning. It will only update
      * engagements that haven't been migrated. 
      */
-    public void migrate(boolean migrateUuids, boolean migrateParticipants, boolean migrateArtifacts, boolean migrateHosting,
-                        boolean migrateEngagements, boolean overwrite, List<String> uuids) {
+    public Map<String, String> migrate(boolean migrateUuids, boolean migrateParticipants, boolean migrateArtifacts, boolean migrateHosting,
+                        boolean migrateEngagements, boolean overwrite, boolean dryRun, List<String> uuids) {
         LOGGER.debug("uuids {} participants {} artifacts {} hosting {} engagements {} overwrite {} uuid {}", migrateUuids,
                 migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements, overwrite, uuids.size());
 
@@ -78,13 +78,14 @@ public class MigrationService {
         }
 
         LOGGER.info("Start Migrate content");
-        migrateAll(migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements, overwrite, uuids);
+        Map<String, String> failures = migrateAll(migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements, overwrite, dryRun, uuids);
         LOGGER.info("End Migrate content");
-
+        return failures;
     }
 
-    private void migrateAll(boolean migrateParticipants, boolean migrateArtifacts, boolean migrateHosting,
-                            boolean migrateEngagements, boolean overwrite, List<String> uuids ) {
+    private Map<String, String> migrateAll(boolean migrateParticipants, boolean migrateArtifacts, boolean migrateHosting,
+                            boolean migrateEngagements, boolean overwrite, boolean dryRun, List<String> uuids ) {
+        Map<String, String> failures = new HashMap<>();
         int counter = 0;
         LOGGER.debug("Migration engagement count {}", getAllEngagements().size());
         for(Engagement e : getAllEngagements().values()) {
@@ -123,10 +124,23 @@ public class MigrationService {
                     CommitMultiple commit = CommitMultiple.builder().id(e.getProjectId()).branch(commitBranch).commitMessage(commitMessage).actions(actions)
                             .authorName(commitAuthor).authorEmail(commitEmail).build();
 
-                    fileService.createFiles(e.getProjectId(), commit);
+                    if(dryRun) {
+                        LOGGER.info("Will not migrate due to dry run {}", e.getUuid());
+                    } else {
+                        LOGGER.info("Migrating create or update {}", e.getUuid());
+                        try {
+                            fileService.createFiles(e.getProjectId(), commit);
+                            LOGGER.info("Migration complete for {}", e.getUuid());
+                        } catch(Exception ex) {
+                            LOGGER.error(String.format("Error migrating %s", e.getUuid()), ex);
+                            failures.put(e.getUuid(), ex.getMessage());
+                        }
+                    }
                 }
             }
         }
+
+        return failures;
     }
 
     /**

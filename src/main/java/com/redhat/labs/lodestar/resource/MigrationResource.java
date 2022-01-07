@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 @Path("/api/migrate")
 @Tag(name = "Migration", description = "Migration services")
@@ -34,17 +35,18 @@ public class MigrationResource {
             @QueryParam("hosting") boolean migrateHosting,
             @QueryParam("engagements") boolean migrateEngagements,
             @QueryParam("overwrite") boolean overwrite,
+            @QueryParam("dryRun") boolean dryRun,
             @QueryParam("uuids") List<String> uuids) {
 
         try {
-            migrationService.migrate(migrateUuids, migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements,
-                    overwrite, uuids);
+            LOGGER.debug("migration uuid {} participants {} artifacts {} hosting {} engagements {} overwrite {} dry run {} uuids {}",
+                    migrateUuids, migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements, overwrite, dryRun, uuids.size());
+            Map<String, String> failures = migrationService.migrate(migrateUuids, migrateParticipants, migrateArtifacts, migrateHosting, migrateEngagements,
+                    overwrite, dryRun, uuids);
+            return Response.ok(failures).build();
         } catch (Exception ex) {
             LOGGER.error("Migration did not complete successfully", ex);
             return Response.status(Response.Status.BAD_REQUEST).entity("{ \"message\": \"Migration did not complete successfully\"}").build();
         }
-        
-        return Response.ok().build();
-
     }
 }
